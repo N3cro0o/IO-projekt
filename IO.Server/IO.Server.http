@@ -1,0 +1,7 @@
+@IO.Server_HostAddress = http://localhost:5110
+
+GET {{IO.Server_HostAddress}}/api/main
+Accept: application/json
+
+###
+
