@@ -13,7 +13,7 @@ interface UserInterface {
     courses: Array<number>;
 }
 
-function Home() {
+function RandomUsers() {
     const [users, setUsers] = useState<UserInterface[]>();
 
     useEffect(() => {
@@ -51,7 +51,6 @@ function Home() {
 
     return (
         <div>
-            <Link to="/loginPage">Losowi uzytkownicy</Link>
             <h1 id="tableLabel">Random users</h1>
             <p>This component demonstrates fetching data from the server.</p>
             {contents_user}
@@ -72,4 +71,4 @@ function Home() {
     }
 }
 
-export default Home;
+export default RandomUsers;
