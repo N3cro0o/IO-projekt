@@ -28,7 +28,7 @@ namespace IO.Server.Controllers
                 Email = index.ToString() + "@wp.pl",
                 FirstName = "Domino",
                 Courses = [rng.Next(10), rng.Next(10), rng.Next(10), rng.Next(10),],
-                UserType = (IO.Server.Elements.User.TYPE)rng.Next(3),
+                UserType = (IO.Server.Elements.User.TYPE)rng.Next(3)
             })
             .ToArray();
         }

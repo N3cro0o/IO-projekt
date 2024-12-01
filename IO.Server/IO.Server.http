@@ -5,3 +5,10 @@ Accept: application/json
 
 ###
 
+POST {{IO.Server_HostAddress}}/api/login/loginRequest
+Content-Type: application/json
+{
+    "Username": "testLogin",
+    "Password": "1234"
+}
+###
