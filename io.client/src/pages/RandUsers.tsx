@@ -9,7 +9,7 @@ interface UserInterface {
     firstName: string;
     email: string;
     id: number;
-    userType: number;
+    userType: string;
     courses: Array<number>;
 }
 
@@ -31,7 +31,6 @@ function RandomUsers() {
                     <th>Last name</th>
                     <th>Email</th>
                     <th>Type</th>
-                    <th>Course IDs</th>
                 </tr>
             </thead>
             <tbody>
@@ -43,7 +42,6 @@ function RandomUsers() {
                         <td>{users.lastName}</td>
                         <td>{users.email}</td>
                         <td>{users.userType}</td>
-                        <td>{users.courses[0]}, {users.courses[1]}, {users.courses[2]}, {users.courses[3]}, </td>
                     </tr>
                 )}
             </tbody>
@@ -59,13 +57,14 @@ function RandomUsers() {
     );
 
     async function populateUserData() {//main/GetRandUsers
-        const response = await fetch('/api/main', {
+        const response = await fetch('/api/main/getEnvUsers', {
             headers: {
                 'Accept': 'application/json'
             }
         });
         if (response.ok) {
             const data = await response.json();
+            console.log(data);
             setUsers(data);
         }
     }

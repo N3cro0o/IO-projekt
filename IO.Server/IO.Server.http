@@ -1,6 +1,6 @@
 @IO.Server_HostAddress = http://localhost:5110
 
-GET {{IO.Server_HostAddress}}/api/main
+GET {{IO.Server_HostAddress}}/api/main/getEnvUsers
 Accept: application/json
 
 ###
@@ -8,7 +8,7 @@ Accept: application/json
 POST {{IO.Server_HostAddress}}/api/login/loginRequest
 Content-Type: application/json
 {
-    "Username": "testLogin",
-    "Password": "1234"
+    "Username": "Admin",
+    "Password": "*******"
 }
 ###

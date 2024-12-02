@@ -21,21 +21,21 @@ namespace IO.Server.Controllers
                 return BadRequest(ModelState);
             }
 
-            if (data.Username == "testLogin" && data.Password == "1234")
+            foreach (User u in Environment.Users)
             {
-                var token = GenerateJwtToken(data.Username);
-                return Ok(new { Message = "Login successful", Token = token});
-            }
-            else
-            {
-                return Unauthorized(new { Message = "Invalid Username or Password" });
+                if (u.CorrectLoginData(data.Username, data.Password))
+                {
+                    var token = GenerateJwtToken(data.Username);
+                    return Ok(new { Message = "Login successful", Token = token });
+                }
             }
 
+            return Unauthorized(new { Message = "Invalid Username or Password" });
         }
         private string GenerateJwtToken(string username)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes("DominoMyBelovedEkspertSrodowiskowy"); 
+            var key = Encoding.ASCII.GetBytes("DominoMyBelovedEkspertSrodowiskowy");
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new[]
