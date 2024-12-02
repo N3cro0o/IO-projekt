@@ -6,7 +6,7 @@
 
         int ID { get; set; }
 
-        private int[] TeachArr { get; set; } = new int[0]; // Teacher vec
+        public List<int> Teachers { get; set; } = new List<int>(); // Teacher vec
 
         public Course(int id)
         {

@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using IO.Server.Elements;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,6 +20,7 @@ namespace IO.Server.Controllers
         public IEnumerable<User> Get()
         {
             var rng = new Random();
+
             return Enumerable.Range(1, 5).Select(index => new User
             {
                 ID = index,
