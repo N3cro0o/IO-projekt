@@ -46,10 +46,11 @@ namespace IO.Server
         private static void EnvSetup()
         {
             // Users
-            for (int i = 0; i < 12; i++)
+            Environment.Users.Add(new User(0, "Admin", "*******", "test@email.com", "Admin", "Main", User.TYPE.Admin));
+            for (int i = 0; i < 11; i++)
             {
                 var user = new User();
-                user.SetID(i);
+                user.SetID(i + 1);
                 Environment.Users.Add(user);
             }
 

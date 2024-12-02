@@ -86,5 +86,12 @@ namespace IO.Server.Elements
             s.Add("email", Email);
             return s;
         }
+
+        public bool CorrectLoginData(string login, string pass)
+        {
+            if (login != Login || pass != Password)
+                return false;
+            return true;
+        }
     }
 }
