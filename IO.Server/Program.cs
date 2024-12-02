@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using IO.Server.Elements;
+using System.Diagnostics;
 
 namespace IO.Server
 {
@@ -8,6 +10,9 @@ namespace IO.Server
     {
         public static void Main(string[] args)
         {
+            EnvSetup();
+            Debug.Print("User count " + Environment.Users.Count.ToString());
+
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
@@ -36,7 +41,30 @@ namespace IO.Server
             app.MapFallbackToFile("/index.html");
 
             app.Run();
+        }
 
+        private static void EnvSetup()
+        {
+            // Users
+            for (int i = 0; i < 12; i++)
+            {
+                var user = new User();
+                user.SetID(i);
+                Environment.Users.Add(user);
+            }
+
+            // Courses
+            for (int i = 0; i < 3; i++)
+            {
+                List<int> teach = new List<int>();
+                List<int> stud = new List<int>();
+                teach.Add(i * 4);
+                stud.Add(i * 4 + 1);
+                stud.Add(i * 4 + 2);
+                stud.Add(i * 4 + 3);
+                var c = new Course(i, "Course no." + i.ToString(), teach, stud, new List<int>());
+                Environment.Courses.Add(c);
+            }
         }
     }
 }

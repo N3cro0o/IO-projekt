@@ -16,23 +16,26 @@ namespace IO.Server.Controllers
             _logger = logger;
         }
 
-        [HttpGet]
-        public IEnumerable<User> Get()
+        [HttpGet("getEnvUsers")]
+        public List<Dictionary<string, string>> GetUsers()
         {
-            var rng = new Random();
-
-            return Enumerable.Range(1, 5).Select(index => new User
+            List<Dictionary<string, string>> d = new List<Dictionary<string, string>>();
+            foreach (User us in Environment.Users)
             {
-                ID = index,
-                Login = "login" + index.ToString(),
-                Password = "1234",
-                LastName = "Doe",
-                Email = index.ToString() + "@wp.pl",
-                FirstName = "Domino",
-                Courses = [rng.Next(10), rng.Next(10), rng.Next(10), rng.Next(10),],
-                UserType = (IO.Server.Elements.User.TYPE)rng.Next(3)
-            })
-            .ToArray();
+                d.Add(us.Dictionary());
+            }
+            return d;
+        }
+
+        [HttpGet("getEnvCourses")]
+        public List<Dictionary<string, string>> GetCourses()
+        {
+            List<Dictionary<string, string>> d = new List<Dictionary<string, string>>();
+            foreach (User us in Environment.Users)
+            {
+                d.Add(us.Dictionary());
+            }
+            return d;
         }
     }
 }
