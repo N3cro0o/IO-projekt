@@ -1,7 +1,18 @@
 @IO.Server_HostAddress = http://localhost:5110
 
-GET {{IO.Server_HostAddress}}/api/main
+GET {{IO.Server_HostAddress}}/api/main/getEnvUsers
 Accept: application/json
 
 ###
 
+POST {{IO.Server_HostAddress}}/api/login/loginRequest
+Content-Type: application/json
+{
+    "Username": "Admin",
+    "Password": "*******"
+}
+###
+GET {{IO.Server_HostAddress}}/api/main/getEnvCourses
+Accept: application/json
+
+###
