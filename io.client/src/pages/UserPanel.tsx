@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import * as React from 'react';
-import { ButtonAppBar } from '../comps/AppBar.tsx';
+import { ButtonAppBar } from '../comps/AppBar';
+import  CardExample  from '../comps/Placeholder';
 
 const UserPanel = (props) => {
     const { logginToken } = props;
@@ -11,9 +12,9 @@ const UserPanel = (props) => {
             <ButtonAppBar />
     
             <div id="mainContainer">
-                {/* G³ówna zawartoœæ UserPanel */}
-                <h1>Witaj w Panelu U¿ytkownika</h1>
-                <p>Tu mo¿esz zarz¹dzaæ swoimi ustawieniami.</p>
+                <div id="Placeholders">
+                    <CardExample />
+                </div>
             </div>
         </div>
     );

@@ -17,14 +17,18 @@ export function ButtonAppBar() {
     const navigate = useNavigate(); // Hook do nawigacji
 
     // Funkcja do sterowania Drawer
-    const toggleDrawer = (open) => (event) => {
+    const toggleDrawer = (open: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => {
+        if (!isLoggedIn) {
+            // Jeœli u¿ytkownik nie jest zalogowany, Drawer nie otwiera siê
+            return;
+        }
         if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
             return;
         }
         setDrawerOpen(open);
     };
 
-    // Funkcja do logowania
+    // Funkcja do wylogowania
     const handleLogout = () => {
         localStorage.removeItem('authToken'); // Usuwamy token z localStorage
         setIsLoggedIn(false); // Ustawiamy stan na niezalogowanego
@@ -57,12 +61,13 @@ export function ButtonAppBar() {
                 <Toolbar>
                     {/* Przyciski na AppBar */}
                     <IconButton
-                        onClick={toggleDrawer(true)}
+                        onClick={toggleDrawer(true)} // Drawer otwiera siê tylko, gdy u¿ytkownik jest zalogowany
                         size="large"
                         edge="start"
                         color="inherit"
                         aria-label="menu"
                         sx={{ mr: 2 }}
+                        disabled={!isLoggedIn} // Wy³¹czenie przycisku, jeœli u¿ytkownik nie jest zalogowany
                     >
                         <MenuIcon />
                     </IconButton>
