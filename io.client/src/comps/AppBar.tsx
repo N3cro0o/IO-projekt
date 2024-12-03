@@ -16,16 +16,6 @@ export function ButtonAppBar() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
 
     const navigate = useNavigate(); // Hook do nawigacji
-=======
-import { Link } from 'react-router-dom';
-import TemporaryDrawer from './Drawer.tsx'; // Import poprawionego Drawer
-import React from 'react';
-
-export function ButtonAppBar() {
-    // Stan do kontrolowania otwierania/zamykania Drawer
-    const [drawerOpen, setDrawerOpen] = React.useState(false);
-
-
     // Funkcja do sterowania Drawer
     const toggleDrawer = (open) => (event) => {
         if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
@@ -111,19 +101,6 @@ export function ButtonAppBar() {
                             </Button>
                         </Link>
                     )}
-                    <Link to="/loginPage" style={{ textDecoration: 'none' }}>
-                        <Button
-                            sx={{
-                                color: '#ffffff',
-                                backgroundColor: '#007bff',
-                                '&:hover': {
-                                    backgroundColor: '#0056b3',
-                                },
-                            }}
-                        >
-                            Login
-                        </Button>
-                    </Link>
                 </Toolbar>
             </AppBar>
 
