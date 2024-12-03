@@ -63,7 +63,7 @@ namespace IO.Server
                 stud.Add(i * 4 + 1);
                 stud.Add(i * 4 + 2);
                 stud.Add(i * 4 + 3);
-                var c = new Course(i, "Course no." + i.ToString(), teach, stud, new List<int>());
+                var c = new Course(i, "Course no." + i.ToString(),0 , teach, stud, new List<int>());
                 Environment.Courses.Add(c);
             }
         }

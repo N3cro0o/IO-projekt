@@ -21,11 +21,11 @@ export const Login = () => {
         setPass(event.target.value);
     };
 
-    // Funkcja do wysy�ania danych logowania na backend
+    // Funkcja do wysyłania danych logowania na backend
     const checkLogin = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault(); // Zapobiega prze�adowaniu strony
 
-        // Resetowanie b��d�w
+        // Resetowanie błędów
         setLoginError('');
         setPassError('');
 
