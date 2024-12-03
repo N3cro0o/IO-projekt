@@ -18,13 +18,18 @@ namespace IO.Server.Elements
         List<int> Tests { get; set; } = new List<int>();
 
         [JsonInclude]
-        List<int> Results { get; set; } = new List<int>(); 
+        List<int> Results { get; set; } = new List<int>();
+        
+        [JsonInclude]
+        int Category { get; set; }
 
-        public Course(int id, string name, List<int> teachers, List<int> students, List<int> tests)
+
+        public Course(int id, string name, int cat, List<int> teachers, List<int> students, List<int> tests)
         {
             ID = id;
             Name = name;
             Teachers = teachers;
+            Category = cat;
             Students = students;
             Tests = tests;
 
@@ -125,5 +130,9 @@ namespace IO.Server.Elements
             return false;
         }
 
+        public int ReturnCategory()
+        {
+            return Category;
+        }
     }
 }
