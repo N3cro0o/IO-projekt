@@ -12,3 +12,7 @@ Content-Type: application/json
     "Password": "*******"
 }
 ###
+GET {{IO.Server_HostAddress}}/api/main/getEnvCourses
+Accept: application/json
+
+###
