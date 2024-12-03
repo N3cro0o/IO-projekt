@@ -31,3 +31,11 @@ th, td {
     padding-left: 1rem;
     padding-right: 1rem;
 }
+
+.error {
+    color: red;
+    font-size: 0.875rem;
+    margin-top: 5px;
+    margin-bottom: 10px;
+}
+
