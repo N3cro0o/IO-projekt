@@ -2,9 +2,16 @@
 {
     public class Report
     {
-        List<int> results { get; set; } = new List<int>();
+        List<int> Results { get; set; } = new List<int>();
         List<int> PassedUsers { get; set; } = new List<int>();
         List<int> FailedUsers { get; set; } = new List<int>();
+
+        public Report(List<int> results, List<int> passedUsers, List<int> failedUsers)
+        {
+            Results = results;
+            PassedUsers = passedUsers;
+            FailedUsers = failedUsers;
+        }
 
         public List<User> ReturnPassed()
         {
