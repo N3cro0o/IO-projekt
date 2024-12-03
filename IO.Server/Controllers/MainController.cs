@@ -17,25 +17,15 @@ namespace IO.Server.Controllers
         }
 
         [HttpGet("getEnvUsers")]
-        public List<Dictionary<string, string>> GetUsers()
+        public IEnumerable<User> GetUsers()
         {
-            List<Dictionary<string, string>> d = new List<Dictionary<string, string>>();
-            foreach (User us in Environment.Users)
-            {
-                d.Add(us.Dictionary());
-            }
-            return d;
+            return Environment.Users;
         }
 
         [HttpGet("getEnvCourses")]
-        public List<Dictionary<string, string>> GetCourses()
+        public IEnumerable<Course> GetCourses()
         {
-            List<Dictionary<string, string>> d = new List<Dictionary<string, string>>();
-            foreach (User us in Environment.Users)
-            {
-                d.Add(us.Dictionary());
-            }
-            return d;
+            return Environment.Courses;
         }
     }
 }

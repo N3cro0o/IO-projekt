@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Numerics;
+using System.Text.Json.Serialization;
 
 namespace IO.Server.Elements
 {
@@ -16,21 +17,29 @@ namespace IO.Server.Elements
 
         string[] names = { "Staszek", "Mathew" , "Franio", "Domino", "Karol"};
 
+        [JsonInclude]
         int ID { get; set; }
 
+        [JsonInclude]
         string Login { get; set; }
 
+        [JsonInclude]
         string Password { get; set; }
 
+        [JsonInclude]
         public string FirstName { get; set; }
 
         public string LastName { get; set; }
 
+        [JsonInclude]
         string Email { get; set; }
 
         public TYPE UserType { get; set; } = TYPE.Guest;
 
+        [JsonInclude]
         List<int> Courses { get; set; } = new List<int>();
+
+        string Token { get; set; } = "";
 
         public User(int id, string login, string pass, string email, string fName, string lName, TYPE type = TYPE.Guest)
         {
@@ -74,24 +83,17 @@ namespace IO.Server.Elements
             ID = id;
         }
 
-        public Dictionary<string, string> Dictionary()
-        {
-            var s = new Dictionary<string, string>();
-            s.Add("id", ID.ToString());
-            s.Add("login", Login);
-            s.Add("password", Password);
-            s.Add("userType", UserType.ToString());
-            s.Add("firstName", FirstName);
-            s.Add("lastName", LastName);
-            s.Add("email", Email);
-            return s;
-        }
-
         public bool CorrectLoginData(string login, string pass)
         {
             if (login != Login || pass != Password)
                 return false;
             return true;
+        }
+
+        public void SetToken(string token)
+        {
+            if (token != null) 
+                Token = token;
         }
     }
 }
