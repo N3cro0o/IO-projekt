@@ -5,6 +5,7 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
+
 import { Link, useNavigate } from 'react-router-dom';
 import TemporaryDrawer from './Drawer.tsx'; // Import poprawionego Drawer
 import React, { useState, useEffect } from 'react';
@@ -15,6 +16,15 @@ export function ButtonAppBar() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
 
     const navigate = useNavigate(); // Hook do nawigacji
+=======
+import { Link } from 'react-router-dom';
+import TemporaryDrawer from './Drawer.tsx'; // Import poprawionego Drawer
+import React from 'react';
+
+export function ButtonAppBar() {
+    // Stan do kontrolowania otwierania/zamykania Drawer
+    const [drawerOpen, setDrawerOpen] = React.useState(false);
+
 
     // Funkcja do sterowania Drawer
     const toggleDrawer = (open: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => {
@@ -32,22 +42,22 @@ export function ButtonAppBar() {
     const handleLogout = () => {
         localStorage.removeItem('authToken'); // Usuwamy token z localStorage
         setIsLoggedIn(false); // Ustawiamy stan na niezalogowanego
-        navigate('/'); // Przekierowanie na stronê g³ówn¹
+        navigate('/'); // Przekierowanie na stronÃª gÂ³Ã³wnÂ¹
     };
 
-    // Sprawdzanie, czy u¿ytkownik jest zalogowany
+    // Sprawdzanie, czy uÂ¿ytkownik jest zalogowany
     useEffect(() => {
         const token = localStorage.getItem('authToken');
         if (token) {
-            setIsLoggedIn(true); // Je¿eli token istnieje, u¿ytkownik jest zalogowany
+            setIsLoggedIn(true); // JeÂ¿eli token istnieje, uÂ¿ytkownik jest zalogowany
         } else {
-            setIsLoggedIn(false); // Jeœli token nie istnieje, u¿ytkownik nie jest zalogowany
+            setIsLoggedIn(false); // JeÂœli token nie istnieje, uÂ¿ytkownik nie jest zalogowany
         }
     }, []);
 
     return (
         <Box sx={{ flexGrow: 1 }}>
-            {/* Górny AppBar */}
+            {/* GÃ³rny AppBar */}
             <AppBar
                 position="fixed"
                 sx={{
@@ -73,10 +83,11 @@ export function ButtonAppBar() {
                     </IconButton>
 
                     <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-                        {/* Tutaj mo¿esz dodaæ logo lub nazwê aplikacji */}
+                        {/* Tutaj moÂ¿esz dodaÃ¦ logo lub nazwÃª aplikacji */}
                     </Typography>
 
-                    {/* Sprawdzamy, czy u¿ytkownik jest zalogowany, i wyœwietlamy odpowiedni przycisk */}
+
+                    {/* Sprawdzamy, czy uÂ¿ytkownik jest zalogowany, i wyÂœwietlamy odpowiedni przycisk */}
                     {isLoggedIn ? (
                         <Button
                             onClick={handleLogout}
@@ -105,6 +116,19 @@ export function ButtonAppBar() {
                             </Button>
                         </Link>
                     )}
+                    <Link to="/loginPage" style={{ textDecoration: 'none' }}>
+                        <Button
+                            sx={{
+                                color: '#ffffff',
+                                backgroundColor: '#007bff',
+                                '&:hover': {
+                                    backgroundColor: '#0056b3',
+                                },
+                            }}
+                        >
+                            Login
+                        </Button>
+                    </Link>
                 </Toolbar>
             </AppBar>
 

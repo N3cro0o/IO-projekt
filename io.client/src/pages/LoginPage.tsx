@@ -1,3 +1,4 @@
+
 import { Link, useNavigate } from 'react-router-dom';
 import { ButtonAppBar } from '../comps/AppBar.tsx';
 import { useState } from 'react';
@@ -11,7 +12,7 @@ export const Login = () => {
     const [passError, setPassError] = useState('');
     const navigate = useNavigate(); // hook do nawigacji w React Router v6
 
-    // Zmienne do zarz¹dzania stanem
+    // Zmienne do zarzï¿½dzania stanem
     const handleLogin = (event: React.ChangeEvent<HTMLInputElement>) => {
         setLogin(event.target.value);
     };
@@ -20,18 +21,18 @@ export const Login = () => {
         setPass(event.target.value);
     };
 
-    // Funkcja do wysy³ania danych logowania na backend
+    // Funkcja do wysyï¿½ania danych logowania na backend
     const checkLogin = async (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault(); // Zapobiega prze³adowaniu strony
+        event.preventDefault(); // Zapobiega przeï¿½adowaniu strony
 
-        // Resetowanie b³êdów
+        // Resetowanie bï¿½ï¿½dï¿½w
         setLoginError('');
         setPassError('');
 
         // Walidacja
         if (!login || !pass) {
-            if (!login) setLoginError('WprowadŸ nazwê u¿ytkownika');
-            if (!pass) setPassError('WprowadŸ has³o');
+            if (!login) setLoginError('Wprowadï¿½ nazwï¿½ uï¿½ytkownika');
+            if (!pass) setPassError('Wprowadï¿½ hasï¿½o');
             return;
         }
 
@@ -55,15 +56,15 @@ export const Login = () => {
                 // Zapisujemy token w localStorage
                 localStorage.setItem('authToken', json_data.Token);
 
-                // Przekierowanie na stronê po zalogowaniu za pomoc¹ React Router
-                navigate('/UserPanel'); // U¿ycie hooka navigate do przekierowania
+                // Przekierowanie na stronï¿½ po zalogowaniu za pomocï¿½ React Router
+                navigate('/UserPanel'); // Uï¿½ycie hooka navigate do przekierowania
             } else {
-                console.error('B³¹d logowania');
-                setLoginError('Niepoprawne dane logowania'); // Wyœwietlenie b³êdu
+                console.error('Bï¿½ï¿½d logowania');
+                setLoginError('Niepoprawne dane logowania'); // Wyï¿½wietlenie bï¿½ï¿½du
             }
         } catch (error) {
-            console.error('B³¹d podczas logowania:', error);
-            setLoginError('Wyst¹pi³ b³¹d podczas logowania'); // Komunikat o b³êdzie w przypadku problemu z serwerem
+            console.error('Bï¿½ï¿½d podczas logowania:', error);
+            setLoginError('Wystï¿½piï¿½ bï¿½ï¿½d podczas logowania'); // Komunikat o bï¿½ï¿½dzie w przypadku problemu z serwerem
         }
     };
 
@@ -77,7 +78,7 @@ export const Login = () => {
                             <p>Username</p>
                             <input type="text" value={login} onChange={handleLogin} />
                         </label>
-                        {loginError && <p className="error">{loginError}</p>} {/* Wyœwietlenie b³êdu dla loginu */}
+                        {loginError && <p className="error">{loginError}</p>} {/* Wyï¿½wietlenie bï¿½ï¿½du dla loginu */}
 
                         <br />
                         <br />
@@ -85,7 +86,7 @@ export const Login = () => {
                             <p>Password</p>
                             <input type="password" value={pass} onChange={handlePass} />
                         </label>
-                        {passError && <p className="error">{passError}</p>} {/* Wyœwietlenie b³êdu dla has³a */}
+                        {passError && <p className="error">{passError}</p>} {/* Wyï¿½wietlenie bï¿½ï¿½du dla hasï¿½a */}
                         <br />
                         <br />
                         <Button
@@ -103,7 +104,7 @@ export const Login = () => {
                     </form>
                     <br />
                     <br />
-                    <Link to="/">Go back</Link> {/* Link do powrotu na stronê g³ówn¹ */}
+                    <Link to="/">Go back</Link> {/* Link do powrotu na stronï¿½ gï¿½ï¿½wnï¿½ */}
                 </div>
             </div>
         </div>
