@@ -9,13 +9,11 @@ namespace IO.Server.Elements
     {
         public enum TYPE
         {
-            Guest = 0,
-            Student = 1,
-            Teacher = 2,
-            Admin = 10,
+            gosc = 0,
+            uczen = 1,
+            nauczyciel = 2,
+            admin = 10,
         }
-
-        string[] names = { "Staszek", "Mathew" , "Franio", "Domino", "Karol"};
 
         [JsonInclude]
         int ID { get; set; }
@@ -34,14 +32,14 @@ namespace IO.Server.Elements
         [JsonInclude]
         string Email { get; set; }
 
-        public TYPE UserType { get; set; } = TYPE.Guest;
+        public string UserType { get; set; }
 
         [JsonInclude]
         List<int> Courses { get; set; } = new List<int>();
 
         string Token { get; set; } = "";
 
-        public User(int id, string login, string pass, string email, string fName, string lName, TYPE type = TYPE.Guest)
+        public User(int id, string login, string pass, string email, string fName, string lName, string type)
         {
             ID = id;
             Login = login;
@@ -52,31 +50,7 @@ namespace IO.Server.Elements
             UserType = type;
         }
 
-        public User()
-        {
-            Random rng = new Random();
-            int lSize = 8;
-            int pSize = 10;
-            string login = "";
-            string password = "";
-
-            for (int i = 0; i < lSize; i++)
-            {
-                login += Convert.ToChar(rng.Next(0, 26) + 65);
-            }
-            for (int i = 0; i < pSize; i++)
-            {
-                password += Convert.ToChar(rng.Next(0, 26) + 65);
-            }
-
-            ID = rng.Next();
-            Login = login;
-            Password = password;
-            Email = login + "@" + password + ".com";
-            FirstName = names[rng.Next(0, 5)];
-            LastName = names[rng.Next(0, 5)];
-            UserType = TYPE.Guest;
-        }
+        public User() {}
 
         public void SetID(int id)
         {

@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using IO.Server.Elements;
 using System.Diagnostics;
+using Microsoft.AspNetCore.Mvc;
+using Npgsql;
 
 namespace IO.Server
 {
@@ -15,10 +17,26 @@ namespace IO.Server
 
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
+            // Rejestracja po³¹czenia do bazy danych PostgreSQL w DI
+            builder.Services.AddScoped<NpgsqlConnection>(provider =>
+            {
+                var connectionString = "Host=localhost;Port=5432;Username=postgres;Password=admin;Database=TesatyWiezy";
+                return new NpgsqlConnection(connectionString);
+            });
 
+            // Konfiguracja CORS
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll", policy =>
+                {
+                    policy.AllowAnyOrigin()
+                          .AllowAnyMethod()
+                          .AllowAnyHeader();
+                });
+            });
+
+            // Inne serwisy
             builder.Services.AddControllers();
-            // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
 
             var app = builder.Build();
@@ -26,18 +44,17 @@ namespace IO.Server
             app.UseDefaultFiles();
             app.MapStaticAssets();
 
-            // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.MapOpenApi();
             }
 
+            // W³¹czenie CORS
+            app.UseCors("AllowAll");
+
             app.UseHttpsRedirection();
-
             app.UseAuthorization();
-
             app.MapControllers();
-
             app.MapFallbackToFile("/index.html");
 
             app.Run();
@@ -46,7 +63,7 @@ namespace IO.Server
         private static void EnvSetup()
         {
             // Users
-            Environment.Users.Add(new User(0, "Admin", "*******", "test@email.com", "Admin", "Main", User.TYPE.Admin));
+            Environment.Users.Add(new User(0, "Admin", "*******", "test@email.com", "Admin", "Main", "Admin"));
             for (int i = 0; i < 11; i++)
             {
                 var user = new User();
@@ -63,7 +80,7 @@ namespace IO.Server
                 stud.Add(i * 4 + 1);
                 stud.Add(i * 4 + 2);
                 stud.Add(i * 4 + 3);
-                var c = new Course(i, "Course no." + i.ToString(),0 , teach, stud, new List<int>());
+                var c = new Course(i, "Course no." + i.ToString(), 0, teach, stud, new List<int>());
                 Environment.Courses.Add(c);
             }
         }

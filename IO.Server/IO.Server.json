@@ -5,6 +5,18 @@
     "version": "1.0.0"
   },
   "paths": {
+    "/api/TestDatabase/test-connection": {
+      "get": {
+        "tags": [
+          "TestDatabase"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/Main/getEnvUsers": {
       "get": {
         "tags": [
@@ -80,6 +92,44 @@
           }
         }
       }
+    },
+    "/api/User/list": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -124,11 +174,12 @@
               "type": "integer",
               "format": "int32"
             }
+          },
+          "category": {
+            "type": "integer",
+            "format": "int32"
           }
         }
-      },
-      "TYPE": {
-        "type": "integer"
       },
       "User": {
         "type": "object",
@@ -153,7 +204,7 @@
             "type": "string"
           },
           "userType": {
-            "$ref": "#/components/schemas/TYPE"
+            "type": "string"
           },
           "courses": {
             "type": "array",
@@ -168,7 +219,13 @@
   },
   "tags": [
     {
+      "name": "TestDatabase"
+    },
+    {
       "name": "Main"
+    },
+    {
+      "name": "User"
     }
   ]
 }

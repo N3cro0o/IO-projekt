@@ -32,34 +32,9 @@ namespace IO.Server.Elements
             Category = cat;
             Students = students;
             Tests = tests;
-
-            // Update roles
-            TeacherUpdate();
-            StudentUpdate();
         }
 
-        void TeacherUpdate()
-        {
-            foreach (int t in Teachers)
-            {
-                var user = Environment.Users[t];
-                if (user.UserType == User.TYPE.Admin)
-                    continue;
-                user.UserType = User.TYPE.Teacher;
-            }
-        }
-
-        void StudentUpdate()
-        {
-            foreach (int t in Students)
-            {
-                var user = Environment.Users[t];
-                if (user.UserType == User.TYPE.Admin || user.UserType == User.TYPE.Teacher)
-                    continue;
-                Environment.Users[t].UserType = User.TYPE.Student;
-            }
-        }
-
+     
         public List<User> ShowTeachers()
         {
             List<User> users = new List<User>();
@@ -83,15 +58,11 @@ namespace IO.Server.Elements
         public void AddStudent(int id)
         {
             Students.Add(id);
-
-            StudentUpdate();
         }
 
         public void AddTeacher(int id)
         {
             Teachers.Add(id);
-
-            TeacherUpdate();
         }
 
         public bool RemoveStudent(int id)

@@ -2,10 +2,10 @@ import { Link } from 'react-router-dom';
 import * as React from 'react';
 import { ButtonAppBar } from '../comps/AppBar.tsx';
 import { IndividualIntervalsExample } from '../comps/Carousel.tsx'
-
+import UserList from './UserList';
 
 const MainPage = (props) => {
-    const { logginToken } = props;
+    const { logginToken } = props; 
   
     return (
         <div>
@@ -24,6 +24,8 @@ const MainPage = (props) => {
                 egzaminów oraz sprawdzaæ wiedzê u¿ytkowników aplikacji. Du¿¹ zalet¹ naszego programu
                 bêdzie zapisywanie pytañ w pulach pytañ podzielonych na kategorie oraz mo¿liwe wykorzystywanie pytañ
                 w przysz³oœci przy tworzeniu nowych testów
+
+                <UserList />
         </div>
         </div>
     );

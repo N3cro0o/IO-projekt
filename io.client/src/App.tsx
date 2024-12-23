@@ -7,7 +7,6 @@ import { HashRouter as HRouter, Routes, Route } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import UserPanel from './pages/UserPanel';
 
-
 function App() {
     const [token, setToken] = useState(-1);
 
