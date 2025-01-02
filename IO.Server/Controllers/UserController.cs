@@ -42,7 +42,7 @@ namespace IO.Server.Controllers
                             lName: reader.GetString(3),
                             email: reader.GetString(4),
                             pass: reader.GetString(5),
-                            type: reader.GetString(6)
+                            role: reader.GetString(6)
                         );
                         users.Add(user);
                     }

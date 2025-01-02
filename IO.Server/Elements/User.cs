@@ -32,14 +32,14 @@ namespace IO.Server.Elements
         [JsonInclude]
         string Email { get; set; }
 
-        public string UserType { get; set; }
+        public string UserRole { get; set; }
 
         [JsonInclude]
         List<int> Courses { get; set; } = new List<int>();
 
         string Token { get; set; } = "";
 
-        public User(int id, string login, string pass, string email, string fName, string lName, string type)
+        public User(int id, string login, string pass, string email, string fName, string lName, string role)
         {
             ID = id;
             Login = login;
@@ -47,7 +47,7 @@ namespace IO.Server.Elements
             Email = email;
             FirstName = fName;
             LastName = lName;
-            UserType = type;
+            UserRole = role;
         }
 
         public User() {}
