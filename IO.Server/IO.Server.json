@@ -17,6 +17,44 @@
         }
       }
     },
+    "/api/Course/list": {
+      "get": {
+        "tags": [
+          "Course"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Course"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Course"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Course"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/Main/getEnvUsers": {
       "get": {
         "tags": [
@@ -220,6 +258,9 @@
   "tags": [
     {
       "name": "TestDatabase"
+    },
+    {
+      "name": "Course"
     },
     {
       "name": "Main"

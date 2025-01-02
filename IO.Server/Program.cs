@@ -20,7 +20,7 @@ namespace IO.Server
             // Rejestracja po³¹czenia do bazy danych PostgreSQL w DI
             builder.Services.AddScoped<NpgsqlConnection>(provider =>
             {
-                var connectionString = "Host=localhost;Port=5432;Username=postgres;Password=admin;Database=TesatyWiezy";
+                var connectionString = "Host=localhost;Port=5433;Username=postgres;Password=12345;Database=TesatyWiezy";
                 return new NpgsqlConnection(connectionString);
             });
 
