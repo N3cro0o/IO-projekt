@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Npgsql;
-using System.Collections.Generic;
-using IO.Server.Elements;
 
 namespace IO.Server.Controllers
 {
