@@ -14,6 +14,7 @@ namespace IO.Server.Controllers
         {
             _connection = connection;
         }
+   
 
         [HttpGet("list")]
         public ActionResult<IEnumerable<Course>> GetCourses()
