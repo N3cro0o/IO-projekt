@@ -72,6 +72,7 @@ namespace IO.Server
             }
 
             // Courses
+            // Courses
             for (int i = 0; i < 3; i++)
             {
                 List<int> teach = new List<int>();
@@ -80,9 +81,22 @@ namespace IO.Server
                 stud.Add(i * 4 + 1);
                 stud.Add(i * 4 + 2);
                 stud.Add(i * 4 + 3);
-                var c = new Course(i, "Course no." + i.ToString(), 0, teach, stud, new List<int>());
-                Environment.Courses.Add(c);
+
+                var course = new Course(
+                    id: i,
+                    name: $"Course {i}",
+                    cat: "General",
+                    teachers: teach,
+                    students: stud,
+                    tests: new List<int>()
+                );
+
+                Environment.Courses.Add(course);
             }
+
+
+
         }
     }
-}
+    }
+

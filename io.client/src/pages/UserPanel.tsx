@@ -1,21 +1,54 @@
-import { Link } from 'react-router-dom';
-import * as React from 'react';
-import { ButtonAppBar } from '../comps/AppBar';
-import  CardExample  from '../comps/Placeholder';
+import React, { useEffect, useState } from 'react';
+import './UserPanel.css'; // Plik stylów CSS
 
-const UserPanel = (props) => {
-    const { logginToken } = props;
+interface Course {
+    id: number;
+    name: string;
+    category: string;
+}
 
-  
+const UserPanel: React.FC = () => {
+    const [courses, setCourses] = useState<Course[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        fetch('https://localhost:59127/api/course/list')
+            .then((response) => response.json())
+            .then((data: Course[]) => {
+                setCourses(data);
+                setLoading(false);
+            })
+            .catch(() => {
+                setCourses([]);
+                setLoading(false);
+            });
+    }, []);
+
+    if (loading) {
+        return <p>£adowanie kursów...</p>;
+    }
+
     return (
-        <div>
-            <ButtonAppBar />
-    
-            <div id="mainContainer">
-                <div id="Placeholders">
-                    <CardExample />
+        <div className="user-panel">
+            <h1>Twoje kursy:</h1>
+            {courses.length === 0 ? (
+                <p>Brak kursów do wyœwietlenia.</p>
+            ) : (
+                <div className="courses-container">
+                    {courses.map((course) => (
+                        <div key={course.id} className="course-card">
+                            <h3>{course.name}</h3>
+                            <p>Kategoria: {course.category}</p>
+                            <button
+                                onClick={() => (window.location.href = `/course/${course.id}`)}
+                                className="details-button"
+                            >
+                                Zobacz szczegoly
+                            </button>
+                        </div>
+                    ))}
                 </div>
-            </div>
+            )}
         </div>
     );
 };

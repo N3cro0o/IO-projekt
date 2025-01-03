@@ -175,6 +175,7 @@
       "Course": {
         "required": [
           "name",
+          "id",
           "teachers",
           "students",
           "tests"
@@ -184,6 +185,10 @@
           "name": {
             "type": "string",
             "nullable": true
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32"
           },
           "teachers": {
             "type": "array",
@@ -214,8 +219,7 @@
             }
           },
           "category": {
-            "type": "integer",
-            "format": "int32"
+            "type": "string"
           }
         }
       },
