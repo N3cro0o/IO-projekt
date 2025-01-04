@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+
 export const Registration = () => {
     const [formData, setFormData] = useState({
         login: '',
@@ -95,4 +96,5 @@ export const Registration = () => {
             {error && <p>{error}</p>}
         </form>
     );
+
 };

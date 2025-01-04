@@ -1,8 +1,8 @@
-import { Link } from 'react-router-dom';
 import * as React from 'react';
 import { ButtonAppBar } from '../comps/AppBar.tsx';
 import { IndividualIntervalsExample } from '../comps/Carousel.tsx'
 import UserList from './UserList';
+import  BasicModal  from '../comps/modal.tsx';
 
 const MainPage = (props) => {
     const { logginToken } = props; 
@@ -25,7 +25,7 @@ const MainPage = (props) => {
                 bêdzie zapisywanie pytañ w pulach pytañ podzielonych na kategorie oraz mo¿liwe wykorzystywanie pytañ
                 w przysz³oœci przy tworzeniu nowych testów
 
-                <UserList />
+                <BasicModal />
         </div>
         </div>
     );
