@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import './CourseTests.css';
 
 interface Test {
@@ -13,16 +13,16 @@ interface Test {
 
 const CourseTests: React.FC = () => {
     const { courseId } = useParams<{ courseId: string }>();
+    const navigate = useNavigate();
     const [tests, setTests] = useState<Test[]>([]);
     const [loading, setLoading] = useState(true);
-    const [startedTest, setStartedTest] = useState<string | null>(null); // Nazwa rozpoczêtego testu
-    const [deletedTest, setDeletedTest] = useState<string | null>(null); // Nazwa usuniêtego testu
+    const [startedTest, setStartedTest] = useState<string | null>(null);
+    const [deletedTest, setDeletedTest] = useState<string | null>(null);
 
     useEffect(() => {
         fetch(`https://localhost:59127/api/test/${courseId}/tests`)
             .then((response) => response.json())
             .then((data: Test[]) => {
-                console.log("Pobrane testy:", data);
                 setTests(data);
                 setLoading(false);
             })
@@ -34,36 +34,31 @@ const CourseTests: React.FC = () => {
     }, [courseId]);
 
     const handleStartTest = (testName: string) => {
-        setStartedTest(testName); // Ustaw rozpoczêty test
-        setTimeout(() => setStartedTest(null), 5000); // Ukryj komunikat po 5 sekundach
+        setStartedTest(testName);
+        setTimeout(() => setStartedTest(null), 5000);
     };
 
     const handleDeleteTest = (testId: number, testName: string) => {
-        // Wyœwietlenie okna potwierdzenia
         const confirmDelete = window.confirm(`Czy na pewno chcesz usun¹æ test "${testName}"?`);
-        if (!confirmDelete) {
-            return; // U¿ytkownik anulowa³ usuniêcie
-        }
+        if (!confirmDelete) return;
 
-        // Wyœlij ¿¹danie DELETE do API
         fetch(`https://localhost:59127/api/test/${testId}`, {
             method: 'DELETE',
         })
             .then((response) => {
                 if (response.ok) {
-                    console.log("Test usuniêty pomyœlnie.");
                     setTests((prevTests) => prevTests.filter((test) => test.testId !== testId));
                     setDeletedTest(testName);
                     setTimeout(() => setDeletedTest(null), 5000);
                 } else {
                     console.error(`B³¹d podczas usuwania testu: ${response.status}`);
-                    response.text().then((text) => console.error("Treœæ b³êdu:", text));
                 }
             })
-            .catch((error) => {
-                console.error("B³¹d podczas ¿¹dania usuniêcia testu:", error);
-            });
+            .catch((error) => console.error("B³¹d podczas usuwania testu:", error));
+    };
 
+    const handleCheckResults = (testId: number) => {
+        navigate(`/course/${courseId}/test/${testId}/results`);
     };
 
     if (loading) {
@@ -73,21 +68,16 @@ const CourseTests: React.FC = () => {
     return (
         <div className="course-tests">
             <h1>Testy dla kursu: {courseId}</h1>
-
-            {/* Zielony komunikat dla rozpoczêcia testu */}
             {startedTest && (
                 <div className="success-banner">
                     Test <strong>{startedTest}</strong> rozpoczêty prawid³owo!
                 </div>
             )}
-
-            {/* Czerwony komunikat dla usuniêcia testu */}
             {deletedTest && (
                 <div className="error-banner">
                     Test <strong>{deletedTest}</strong> zosta³ usuniêty!
                 </div>
             )}
-
             {tests.length === 0 ? (
                 <p>Brak testów do wyœwietlenia.</p>
             ) : (
@@ -98,10 +88,7 @@ const CourseTests: React.FC = () => {
                             <p>Kategoria: {test.category}</p>
                             <p>Data rozpoczêcia: {test.startTime}</p>
                             <p>Data zakoñczenia: {test.endTime}</p>
-                            <button
-                                className="button"
-                                onClick={() => handleStartTest(test.name)}
-                            >
+                            <button className="button" onClick={() => handleStartTest(test.name)}>
                                 Rozpocznij test
                             </button>
                             <button
@@ -110,7 +97,9 @@ const CourseTests: React.FC = () => {
                             >
                                 Usuñ test
                             </button>
-                            <button className="button">SprawdŸ wyniki</button>
+                            <button className="button" onClick={() => handleCheckResults(test.testId)}>
+                                SprawdŸ wyniki
+                            </button>
                         </li>
                     ))}
                 </ul>
