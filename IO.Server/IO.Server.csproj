@@ -15,6 +15,9 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+
+	  <Compile Remove="AppDbContext.cs" />
+
 	  <Compile Remove="Nowy folder1\**" />
 	  <Compile Remove="Nowy folder\**" />
 	  <Content Remove="Nowy folder1\**" />
@@ -27,6 +30,7 @@
 
 	<ItemGroup>
 	  <Compile Remove="Controllers\RegisterController.cs" />
+
 	</ItemGroup>
 
 	<ItemGroup>

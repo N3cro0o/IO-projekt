@@ -33,7 +33,7 @@ public class TestDatabaseController : ControllerBase
         {
             if (_connection.State == System.Data.ConnectionState.Open)
             {
-                _connection.Close();
+                _connection.Close(); 
             }
         }
     }

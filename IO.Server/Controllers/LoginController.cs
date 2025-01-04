@@ -103,8 +103,11 @@ namespace IO.Server.Controllers
     }
 }
 
+
+
     public class LoginData
     {
     public string Login { get; set; }
     public string Password { get; set; }
 }
+

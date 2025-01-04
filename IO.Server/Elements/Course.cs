@@ -6,25 +6,24 @@ namespace IO.Server.Elements
     {
         public string? Name { get; set; }
 
-        int ID { get; set; }
+        public int ID { get; set; }
 
         [JsonInclude]
-        List<int> Teachers { get; set; } = new List<int>();
+        public List<int> Teachers { get; set; } = new List<int>();
 
         [JsonInclude]
-        List<int> Students { get; set; } = new List<int>();
+        public List<int> Students { get; set; } = new List<int>();
 
         [JsonInclude]
-        List<int> Tests { get; set; } = new List<int>();
+        public List<int> Tests { get; set; } = new List<int>();
 
         [JsonInclude]
-        List<int> Results { get; set; } = new List<int>();
-        
+        public List<int> Results { get; set; } = new List<int>();
+
         [JsonInclude]
-        int Category { get; set; }
+        public string Category { get; set; } // Changed to string
 
-
-        public Course(int id, string name, int cat, List<int> teachers, List<int> students, List<int> tests)
+        public Course(int id, string name, string cat, List<int> teachers, List<int> students, List<int> tests)
         {
             ID = id;
             Name = name;
@@ -34,7 +33,6 @@ namespace IO.Server.Elements
             Tests = tests;
         }
 
-     
         public List<User> ShowTeachers()
         {
             List<User> users = new List<User>();
@@ -99,11 +97,6 @@ namespace IO.Server.Elements
                 }
             }
             return false;
-        }
-
-        public int ReturnCategory()
-        {
-            return Category;
         }
     }
 }

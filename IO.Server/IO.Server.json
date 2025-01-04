@@ -17,6 +17,42 @@
         }
       }
     },
+
+    "/api/Course/list": {
+      "get": {
+        "tags": [
+          "Course"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Course"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Course"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Course"
+                  }
+                }
+              }
+            }
+
     "/api/Login/login": {
       "post": {
         "tags": [
@@ -45,6 +81,7 @@
         "responses": {
           "200": {
             "description": "OK"
+
           }
         }
       }
@@ -125,6 +162,53 @@
         }
       }
     },
+
+    "/api/Test/{courseId}/tests": {
+      "get": {
+        "tags": [
+          "Test"
+        ],
+        "parameters": [
+          {
+            "name": "courseId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Test"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Test"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Test"
+                  }
+                }
+              }
+            }
+
     "/api/Registration/register": {
       "post": {
         "tags": [
@@ -153,6 +237,7 @@
         "responses": {
           "200": {
             "description": "OK"
+
           }
         }
       }
@@ -201,6 +286,7 @@
       "Course": {
         "required": [
           "name",
+          "id",
           "teachers",
           "students",
           "tests"
@@ -210,6 +296,10 @@
           "name": {
             "type": "string",
             "nullable": true
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32"
           },
           "teachers": {
             "type": "array",
@@ -240,6 +330,32 @@
             }
           },
           "category": {
+            "type": "string"
+          }
+        }
+      },
+      "Test": {
+        "type": "object",
+        "properties": {
+          "testId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "startTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "category": {
+            "type": "string"
+          },
+          "courseId": {
             "type": "integer",
             "format": "int32"
           }
@@ -318,13 +434,19 @@
       "name": "TestDatabase"
     },
     {
+
+      "name": "Course"
       "name": "Login"
+
     },
     {
       "name": "Main"
     },
     {
+
+      "name": "Test"
       "name": "Registration"
+
     },
     {
       "name": "User"
