@@ -33,22 +33,22 @@ export function ButtonAppBar() {
     const handleLogout = () => {
         localStorage.removeItem('authToken'); // Usuwamy token z localStorage
         setIsLoggedIn(false); // Ustawiamy stan na niezalogowanego
-        navigate('/'); // Przekierowanie na stronÃª gÂ³Ã³wnÂ¹
+        navigate('/'); // Przekierowanie na stronê g³ówn¹
     };
 
-    // Sprawdzanie, czy uÂ¿ytkownik jest zalogowany
+    // Sprawdzanie, czy u¿ytkownik jest zalogowany
     useEffect(() => {
         const token = localStorage.getItem('authToken');
         if (token) {
-            setIsLoggedIn(true); // JeÂ¿eli token istnieje, uÂ¿ytkownik jest zalogowany
+            setIsLoggedIn(true); // Je¿eli token istnieje, u¿ytkownik jest zalogowany
         } else {
-            setIsLoggedIn(false); // JeÂœli token nie istnieje, uÂ¿ytkownik nie jest zalogowany
+            setIsLoggedIn(false); // Jeœli token nie istnieje, u¿ytkownik nie jest zalogowany
         }
     }, []);
 
     return (
         <Box sx={{ flexGrow: 1 }}>
-            {/* GÃ³rny AppBar */}
+            {/* Górny AppBar */}
             <AppBar
                 position="fixed"
                 sx={{
@@ -74,11 +74,10 @@ export function ButtonAppBar() {
                     </IconButton>
 
                     <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-                        {/* Tutaj moÂ¿esz dodaÃ¦ logo lub nazwÃª aplikacji */}
+                        {/* Tutaj mo¿esz dodaæ logo lub nazwê aplikacji */}
                     </Typography>
 
-
-                    {/* Sprawdzamy, czy uÂ¿ytkownik jest zalogowany, i wyÂœwietlamy odpowiedni przycisk */}
+                    {/* Sprawdzamy, czy u¿ytkownik jest zalogowany, i wyœwietlamy odpowiedni przycisk */}
                     {isLoggedIn ? (
                         <Button
                             onClick={handleLogout}
@@ -93,19 +92,35 @@ export function ButtonAppBar() {
                             Logout
                         </Button>
                     ) : (
-                        <Link to="/loginPage" style={{ textDecoration: 'none' }}>
-                            <Button
-                                sx={{
-                                    color: '#ffffff',
-                                    backgroundColor: '#007bff', // Niebieski kolor przycisku logowania
-                                    '&:hover': {
-                                        backgroundColor: '#0056b3',
-                                    },
-                                }}
-                            >
-                                Login
-                            </Button>
-                        </Link>
+                        <>
+                            <Link to="/loginPage" style={{ textDecoration: 'none' }}>
+                                <Button
+                                    sx={{
+                                        color: '#ffffff',
+                                        backgroundColor: '#007bff', // Niebieski kolor przycisku logowania
+                                        '&:hover': {
+                                            backgroundColor: '#0056b3',
+                                        },
+                                    }}
+                                >
+                                    Login
+                                </Button>
+                            </Link>
+
+                            <Link to="/Registration" style={{ textDecoration: 'none', marginLeft: '10px' }}>
+                                <Button
+                                    sx={{
+                                        color: '#ffffff',
+                                        backgroundColor: '#28a745', // Zielony kolor przycisku rejestracji
+                                        '&:hover': {
+                                            backgroundColor: '#218838',
+                                        },
+                                    }}
+                                >
+                                    Register
+                                </Button>
+                            </Link>
+                        </>
                     )}
                 </Toolbar>
             </AppBar>

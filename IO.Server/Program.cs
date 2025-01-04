@@ -5,6 +5,8 @@ using IO.Server.Elements;
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Npgsql;
+using Npgsql.EntityFrameworkCore.PostgreSQL;
+
 
 namespace IO.Server
 {
@@ -12,7 +14,6 @@ namespace IO.Server
     {
         public static void Main(string[] args)
         {
-            EnvSetup();
             Debug.Print("User count " + Environment.Users.Count.ToString());
 
             var builder = WebApplication.CreateBuilder(args);
@@ -23,6 +24,9 @@ namespace IO.Server
                 var connectionString = "Host=localhost;Port=5432;Username=postgres;Password=admin;Database=TesatyWiezy";
                 return new NpgsqlConnection(connectionString);
             });
+
+
+            builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("PostgreSQL")));
 
             // Konfiguracja CORS
             builder.Services.AddCors(options =>
@@ -53,36 +57,12 @@ namespace IO.Server
             app.UseCors("AllowAll");
 
             app.UseHttpsRedirection();
+            app.UseAuthentication();
             app.UseAuthorization();
             app.MapControllers();
             app.MapFallbackToFile("/index.html");
 
             app.Run();
-        }
-
-        private static void EnvSetup()
-        {
-            // Users
-            Environment.Users.Add(new User(0, "Admin", "*******", "test@email.com", "Admin", "Main", "Admin"));
-            for (int i = 0; i < 11; i++)
-            {
-                var user = new User();
-                user.SetID(i + 1);
-                Environment.Users.Add(user);
-            }
-
-            // Courses
-            for (int i = 0; i < 3; i++)
-            {
-                List<int> teach = new List<int>();
-                List<int> stud = new List<int>();
-                teach.Add(i * 4);
-                stud.Add(i * 4 + 1);
-                stud.Add(i * 4 + 2);
-                stud.Add(i * 4 + 3);
-                var c = new Course(i, "Course no." + i.ToString(), 0, teach, stud, new List<int>());
-                Environment.Courses.Add(c);
-            }
         }
     }
 }

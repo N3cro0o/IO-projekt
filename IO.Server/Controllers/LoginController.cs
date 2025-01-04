@@ -1,64 +1,110 @@
-﻿using IO.Server.Elements;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.AspNetCore.Mvc;
+using Npgsql;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using System;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using IO.Server.Elements;
+using System.Diagnostics;
 
-[ApiController]
-[Route("api/[controller]")]
-public class LoginController : ControllerBase
+namespace IO.Server.Controllers
 {
-    private readonly AppDbContext _context;
-
-    public LoginController(AppDbContext context)
+    [ApiController]
+    [Route("api/[controller]")]
+    public class LoginController : ControllerBase
     {
-        _context = context;
-    }
+        private readonly NpgsqlConnection _connection;
 
-    [HttpPost("loginRequest")]
-    public async Task<IActionResult> Login([FromBody] LoginData data)
-    {
-        if (!ModelState.IsValid)
+        public LoginController(NpgsqlConnection connection)
         {
-            return BadRequest(ModelState);
+            _connection = connection;
         }
 
-        // Wyszukiwanie użytkownika po loginie lub emailu
-        var user = await _context.Users.FirstOrDefaultAsync(u =>
-                (u.Login == data.Username || u.Email == data.Username) &&
-                u.Password == data.Password);
-
-        if (user == null)
+        [HttpPost("login")]
+        public IActionResult Login([FromBody] LoginData data)
         {
-            return Unauthorized(new { Message = "Invalid username or password" });
+
+            if (data == null)
+            {
+                return BadRequest("Dane nie mogą być puste");
+            }
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                _connection.Open();
+
+                // Zapytanie SQL w celu pobrania użytkownika na podstawie loginu
+                string query = "SELECT login, password, role FROM \"User\" WHERE login = @login";
+                using (var command = new NpgsqlCommand(query, _connection))
+                {
+                    // Dodanie parametru zapytania SQL
+                    command.Parameters.AddWithValue("@login", data.Login);
+
+                    using (var reader = command.ExecuteReader())
+                    {
+                        if (!reader.Read())
+                        {
+                            // Brak użytkownika w bazie danych
+                            return Unauthorized(new { Message = "Invalid Username" });
+                        }
+
+                        // Pobranie hasła z bazy danych
+                        var storedPassword = reader.GetString(1); // Druga kolumna zawiera hasło
+                        if (storedPassword != data.Password)
+                        {
+                            // Hasło nie pasuje
+                            return Unauthorized(new { Message = "Invalid Password" });
+                        }
+
+                        // Pobranie roli użytkownika
+                        var userRole = reader.GetString(2); // Trzecia kolumna zawiera rolę
+
+                        // Wygenerowanie tokenu JWT
+                        var token = GenerateJwtToken(data.Login, userRole);
+                        return Ok(new { Message = "Login successful", Token = token });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Obsługa błędów
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+            finally
+            {
+                _connection.Close();
+            }
         }
 
-        // Generowanie tokenu JWT
-        var token = GenerateJwtToken(user.Login, user.Role);
-
-        return Ok(new { Message = "Login successful", Token = token });
-    }
-
-    private string GenerateJwtToken(string username, string role)
-    {
-        var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.ASCII.GetBytes("YourSecretKeyHere");
-
-        var tokenDescriptor = new SecurityTokenDescriptor
+        private string GenerateJwtToken(string username, string role)
         {
-            Subject = new ClaimsIdentity(new[]
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes("YourSuperSecretKey");
+
+            var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, username),
                 new Claim(ClaimTypes.Role, role)
-            }),
-            Expires = DateTime.UtcNow.AddHours(12),
-            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-        };
+            };
 
-        var token = tokenHandler.CreateToken(tokenDescriptor);
-        return tokenHandler.WriteToken(token);
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(claims),
+                Expires = DateTime.UtcNow.AddHours(12),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
+
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token);
+        }
     }
+}
+
+    public class LoginData
+    {
+    public string Login { get; set; }
+    public string Password { get; set; }
 }
