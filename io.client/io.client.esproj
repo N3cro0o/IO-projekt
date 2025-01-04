@@ -10,6 +10,8 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="src\comps\App.tsx" />
+    <None Remove="src\pages\index.tsx" />
+    <None Remove="src\pages\Results.tsx" />
     <None Remove="src\pages\TestDB.tsx" />
     <None Remove="src\pages\TestList.css" />
     <None Remove="src\pages\TestList.tsx" />

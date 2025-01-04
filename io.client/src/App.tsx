@@ -8,6 +8,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import UserPanel from './pages/UserPanel';
 import CourseTests from './pages/CourseTests'; // Import nowego komponentu
 
+
 function App() {
     const [token, setToken] = useState(-1);
 
@@ -21,6 +22,9 @@ function App() {
                     <Route path="/loginPage" element={<Login token={token} setToken={setToken} />} />
                     <Route path="/UserPanel" element={<UserPanel logginToken={token} />} />
                     <Route path="/course/:courseId/tests" element={<CourseTests logginToken={token} />} />
+                    <Route path="/course/:courseId" element={<CourseTests />} />
+                    
+                    
                 </Routes>
             </HRouter>
         </div>

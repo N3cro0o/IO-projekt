@@ -6,12 +6,37 @@
    
 }
 
+
 body {
     font-family: 'Arial', sans-serif;
     background: #f4f4f9; 
     color: #333;
     line-height: 1.6;
+
 }
+
+.success-banner {
+    background-color: #2ecc71; /* Zielony kolor t³a */
+    color: white; /* Bia³y kolor tekstu */
+    font-size: 2rem; /* Du¿y rozmiar czcionki */
+    text-align: center; /* Wyœrodkowanie tekstu */
+    padding: 20px; /* Odstêpy wewnêtrzne */
+    border-radius: 8px; /* Zaokr¹glenie rogów */
+    margin-bottom: 20px; /* Odstêp od innych elementów */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Delikatny cieñ */
+}
+.error-banner {
+    background-color: #e74c3c; /* Czerwony kolor t³a */
+    color: white; /* Bia³y kolor tekstu */
+    font-size: 2rem; /* Du¿y rozmiar czcionki */
+    text-align: center; /* Wyœrodkowanie tekstu */
+    padding: 20px; /* Odstêpy wewnêtrzne */
+    border-radius: 8px; /* Zaokr¹glenie rogów */
+    margin-bottom: 20px; /* Odstêp od innych elementów */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Delikatny cieñ */
+}
+
+
 
 .course-tests {
     padding: 40px 20px;
@@ -19,6 +44,7 @@ body {
     margin: 0 auto;
     color: white;
 }
+
 
 h1 {
     text-align: center;
@@ -60,6 +86,7 @@ p {
 /* Stylizacja dla przycisków */
 .button {
     padding: 12px 24px;
+    margin-left: 10px;
     font-size: 1rem;
     background: #3498db; /* Kolor t³a przycisku */
     color: #fff; /* Kolor tekstu */
@@ -123,4 +150,7 @@ p {
         .test-card .test-date {
             margin-top: 10px;
         }
+
+    
+
 }

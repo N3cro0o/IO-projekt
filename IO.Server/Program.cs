@@ -12,57 +12,72 @@ namespace IO.Server
     {
         public static void Main(string[] args)
         {
+            // Konfiguracja œrodowiska (opcjonalnie)
             EnvSetup();
+
+            // Wydrukowanie liczby u¿ytkowników w konsoli
             Debug.Print("User count " + Environment.Users.Count.ToString());
 
+            // Tworzenie buildera aplikacji
             var builder = WebApplication.CreateBuilder(args);
 
-            // Rejestracja po³¹czenia do bazy danych PostgreSQL w DI
+            // Rejestracja po³¹czenia z baz¹ danych PostgreSQL w DI
             builder.Services.AddScoped<NpgsqlConnection>(provider =>
             {
+                // Connection string do bazy danych PostgreSQL
                 var connectionString = "Host=localhost;Port=5433;Username=postgres;Password=12345;Database=TesatyWiezy";
                 return new NpgsqlConnection(connectionString);
             });
 
-            // Konfiguracja CORS
+            // Konfiguracja CORS (AllowAll)
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowAll", policy =>
                 {
-                    policy.AllowAnyOrigin()
-                          .AllowAnyMethod()
-                          .AllowAnyHeader();
+                    policy.AllowAnyOrigin() // Pozwól na dowolne Ÿród³o
+                          .AllowAnyMethod()   // Pozwól na dowoln¹ metodê HTTP (GET, POST, DELETE, itd.)
+                          .AllowAnyHeader();  // Pozwól na dowolne nag³ówki
                 });
             });
 
-            // Inne serwisy
-            builder.Services.AddControllers();
-            builder.Services.AddOpenApi();
+            // Dodanie innych serwisów
+            builder.Services.AddControllers(); // Rejestracja kontrolerów
+            builder.Services.AddOpenApi(); // Dodanie wsparcia dla OpenAPI (Swagger)
 
+            // Budowanie aplikacji
             var app = builder.Build();
 
+            // Mapowanie plików statycznych
             app.UseDefaultFiles();
             app.MapStaticAssets();
 
+            // W³¹czenie OpenAPI w trybie deweloperskim
             if (app.Environment.IsDevelopment())
             {
                 app.MapOpenApi();
             }
 
-            // W³¹czenie CORS
+            // W³¹czenie CORS dla aplikacji
             app.UseCors("AllowAll");
 
+            // W³¹czenie HTTPS redirection oraz autoryzacji
             app.UseHttpsRedirection();
             app.UseAuthorization();
+
+            // Mapowanie kontrolerów
             app.MapControllers();
+
+            // Fallback do pliku index.html
             app.MapFallbackToFile("/index.html");
 
+            // Uruchomienie aplikacji
             app.Run();
         }
 
+        // Metoda konfiguruj¹ca dane testowe (opcjonalnie)
         private static void EnvSetup()
         {
-            // Users
+            // Dodanie u¿ytkowników
             Environment.Users.Add(new User(0, "Admin", "*******", "test@email.com", "Admin", "Main", "Admin"));
             for (int i = 0; i < 11; i++)
             {
@@ -71,8 +86,7 @@ namespace IO.Server
                 Environment.Users.Add(user);
             }
 
-            // Courses
-            // Courses
+            // Dodanie kursów
             for (int i = 0; i < 3; i++)
             {
                 List<int> teach = new List<int>();
@@ -93,10 +107,6 @@ namespace IO.Server
 
                 Environment.Courses.Add(course);
             }
-
-
-
         }
     }
-    }
-
+}
