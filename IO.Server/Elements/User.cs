@@ -1,72 +1,64 @@
-﻿using System.Diagnostics;
-using System.Numerics;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
+using System.Collections.Generic;
 
 namespace IO.Server.Elements
 {
-
     public class User
     {
-        public enum TYPE
-        {
-            gosc = 0,
-            uczen = 1,
-            nauczyciel = 2,
-            admin = 10,
-        }
+        [JsonInclude]
+        public int? ID { get; set; }
 
         [JsonInclude]
-        int ID { get; set; }
+        public string Login { get; set; }
 
         [JsonInclude]
-        string Login { get; set; }
-
-        [JsonInclude]
-        string Password { get; set; }
+        public string PasswordHash { get; set; } // Zmienione z Password na PasswordHash
 
         [JsonInclude]
         public string FirstName { get; set; }
 
+        [JsonInclude]
         public string LastName { get; set; }
 
         [JsonInclude]
-        string Email { get; set; }
-
-        public string UserType { get; set; }
+        public string Email { get; set; }
 
         [JsonInclude]
-        List<int> Courses { get; set; } = new List<int>();
+        public string UserRole { get; set; }
+
+        [JsonInclude]
+        public List<int> Courses { get; set; } = new List<int>();
 
         string Token { get; set; } = "";
 
-        public User(int id, string login, string pass, string email, string fName, string lName, string type)
+        // Konstruktor z haszowanym hasłem
+        public User(int? id, string login, string passwordHash, string email, string fName, string lName, string role)
         {
             ID = id;
             Login = login;
-            Password = pass;
+            PasswordHash = passwordHash; // Zmieniamy na hash hasła
             Email = email;
             FirstName = fName;
             LastName = lName;
-            UserType = type;
+            UserRole = role;
         }
 
-        public User() {}
+        public User() { }
 
         public void SetID(int id)
         {
             ID = id;
         }
 
-        public bool CorrectLoginData(string login, string pass)
-        {
-            if (login != Login || pass != Password)
-                return false;
-            return true;
-        }
+        // Weryfikacja hasła przy logowaniu
+        //public bool VerifyPassword(string password)
+        //{
+        //    return BCrypt.Net.BCrypt.Verify(password, PasswordHash); // Weryfikacja hasła z hashem
+        //}
 
         public void SetToken(string token)
         {
-            if (token != null) 
+            if (token != null)
                 Token = token;
         }
     }

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
 	<PropertyGroup>
 		<TargetFramework>net9.0</TargetFramework>
@@ -15,7 +15,22 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+
 	  <Compile Remove="AppDbContext.cs" />
+
+	  <Compile Remove="Nowy folder1\**" />
+	  <Compile Remove="Nowy folder\**" />
+	  <Content Remove="Nowy folder1\**" />
+	  <Content Remove="Nowy folder\**" />
+	  <EmbeddedResource Remove="Nowy folder1\**" />
+	  <EmbeddedResource Remove="Nowy folder\**" />
+	  <None Remove="Nowy folder1\**" />
+	  <None Remove="Nowy folder\**" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Remove="Controllers\RegisterController.cs" />
+
 	</ItemGroup>
 
 	<ItemGroup>
@@ -24,7 +39,6 @@
 			<Version>9.*-*</Version>
 		</PackageReference>
 		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.0" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -40,6 +54,8 @@
 		</PackageReference>
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.2" />
 		<PackageReference Include="Npgsql" Version="9.0.1" />
+		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.0" />
+		<PackageReference Include="BCrypt.Net-Next" Version="4.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>
