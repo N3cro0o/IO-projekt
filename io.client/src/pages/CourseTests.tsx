@@ -20,17 +20,23 @@ const CourseTests: React.FC = () => {
     const [deletedTest, setDeletedTest] = useState<string | null>(null);
 
     useEffect(() => {
-        fetch(`https://localhost:59127/api/test/${courseId}/tests`)
-            .then((response) => response.json())
-            .then((data: Test[]) => {
+        const fetchTests = async () => {
+            try {
+                const response = await fetch(`https://localhost:59127/api/test/${courseId}/tests`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data: Test[] = await response.json();
                 setTests(data);
-                setLoading(false);
-            })
-            .catch((error) => {
+            } catch (error) {
                 console.error("B³¹d podczas pobierania testów:", error);
                 setTests([]);
+            } finally {
                 setLoading(false);
-            });
+            }
+        };
+
+        fetchTests();
     }, [courseId]);
 
     const handleStartTest = (testName: string) => {
@@ -38,23 +44,29 @@ const CourseTests: React.FC = () => {
         setTimeout(() => setStartedTest(null), 5000);
     };
 
-    const handleDeleteTest = (testId: number, testName: string) => {
+    const handleDeleteTest = async (testId: number, testName: string) => {
         const confirmDelete = window.confirm(`Czy na pewno chcesz usun¹æ test "${testName}"?`);
         if (!confirmDelete) return;
 
-        fetch(`https://localhost:59127/api/test/${testId}`, {
-            method: 'DELETE',
-        })
-            .then((response) => {
-                if (response.ok) {
-                    setTests((prevTests) => prevTests.filter((test) => test.testId !== testId));
-                    setDeletedTest(testName);
-                    setTimeout(() => setDeletedTest(null), 5000);
-                } else {
-                    console.error(`B³¹d podczas usuwania testu: ${response.status}`);
-                }
-            })
-            .catch((error) => console.error("B³¹d podczas usuwania testu:", error));
+        try {
+            const response = await fetch(`https://localhost:59127/api/deletetest/${testId}`, {
+                method: 'DELETE',
+            });
+
+            if (response.ok) {
+                setTests((prevTests) => prevTests.filter((test) => test.testId !== testId));
+                setDeletedTest(testName);
+                setTimeout(() => setDeletedTest(null), 5000);
+            } else {
+                console.error(`B³¹d podczas usuwania testu: ${response.status}`);
+            }
+        } catch (error) {
+            console.error("B³¹d podczas usuwania testu:", error);
+        }
+    };
+
+    const handleSetTime = (testId: number) => {
+        navigate(`/course/${courseId}/test/${testId}/set-time`);
     };
 
     const handleCheckResults = (testId: number) => {
@@ -88,6 +100,9 @@ const CourseTests: React.FC = () => {
                             <p>Kategoria: {test.category}</p>
                             <p>Data rozpoczêcia: {test.startTime}</p>
                             <p>Data zakoñczenia: {test.endTime}</p>
+                            <button className="button" onClick={() => handleSetTime(test.testId)}>
+                                Ustaw czas rozpoczêcia i zakoñczenia testu
+                            </button>
                             <button className="button" onClick={() => handleStartTest(test.name)}>
                                 Rozpocznij test
                             </button>
@@ -98,7 +113,7 @@ const CourseTests: React.FC = () => {
                                 Usuñ test
                             </button>
                             <button className="button" onClick={() => handleCheckResults(test.testId)}>
-                                SprawdŸ wyniki
+                                Pobierz raport
                             </button>
                         </li>
                     ))}

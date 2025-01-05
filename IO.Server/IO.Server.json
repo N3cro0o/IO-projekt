@@ -55,6 +55,29 @@
         }
       }
     },
+    "/api/DeleteTest/{testId}": {
+      "delete": {
+        "tags": [
+          "DeleteTest"
+        ],
+        "parameters": [
+          {
+            "name": "testId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/Main/getEnvUsers": {
       "get": {
         "tags": [
@@ -127,6 +150,49 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/api/SetTestTime/{testId}": {
+      "put": {
+        "tags": [
+          "SetTestTime"
+        ],
+        "parameters": [
+          {
+            "name": "testId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TestTimeUpdateRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TestTimeUpdateRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/TestTimeUpdateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
           }
         }
       }
@@ -299,6 +365,19 @@
           }
         }
       },
+      "TestTimeUpdateRequest": {
+        "type": "object",
+        "properties": {
+          "startTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endTime": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
       "User": {
         "type": "object",
         "properties": {
@@ -343,7 +422,13 @@
       "name": "Course"
     },
     {
+      "name": "DeleteTest"
+    },
+    {
       "name": "Main"
+    },
+    {
+      "name": "SetTestTime"
     },
     {
       "name": "Test"

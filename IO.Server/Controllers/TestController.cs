@@ -3,67 +3,69 @@ using Npgsql;
 using System;
 using System.Collections.Generic;
 
-namespace YourNamespace.Controllers
+namespace IO.Server.Controllers
 {
     [ApiController]
-    [Route("api/test")]
+    [Route("api/[controller]")]
     public class TestController : ControllerBase
     {
         private readonly NpgsqlConnection _connection;
 
-        public TestController()
+        public TestController(NpgsqlConnection connection)
         {
-            _connection = new NpgsqlConnection("Host=localhost;Database=TesatyWiezy;Username=postgres;Password=yourpassword");
+            _connection = connection;
         }
 
-        [HttpGet("{courseId}/{testId}/users")]
-        public ActionResult<IEnumerable<User>> GetUsersForTest(int courseId, int testId)
+        [HttpGet("{courseId}/tests")]
+        public ActionResult<IEnumerable<Test>> GetTestsByCourseId(int courseId)
         {
-            var users = new List<User>();
+            var tests = new List<Test>();
 
             try
             {
                 _connection.Open();
 
                 const string query = @"
-        SELECT DISTINCT u.userid, u.name, u.surname, u.email
-        FROM ""User"" u
-        INNER JOIN ""Results"" r ON r.userid = u.userid
-        INNER JOIN ""UserToCourse"" utc ON utc.userid = u.userid
-        WHERE r.testid = @TestId AND utc.courseid = @CourseId";
+            SELECT testid, name, starttime, endtime, category, courseid 
+            FROM ""Test"" 
+            WHERE courseid = @CourseId";
 
                 using (var command = new NpgsqlCommand(query, _connection))
                 {
-                    command.Parameters.AddWithValue("@TestId", testId);
                     command.Parameters.AddWithValue("@CourseId", courseId);
 
                     using (var reader = command.ExecuteReader())
                     {
                         while (reader.Read())
                         {
-                            var user = new User
+                            var test = new Test
                             {
-                                UserId = reader.GetInt32(0),
+                                TestId = reader.GetInt32(0),
                                 Name = reader.GetString(1),
-                                Surname = reader.GetString(2),
-                                Email = reader.GetString(3)
+                                StartTime = reader.GetDateTime(2),
+                                EndTime = reader.GetDateTime(3),
+                                Category = reader.GetString(4),
+                                CourseId = reader.GetInt32(5)
                             };
 
-                            users.Add(user);
+                            tests.Add(test);
+                            Console.WriteLine($"Test wczytany: ID={test.TestId}, Name={test.Name}, CourseID={test.CourseId}");
                         }
                     }
                 }
 
-                if (users.Count == 0)
+                Console.WriteLine($"Łączna liczba testów dla kursu {courseId}: {tests.Count}");
+
+                if (tests.Count == 0)
                 {
-                    return NotFound("No users found for the specified test and course.");
+                    return NotFound("No tests found for the specified course ID.");
                 }
 
-                return Ok(users);
+                return Ok(tests);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error: {ex.Message}");
+                Console.WriteLine($"Błąd: {ex.Message}");
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
             finally
@@ -73,13 +75,16 @@ namespace YourNamespace.Controllers
         }
 
 
+
     }
 
-    public class User
+    public class Test
     {
-        public int UserId { get; set; }
+        public int TestId { get; set; } // Poprawiona nazwa na bardziej zgodną z kodem
         public string Name { get; set; }
-        public string Surname { get; set; }
-        public string Email { get; set; }
+        public DateTime? StartTime { get; set; } // Poprawna nazwa i typ
+        public DateTime? EndTime { get; set; } // Poprawna nazwa i typ
+        public string Category { get; set; }
+        public int CourseId { get; set; }
     }
 }
