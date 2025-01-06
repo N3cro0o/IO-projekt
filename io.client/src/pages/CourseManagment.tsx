@@ -5,9 +5,6 @@ import ModalChangeUsers from '../comps/modalChangeUsers.tsx';
 import ModalAddCourse from '../comps/modalAddCourse.tsx';
 import { ButtonAppBar } from '../comps/AppBar.tsx';
 
-//dodac pobieranie ID ownera z tokenu i przekazac do add Course
-//dodac usuwanie wsyzstkich testów wraz z kursem
-
 export const Course = () => {
     const [loading, setLoading] = useState<boolean>(true);
     const [courses, setCourses] = useState<Course[]>([]);
@@ -15,8 +12,9 @@ export const Course = () => {
     const [selectedCourseId, setSelectedCourseId] = useState<number | null>(null);
     const [selectedCourseName, setSelectedCourseName] = useState<string | null>(null);
     const [selectedCourseName2, setSelectedCourseName2] = useState<string | null>(null)
-    const [selectedCourseId2, setSelectedCourseId2] = useState<number | null>(null);  // Przechowuj tylko ID kursu
+    const [selectedCourseId2, setSelectedCourseId2] = useState<number | null>(null);
     const [selectedOwnerId, setSelectedOwnerId] = useState<number | null>(null);
+    const [openModalAddCourse, setOpenModalAddCourse] = useState<boolean>(false); // Stan otwarcia modala
 
     interface Course {
         id: number;
@@ -51,6 +49,22 @@ export const Course = () => {
         fetchCourses();
     }, []);
 
+    // Funkcja odœwie¿ania kursów
+    const refreshCourses = async () => {
+        try {
+            const response = await fetch('https://localhost:7293/api/CoursesManager/listCourses');
+            const apiData = await response.json();
+            const transformedData = transformCourseData(apiData);
+            setCourses(transformedData);
+        } catch (error) {
+            console.error('Error fetching courses:', error);
+        }
+    };
+
+    useEffect(() => {
+        refreshCourses(); // Za³aduj kursy na pocz¹tku
+    }, []);
+
     const handleDeleteCourse = async (courseid: number, name: string) => {
         const confirmDelete = window.confirm(`Czy na pewno chcesz usun¹æ kurs "${name}"?`);
         if (!confirmDelete) return;
@@ -77,17 +91,21 @@ export const Course = () => {
     };
 
     const handleAddUsers = (courseId: number, coursename: string) => {
-        setSelectedCourseId(courseId);  // Ustawiamy tylko raz, nie bêdziemy zmieniaæ wielokrotnie
-        setSelectedCourseName(coursename);   
+        setSelectedCourseId(courseId);
+        setSelectedCourseName(coursename);
     };
 
     const handleChangeUsers = (courseId: number, coursename: string) => {
-        setSelectedCourseId2(courseId);  // Ustawiamy tylko raz, nie bêdziemy zmieniaæ wielokrotnie
-        setSelectedCourseName2(coursename); 
+        setSelectedCourseId2(courseId);
+        setSelectedCourseName2(coursename);
     };
 
-    const handleAddCourse = (ownerId: number) => {
-        setSelectedOwnerId(ownerId);  // Ustawiamy tylko raz, nie bêdziemy zmieniaæ wielokrotnie
+    const handleAddCourse = () => {
+        setOpenModalAddCourse(true); // Otwórz modal
+    };
+
+    const handleCloseAddCourseModal = () => {
+        setOpenModalAddCourse(false); // Zamknij modal
     };
 
     if (loading) return <div>Loading...</div>;
@@ -142,8 +160,7 @@ export const Course = () => {
                         </tbody>
                     </table>
                     <div style={{ textAlign: 'left', marginTop: '20px' }}>
-                        {/*Wstrzykiwanie OwnerId*/}
-                        <Button onClick={() => handleAddCourse(1)} variant="contained" color="success">
+                        <Button onClick={handleAddCourse} variant="contained" color="success">
                             Add Course
                         </Button>
                     </div>
@@ -151,21 +168,26 @@ export const Course = () => {
                     {/* Modal bêdzie siê otwiera³, gdy selectedCourseId nie bêdzie null */}
                     {selectedCourseId !== null && selectedCourseName !== null && (
                         <BasicModal courseId={selectedCourseId} coursename={selectedCourseName} handleClose={() => {
-                            setSelectedCourseId(null);  // Zresetuj ID kursu
-                            setSelectedCourseName(null);  // Zresetuj nazwê kursu
-                        }} />
-                    )}
-                    
-                    {selectedCourseId2 !== null && selectedCourseName2 !== null && (
-                        <ModalChangeUsers courseId={selectedCourseId2} coursename={selectedCourseName2} handleClose={() => {
-                            setSelectedCourseId2(null);  // Zresetuj ID kursu
-                            setSelectedCourseName2(null);  // Zresetuj nazwê kursu
+                            setSelectedCourseId(null);
+                            setSelectedCourseName(null);
                         }} />
                     )}
 
-                    {/*Zmiana na ownerId*/}
-                    {selectedOwnerId !== null && (
-                        <ModalAddCourse ownerId={selectedOwnerId} handleClose={() => setSelectedOwnerId(null)} />
+                    {selectedCourseId2 !== null && selectedCourseName2 !== null && (
+                        <ModalChangeUsers courseId={selectedCourseId2} coursename={selectedCourseName2} handleClose={() => {
+                            setSelectedCourseId2(null);
+                            setSelectedCourseName2(null);
+                        }} />
+                    )}
+
+                    {/* Modal dla dodawania kursu */}
+                    {openModalAddCourse && (
+                        <ModalAddCourse
+                            ownerId={1}  // Mo¿esz tu dodaæ dynamiczne `ownerId` z tokenu
+                            open={openModalAddCourse}
+                            handleClose={handleCloseAddCourseModal}
+                            refreshCourses={refreshCourses} // Przekazujemy refreshCourses
+                        />
                     )}
                 </div>
             </div>

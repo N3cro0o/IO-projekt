@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
@@ -8,14 +7,16 @@ import { Alert } from '@mui/material';
 
 interface AddCourseProps {
     ownerId: number;
+    handleClose: () => void;
+    refreshCourses: () => void;
 }
 
-export const AddCourse: React.FC<AddCourseProps> = ({ownerId}) =>  {
+export const AddCourse: React.FC<AddCourseProps> = ({ ownerId, handleClose, refreshCourses }) => {
     const [formData, setFormData] = useState({
         name: '',
         category: '',
         description: '',
-        ownerid: ownerId
+        ownerid: ownerId,
     });
 
     const [error, setError] = useState('');
@@ -23,15 +24,13 @@ export const AddCourse: React.FC<AddCourseProps> = ({ownerId}) =>  {
         name: '',
         category: '',
         description: '',
-        ownerid: ''
+        ownerid: '',
     });
-    const navigate = useNavigate();
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
 
-        // Reset the error for the specific field when the user starts typing
         setErrorFields({ ...errorFields, [name]: '' });
     };
 
@@ -40,7 +39,6 @@ export const AddCourse: React.FC<AddCourseProps> = ({ownerId}) =>  {
         setError('');
         let hasError = false;
 
-        // Validate form
         const newErrorFields = { ...errorFields };
 
         if (!formData.name) {
@@ -55,13 +53,10 @@ export const AddCourse: React.FC<AddCourseProps> = ({ownerId}) =>  {
             newErrorFields.description = 'Description is required';
             hasError = true;
         }
-        if (!formData.ownerid) {
-            console.log('Bad Authorization');
-        }
 
         setErrorFields(newErrorFields);
 
-        if (hasError) return; // If there are errors, stop the submission
+        if (hasError) return;
 
         try {
             const response = await fetch('https://localhost:7293/api/AddCourse/addCourse', {
@@ -78,10 +73,13 @@ export const AddCourse: React.FC<AddCourseProps> = ({ownerId}) =>  {
             });
 
             if (response.ok) {
-                navigate('/loginPage');
-            } 
-        }
-        catch (error) {
+                console.log('Course added successfully');
+                refreshCourses(); // Odœwie¿enie listy kursów
+                handleClose(); // Zamykanie modala po pomyœlnym dodaniu kursu
+            } else {
+                setError('Failed to create the course');
+            }
+        } catch (error) {
             setError('Error while creating the course');
         }
     };
@@ -96,10 +94,9 @@ export const AddCourse: React.FC<AddCourseProps> = ({ownerId}) =>  {
                     backgroundColor: '#444',
                     borderRadius: '8px',
                     boxShadow: 2,
-                    marginTop: '20px', // Dodajemy margin-top, aby formularz znajdowa³ siê poni¿ej AppBar
+                    marginTop: '20px',
                 }}
             >
-
                 <Typography variant="h6" color="white" sx={{ marginBottom: '20px' }}>
                     Create a Course
                 </Typography>
@@ -121,11 +118,7 @@ export const AddCourse: React.FC<AddCourseProps> = ({ownerId}) =>  {
                             },
                         }}
                     />
-                    {errorFields.name && (
-                        <Alert severity="error" sx={{ marginBottom: '16px' }}>
-                            {errorFields.name}
-                        </Alert>
-                    )}
+                    {errorFields.name && <Alert severity="error">{errorFields.name}</Alert>}
 
                     <TextField
                         label="Category"
@@ -143,11 +136,7 @@ export const AddCourse: React.FC<AddCourseProps> = ({ownerId}) =>  {
                             },
                         }}
                     />
-                    {errorFields.category && (
-                        <Alert severity="error" sx={{ marginBottom: '16px' }}>
-                            {errorFields.category}
-                        </Alert>
-                    )}
+                    {errorFields.category && <Alert severity="error">{errorFields.category}</Alert>}
 
                     <TextField
                         label="Description"
@@ -165,13 +154,9 @@ export const AddCourse: React.FC<AddCourseProps> = ({ownerId}) =>  {
                             },
                         }}
                     />
-                    {errorFields.description && (
-                        <Alert severity="error" sx={{ marginBottom: '16px' }}>
-                            {errorFields.description}
-                        </Alert>
-                    )}
+                    {errorFields.description && <Alert severity="error">{errorFields.description}</Alert>}
 
-                    {error && <Alert severity="error" sx={{ marginBottom: '16px' }}>{error}</Alert>}
+                    {error && <Alert severity="error">{error}</Alert>}
 
                     <Button
                         type="submit"

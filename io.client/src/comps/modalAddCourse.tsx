@@ -4,7 +4,7 @@ import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
-import AddCourse from '../pages/addCourse';
+import AddCourse from '../pages/addCourse'; // Twoja logika dodawania kursu
 
 const style = {
     position: 'absolute',
@@ -30,25 +30,17 @@ const headerStyle = {
     paddingBottom: '10px',
 };
 
-const contentStyle = {
-    overflowY: 'auto',
-    maxHeight: '60vh',
-    scrollbarWidth: 'thin',
-    '&::-webkit-scrollbar': {
-        width: '8px',
-    },
-    '&::-webkit-scrollbar-thumb': {
-        backgroundColor: '#888',
-        borderRadius: '4px',
-    },
-    '&::-webkit-scrollbar-thumb:hover': {
-        backgroundColor: '#555',
-    },
-};
-
-export default function ModalAddCourse({ ownerId, handleClose }: { ownerId: number, handleClose: () => void }) {
-    const [open, setOpen] = React.useState(true);  // Modal powinien otwieraæ siê tylko raz po klikniêciu przycisku
-
+export default function ModalAddCourse({
+    ownerId,
+    handleClose,
+    open,
+    refreshCourses,
+}: {
+    ownerId: number;
+    handleClose: () => void;
+    open: boolean;
+    refreshCourses: () => void;
+}) {
     return (
         <Modal
             open={open}
@@ -65,9 +57,7 @@ export default function ModalAddCourse({ ownerId, handleClose }: { ownerId: numb
                         <CloseIcon />
                     </IconButton>
                 </div>
-                <Box sx={contentStyle}>
-                    <AddCourse ownerId={ownerId} />
-                </Box>
+                <AddCourse ownerId={ownerId} handleClose={handleClose} refreshCourses={refreshCourses} />
             </Box>
         </Modal>
     );

@@ -17,6 +17,38 @@
         }
       }
     },
+    "/api/AddCourse/addCourse": {
+      "post": {
+        "tags": [
+          "AddCourse"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddCourse"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddCourse"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddCourse"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/Course/list": {
       "get": {
         "tags": [
@@ -444,6 +476,24 @@
   },
   "components": {
     "schemas": {
+      "AddCourse": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "ownerId": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
       "Course": {
         "required": [
           "name",
@@ -633,6 +683,9 @@
   "tags": [
     {
       "name": "TestDatabase"
+    },
+    {
+      "name": "AddCourse"
     },
     {
       "name": "Course"
