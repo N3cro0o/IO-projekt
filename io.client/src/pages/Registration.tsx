@@ -6,6 +6,7 @@ import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import { Alert } from '@mui/material';
 import { ButtonAppBar } from '../comps/AppBar.tsx';
+import { Link} from 'react-router-dom';
 
 export const Registration = () => {
     const [formData, setFormData] = useState({
@@ -242,6 +243,11 @@ export const Registration = () => {
                         Register
                     </Button>
                 </form>
+                <Box sx={{ marginTop: '16px', textAlign: 'center' }}>
+                    <Link to="/LoginPage" style={{ color: '#fff', textDecoration: 'none' }}>
+                        Have an account? Login
+                    </Link>
+                </Box>
             </Box>
         </div>
     );

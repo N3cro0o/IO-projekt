@@ -48,18 +48,18 @@ const UserList: React.FC<UserListProps> = ({ courseId }) => {
     };
 
     const handleAddUsers = async () => {
-        try {
-            const payload = {
-                courseId,
-                userIds: Array.from(selectedUserIds),
-            };
+        const payload = {
+            courseId,
+            userIds: Array.from(selectedUserIds), // Przekszta³cenie Set na tablicê
+        };
 
+        try {
             const response = await fetch('https://localhost:7293/api/CourseUsers/addUsers', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(payload),
+                body: JSON.stringify(payload), 
             });
 
             if (!response.ok) {
