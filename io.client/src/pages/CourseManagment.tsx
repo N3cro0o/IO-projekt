@@ -1,14 +1,18 @@
 import Button from '@mui/material/Button';
 import React, { useEffect, useState } from 'react';
 import BasicModal from '../comps/modal.tsx';
+import ModalChangeUsers from '../comps/modalChangeUsers.tsx';
+import ModalAddCourse from '../comps/modalAddCourse.tsx';
 import { ButtonAppBar } from '../comps/AppBar.tsx';
-import UserList from '../pages/UserList';
+
 
 export const Course = () => {
     const [loading, setLoading] = useState<boolean>(true);
     const [courses, setCourses] = useState<Course[]>([]);
     const [deletedCourse, setDeletedCourse] = useState<string | null>(null);
     const [selectedCourseId, setSelectedCourseId] = useState<number | null>(null);  // Przechowuj tylko ID kursu
+    const [selectedCourseId2, setSelectedCourseId2] = useState<number | null>(null);  // Przechowuj tylko ID kursu
+    const [selectedOwnerId, setSelectedOwnerId] = useState<number | null>(null);
 
     const [formData, setFormData] = useState({
         courseid: '',
@@ -81,6 +85,14 @@ export const Course = () => {
         setSelectedCourseId(courseId);  // Ustawiamy tylko raz, nie bêdziemy zmieniaæ wielokrotnie
     };
 
+    const handleChangeUsers = (courseId: number) => {
+        setSelectedCourseId2(courseId);  // Ustawiamy tylko raz, nie bêdziemy zmieniaæ wielokrotnie
+    };
+
+    const handleAddCourse = (ownerId: number) => {
+        setSelectedOwnerId(ownerId);  // Ustawiamy tylko raz, nie bêdziemy zmieniaæ wielokrotnie
+    };
+
     if (loading) return <div>Loading...</div>;
 
     return (
@@ -117,7 +129,7 @@ export const Course = () => {
                                         <Button onClick={() => handleAddUsers(course.id)} variant="contained">
                                             Add Users
                                         </Button>
-                                        <Button variant="contained" color="warning">
+                                        <Button onClick={() => handleChangeUsers(course.id)} variant="contained" color="warning">
                                             Change Users
                                         </Button>
                                         <Button
@@ -133,7 +145,8 @@ export const Course = () => {
                         </tbody>
                     </table>
                     <div style={{ textAlign: 'left', marginTop: '20px' }}>
-                        <Button variant="contained" color="success">
+                        {/*Wstrzykiwanie OwnerId*/}
+                        <Button onClick={() => handleAddCourse(1)} variant="contained" color="success">
                             Add Course
                         </Button>
                     </div>
@@ -141,6 +154,15 @@ export const Course = () => {
                     {/* Modal bêdzie siê otwiera³, gdy selectedCourseId nie bêdzie null */}
                     {selectedCourseId !== null && (
                         <BasicModal courseId={selectedCourseId} handleClose={() => setSelectedCourseId(null)} />
+                    )}
+                    
+                    {selectedCourseId2 !== null && (
+                        <ModalChangeUsers courseId={selectedCourseId2} handleClose={() => setSelectedCourseId2(null)} />
+                    )}
+
+                    {/*Zmiana na ownerId*/}
+                    {selectedOwnerId !== null && (
+                        <ModalAddCourse ownerId={selectedOwnerId} handleClose={() => setSelectedOwnerId(null)} />
                     )}
                 </div>
             </div>
