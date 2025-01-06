@@ -93,8 +93,7 @@ export const Registration = () => {
                 setError(errorData.Message || 'Error during registration');
             }
         } catch (error) {
-            console.log(error);
-            setError('Error during registration');
+            setError('An error occurred during registration');
         }
     };
 

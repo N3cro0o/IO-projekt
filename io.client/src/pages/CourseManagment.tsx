@@ -66,7 +66,7 @@ export const Course = () => {
     }, []);
 
     const handleDeleteCourse = async (courseid: number, name: string) => {
-        const confirmDelete = window.confirm(`Are you sure about deleting course: "${name}"?`);
+        const confirmDelete = window.confirm(`Czy na pewno chcesz usun¹æ kurs "${name}"?`);
         if (!confirmDelete) return;
 
         try {
