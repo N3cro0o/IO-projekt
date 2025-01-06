@@ -1,0 +1,16 @@
+.user-panel {
+    padding: 20px;
+    min-height: 100vh;
+}
+
+.content-container {
+    margin-top: 20px;
+}
+
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 80vh;
+}

@@ -1,7 +1,10 @@
-import React from 'react';
-//import useState from 'react';
-class User extends React.Component<{ login: string, pass : string, id : number }, {count: number}> {
-    state = { count: 0 };
+export interface User {
+    id: number;
+    login: string;
+    password: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    userType: string; // Mo¿esz u¿yæ bardziej szczegó³owego typu np. enum
 }
 
-export default User;

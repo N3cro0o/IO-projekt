@@ -1,98 +1,64 @@
-﻿using System.Diagnostics;
-using System.Numerics;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
+using System.Collections.Generic;
 
 namespace IO.Server.Elements
 {
-
     public class User
     {
-        public enum TYPE
-        {
-            Guest = 0,
-            Student = 1,
-            Teacher = 2,
-            Admin = 10,
-        }
-
-        string[] names = { "Staszek", "Mathew" , "Franio", "Domino", "Karol"};
+        [JsonInclude]
+        public int? ID { get; set; }
 
         [JsonInclude]
-        int ID { get; set; }
+        public string Login { get; set; }
 
         [JsonInclude]
-        string Login { get; set; }
-
-        [JsonInclude]
-        string Password { get; set; }
+        public string PasswordHash { get; set; } // Zmienione z Password na PasswordHash
 
         [JsonInclude]
         public string FirstName { get; set; }
 
+        [JsonInclude]
         public string LastName { get; set; }
 
         [JsonInclude]
-        string Email { get; set; }
-
-        public TYPE UserType { get; set; } = TYPE.Guest;
+        public string Email { get; set; }
 
         [JsonInclude]
-        List<int> Courses { get; set; } = new List<int>();
+        public string UserRole { get; set; }
+
+        [JsonInclude]
+        public List<int> Courses { get; set; } = new List<int>();
 
         string Token { get; set; } = "";
 
-        public User(int id, string login, string pass, string email, string fName, string lName, TYPE type = TYPE.Guest)
+        // Konstruktor z haszowanym hasłem
+        public User(int? id, string login, string passwordHash, string email, string fName, string lName, string role)
         {
             ID = id;
             Login = login;
-            Password = pass;
+            PasswordHash = passwordHash; // Zmieniamy na hash hasła
             Email = email;
             FirstName = fName;
             LastName = lName;
-            UserType = type;
+            UserRole = role;
         }
 
-        public User()
-        {
-            Random rng = new Random();
-            int lSize = 8;
-            int pSize = 10;
-            string login = "";
-            string password = "";
-
-            for (int i = 0; i < lSize; i++)
-            {
-                login += Convert.ToChar(rng.Next(0, 26) + 65);
-            }
-            for (int i = 0; i < pSize; i++)
-            {
-                password += Convert.ToChar(rng.Next(0, 26) + 65);
-            }
-
-            ID = rng.Next();
-            Login = login;
-            Password = password;
-            Email = login + "@" + password + ".com";
-            FirstName = names[rng.Next(0, 5)];
-            LastName = names[rng.Next(0, 5)];
-            UserType = TYPE.Guest;
-        }
+        public User() { }
 
         public void SetID(int id)
         {
             ID = id;
         }
 
-        public bool CorrectLoginData(string login, string pass)
-        {
-            if (login != Login || pass != Password)
-                return false;
-            return true;
-        }
+        // Weryfikacja hasła przy logowaniu
+        //public bool VerifyPassword(string password)
+        //{
+        //    return BCrypt.Net.BCrypt.Verify(password, PasswordHash); // Weryfikacja hasła z hashem
+        //}
 
         public void SetToken(string token)
         {
-            if (token != null) 
+            if (token != null)
                 Token = token;
         }
     }

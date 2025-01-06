@@ -1,111 +1,145 @@
-
 import { Link, useNavigate } from 'react-router-dom';
 import { ButtonAppBar } from '../comps/AppBar.tsx';
 import { useState } from 'react';
-import '../App.css';
 import Button from '@mui/material/Button';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import TextField from '@mui/material/TextField';
+import { Alert } from '@mui/material';
 
 export const Login = () => {
-    const [login, setLogin] = useState('');
-    const [pass, setPass] = useState('');
+    const [formData, setFormData] = useState({
+        login: '',
+        password: '',
+    });
+
     const [loginError, setLoginError] = useState('');
-    const [passError, setPassError] = useState('');
+    const [passwordError, setPasswordError] = useState('');
     const navigate = useNavigate(); // hook do nawigacji w React Router v6
 
-    // Zmienne do zarz�dzania stanem
-    const handleLogin = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setLogin(event.target.value);
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setFormData({ ...formData, [name]: value }); // Aktualizacja formData na podstawie nazwy pola
     };
 
-    const handlePass = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setPass(event.target.value);
-    };
-
-    // Funkcja do wysyłania danych logowania na backend
     const checkLogin = async (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault(); // Zapobiega prze�adowaniu strony
+        event.preventDefault(); // Zapobiega przeładowaniu strony
 
-        // Resetowanie błędów
         setLoginError('');
-        setPassError('');
+        setPasswordError('');
 
-        // Walidacja
-        if (!login || !pass) {
-            if (!login) setLoginError('Wprowad� nazw� u�ytkownika');
-            if (!pass) setPassError('Wprowad� has�o');
+        if (!formData.login || !formData.password) {
+            if (!formData.login) setLoginError('Enter login');
+            if (!formData.password) setPasswordError('Enter password');
             return;
         }
 
-        const data_to_send = {
-            username: login,
-            password: pass,
-        };
-
-        const data = {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data_to_send),
-        };
-
         try {
-            const resp = await fetch('/api/login/loginRequest', data);
-            if (resp.ok) {
-                const json_data = await resp.json();
-                console.log('Token:', json_data.Token);
+            const response = await fetch('https://localhost:7293/api/Login/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    Login: formData.login,
+                    Password: formData.password,
+                }),
+            });
 
-                // Zapisujemy token w localStorage
+            if (response.ok) {
+                const json_data = await response.json();
                 localStorage.setItem('authToken', json_data.Token);
-
-                // Przekierowanie na stron� po zalogowaniu za pomoc� React Router
-                navigate('/UserPanel'); // U�ycie hooka navigate do przekierowania
+                navigate('/UserPanel');
             } else {
-                console.error('B��d logowania');
-                setLoginError('Niepoprawne dane logowania'); // Wy�wietlenie b��du
+                setLoginError('Incorrect login details');
             }
         } catch (error) {
-            console.error('B��d podczas logowania:', error);
-            setLoginError('Wyst�pi� b��d podczas logowania'); // Komunikat o b��dzie w przypadku problemu z serwerem
+            setLoginError('An error occurred while logging in ');
         }
     };
 
     return (
-        <div>
-            <div id="mainContainer">
-                <ButtonAppBar />
-                <div id="loginContainer">
-                    <form onSubmit={checkLogin}>
-                        <label>
-                            <p>Username</p>
-                            <input type="text" value={login} onChange={handleLogin} />
-                        </label>
-                        {loginError && <p className="error">{loginError}</p>} {/* Wy�wietlenie b��du dla loginu */}
+        <div id="mainContainer" style={{ padding: '20px' }}>
+            <ButtonAppBar />
+            <div id="loginContainer" style={{ marginTop: '20px' }}>
+                <Box
+                    sx={{
+                        maxWidth: '400px',
+                        margin: '0 auto',
+                        padding: '20px',
+                        backgroundColor: '#444',
+                        borderRadius: '8px',
+                        boxShadow: 2,
+                    }}
+                >
+                    <Typography variant="h6" color="white" sx={{ marginBottom: '20px' }}>
+                        Login to your account
+                    </Typography>
 
-                        <br />
-                        <br />
-                        <label>
-                            <p>Password</p>
-                            <input type="password" value={pass} onChange={handlePass} />
-                        </label>
-                        {passError && <p className="error">{passError}</p>} {/* Wy�wietlenie b��du dla has�a */}
-                        <br />
-                        <br />
+                    <form onSubmit={checkLogin}>
+                        <TextField
+                            label="Username"
+                            name="login"
+                            type="text"
+                            value={formData.login}
+                            onChange={handleChange}
+                            fullWidth
+                            sx={{
+                                marginBottom: '16px',
+                                '& .MuiInputLabel-root': { color: 'white' },
+                                '& .MuiInputBase-root': {
+                                    backgroundColor: '#333',
+                                    color: 'white',
+                                },
+                            }}
+                        />
+                        {loginError && (
+                            <Alert severity="error" sx={{ marginBottom: '16px' }}>
+                                {loginError}
+                            </Alert>
+                        )}
+                        <TextField
+                            label="Password"
+                            name="password"
+                            type="password"
+                            value={formData.password}
+                            onChange={handleChange}
+                            fullWidth
+                            sx={{
+                                marginBottom: '16px',
+                                '& .MuiInputLabel-root': { color: 'white' },
+                                '& .MuiInputBase-root': {
+                                    backgroundColor: '#333',
+                                    color: 'white',
+                                },
+                            }}
+                        />
+                        {passwordError && (
+                            <Alert severity="error" sx={{ marginBottom: '16px' }}>
+                                {passwordError}
+                            </Alert>
+                        )}
                         <Button
                             type="submit"
+                            fullWidth
+                            variant="contained"
                             sx={{
-                                color: '#ffffff',
+                                color: '#fff',
                                 backgroundColor: '#007bff',
-                                '&:hover': {
-                                    backgroundColor: '#0056b3',
-                                },
+                                '&:hover': { backgroundColor: '#0056b3' },
+                                marginTop: '20px',
                             }}
                         >
                             Login
                         </Button>
                     </form>
-                    <br />
-                    <br />
-                    <Link to="/">Go back</Link> {/* Link do powrotu na stron� g��wn� */}
-                </div>
+
+                    <Box sx={{ marginTop: '16px', textAlign: 'center' }}>
+                        <Link to="/" style={{ color: '#fff', textDecoration: 'none' }}>
+                            Go back
+                        </Link>
+                    </Box>
+                </Box>
             </div>
         </div>
     );
