@@ -48,18 +48,18 @@ const UserList: React.FC<UserListProps> = ({ courseId }) => {
     };
 
     const handleAddUsers = async () => {
-        const payload = {
-            courseId,
-            userIds: Array.from(selectedUserIds), // Przekszta³cenie Set na tablicê
-        };
-
         try {
-            const response = await fetch('https://localhost:7293/api/CourseUsers/addUsers', {
+            const payload = {
+                courseId,
+                userIds: Array.from(selectedUserIds),
+            };
+
+            const response = await fetch('https://localhost:7293/api/ChangeCourseUsers/kickUsers', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(payload), 
+                body: JSON.stringify(payload),
             });
 
             if (!response.ok) {
@@ -76,7 +76,7 @@ const UserList: React.FC<UserListProps> = ({ courseId }) => {
 
     return (
         <div style={{ backgroundColor: '#333', padding: '20px', borderRadius: '8px', color: '#fff' }}>
-            <h2>Select Users for Course</h2> 
+            <h2>Kick Users from Course</h2>
             <TableContainer component={Paper} sx={{ backgroundColor: '#444', borderRadius: '8px' }}>
                 <Table sx={{ minWidth: 650 }} aria-label="user table">
                     <TableHead>
@@ -104,8 +104,8 @@ const UserList: React.FC<UserListProps> = ({ courseId }) => {
                 </Table>
             </TableContainer>
             <div style={{ marginTop: '20px' }}>
-                <Button variant="contained" color="success" onClick={handleAddUsers}>
-                    Add Users
+                <Button variant="contained" color="warning" onClick={handleAddUsers}>
+                    Kick Users
                 </Button>
             </div>
         </div>

@@ -1,6 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import './CourseTests.css';
+import {
+    Box,
+    Button,
+    Card,
+    CardContent,
+    Typography,
+    CircularProgress,
+    Snackbar,
+} from '@mui/material';
+import { ButtonAppBar } from '../comps/AppBar.tsx';
 
 interface Test {
     testId: number;
@@ -14,13 +23,12 @@ interface Test {
 const formatDate = (dateString: string): string => {
     const date = new Date(dateString);
     const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // Miesi¹ce s¹ indeksowane od 0
+    const month = String(date.getMonth() + 1).padStart(2, '0');
     const year = date.getFullYear();
     const hours = String(date.getHours()).padStart(2, '0');
     const minutes = String(date.getMinutes()).padStart(2, '0');
-    const seconds = String(date.getSeconds()).padStart(2, '0');
 
-    return `${day}-${month}-${year} ; ${hours}:${minutes}:${seconds}`;
+    return `${day}-${month}-${year} ${hours}:${minutes}`;
 };
 
 const CourseTests: React.FC = () => {
@@ -41,7 +49,7 @@ const CourseTests: React.FC = () => {
                 const data: Test[] = await response.json();
                 setTests(data);
             } catch (error) {
-                console.error("B³¹d podczas pobierania testów:", error);
+                console.error('Error while fetching tests:', error);
                 setTests([]);
             } finally {
                 setLoading(false);
@@ -65,7 +73,7 @@ const CourseTests: React.FC = () => {
                             ? {
                                 ...test,
                                 startTime: new Date().toISOString(),
-                                endTime: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString()
+                                endTime: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(),
                             }
                             : test
                     )
@@ -74,14 +82,14 @@ const CourseTests: React.FC = () => {
                 console.error(`Failed to start test: ${response.status}`);
             }
         } catch (error) {
-            console.error("Error starting test:", error);
+            console.error('Error starting test:', error);
         } finally {
             setTimeout(() => setStartedTest(null), 5000);
         }
     };
 
     const handleDeleteTest = async (testId: number, testName: string) => {
-        const confirmDelete = window.confirm(`Czy na pewno chcesz usun¹æ test "${testName}"?`);
+        const confirmDelete = window.confirm(`Are you sure you want to delete the test "${testName}"?`);
         if (!confirmDelete) return;
 
         try {
@@ -94,10 +102,10 @@ const CourseTests: React.FC = () => {
                 setDeletedTest(testName);
                 setTimeout(() => setDeletedTest(null), 5000);
             } else {
-                console.error(`B³¹d podczas usuwania testu: ${response.status}`);
+                console.error(`Error while deleting test: ${response.status}`);
             }
         } catch (error) {
-            console.error("B³¹d podczas usuwania testu:", error);
+            console.error('Error while deleting test:', error);
         }
     };
 
@@ -109,52 +117,95 @@ const CourseTests: React.FC = () => {
         navigate(`/course/${courseId}/test/${testId}/results`);
     };
 
-    if (loading) {
-        return <p>£adowanie testów...</p>;
-    }
-
     return (
-        <div className="course-tests">
-            <h1>Testy dla kursu: {courseId}</h1>
-            {startedTest && (
-                <div className="success-banner">
-                    Test <strong>{startedTest}</strong> rozpoczêty prawidlowo!
-                </div>
-            )}
-            {deletedTest && (
-                <div className="error-banner">
-                    Test <strong>{deletedTest}</strong> zosta³ usuniety!
-                </div>
-            )}
-            {tests.length === 0 ? (
-                <p>Brak testów do wyœwietlenia.</p>
-            ) : (
-                <ul>
-                    {tests.map((test) => (
-                        <li key={test.testId} className="test-card">
-                            <h3>{test.name}</h3>
-                            <p>Kategoria: {test.category}</p>
-                            <p>Data rozpoczecia: {test.startTime ? formatDate(test.startTime) : "Nie ustawiono"}</p>
-                            <p>Data zakonczenia: {test.endTime ? formatDate(test.endTime) : "Nie ustawiono"}</p>
-                            <button className="button" onClick={() => handleSetTime(test.testId)}>
-                                Ustaw czas rozpoczecia i zakonczenia testu
-                            </button>
-                            <button className="button" onClick={() => handleStartTest(test.name, test.testId)}>
-                                Rozpocznij test
-                            </button>
-                            <button
-                                className="button"
-                                onClick={() => handleDeleteTest(test.testId, test.name)}
+        <div>
+            <ButtonAppBar />
+            <Box sx={{ padding: '60px 20px 20px', maxWidth: '800px', margin: '0 auto' }}>
+                <Typography variant="h4" color="white" align="center" gutterBottom>
+                    Test Panel
+                </Typography>
+                {loading ? (
+                    <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
+                        <CircularProgress />
+                    </Box>
+                ) : tests.length === 0 ? (
+                    <Typography variant="h6" align="center">No tests available.</Typography>
+                ) : (
+                    <Box sx={{ display: 'grid', gap: '16px' }}>
+                        {tests.map((test) => (
+                            <Card
+                                key={test.testId}
+                                sx={{
+                                    backgroundColor: '#444',
+                                    color: 'white',
+                                    textAlign: 'center',
+                                    maxWidth: '600px',
+                                    margin: '0 auto',
+                                }}
                             >
-                                Usun test
-                            </button>
-                            <button className="button" onClick={() => handleCheckResults(test.testId)}>
-                                Pobierz raport
-                            </button>
-                        </li>
-                    ))}
-                </ul>
-            )}
+                                <CardContent>
+                                    <Typography variant="h6">{test.name}</Typography>
+                                    <Typography variant="body2">Category: {test.category}</Typography>
+                                    <Typography variant="body2">
+                                        Dates: {test.startTime ? formatDate(test.startTime) : 'Not set'}{' '}
+                                        - {test.endTime ? formatDate(test.endTime) : 'Not set'}
+                                    </Typography>
+                                    <Box
+                                        sx={{
+                                            display: 'flex',
+                                            flexWrap: 'wrap',
+                                            gap: '8px',
+                                            marginTop: '12px',
+                                            justifyContent: 'center',
+                                        }}
+                                    >
+                                        <Button
+                                            variant="contained"
+                                            color="primary"
+                                            onClick={() => handleSetTime(test.testId)}
+                                        >
+                                            Set time
+                                        </Button>
+                                        <Button
+                                            variant="contained"
+                                            color="success"
+                                            onClick={() => handleStartTest(test.name, test.testId)}
+                                        >
+                                            Start test
+                                        </Button>
+                                        <Button
+                                            variant="contained"
+                                            color="error"
+                                            onClick={() => handleDeleteTest(test.testId, test.name)}
+                                        >
+                                            Delete test
+                                        </Button>
+                                        <Button
+                                            variant="contained"
+                                            color="info"
+                                            onClick={() => handleCheckResults(test.testId)}
+                                        >
+                                            View report
+                                        </Button>
+                                    </Box>
+                                </CardContent>
+                            </Card>
+                        ))}
+                    </Box>
+                )}
+                <Snackbar
+                    open={!!startedTest}
+                    autoHideDuration={5000}
+                    onClose={() => setStartedTest(null)}
+                    message={`Test "${startedTest}" started successfully!`}
+                />
+                <Snackbar
+                    open={!!deletedTest}
+                    autoHideDuration={5000}
+                    onClose={() => setDeletedTest(null)}
+                    message={`Test "${deletedTest}" deleted successfully!`}
+                />
+            </Box>
         </div>
     );
 };

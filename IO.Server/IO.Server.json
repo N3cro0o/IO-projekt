@@ -17,6 +17,38 @@
         }
       }
     },
+    "/api/AddCourse/addCourse": {
+      "post": {
+        "tags": [
+          "AddCourse"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddCourse"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddCourse"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddCourse"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/Course/list": {
       "get": {
         "tags": [
@@ -55,6 +87,76 @@
         }
       }
     },
+    "/api/CoursesManager/listCourses": {
+      "get": {
+        "tags": [
+          "CoursesManager"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CourseToReveal"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CourseToReveal"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CourseToReveal"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/DeleteCourse/deleteCourse": {
+      "delete": {
+        "tags": [
+          "DeleteCourse"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteCourseRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteCourseRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteCourseRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/DeleteTest/{testId}": {
       "delete": {
         "tags": [
@@ -71,6 +173,38 @@
             }
           }
         ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Login/login": {
+      "post": {
+        "tags": [
+          "Login"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginData"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginData"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginData"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "200": {
             "description": "OK"
@@ -150,6 +284,38 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/api/Registration/register": {
+      "post": {
+        "tags": [
+          "Registration"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewUser"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewUser"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewUser"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
           }
         }
       }
@@ -310,6 +476,24 @@
   },
   "components": {
     "schemas": {
+      "AddCourse": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "ownerId": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
       "Course": {
         "required": [
           "name",
@@ -361,6 +545,62 @@
           }
         }
       },
+      "CourseToReveal": {
+        "type": "object",
+        "properties": {
+          "courseid": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "courseName": {
+            "type": "string"
+          },
+          "ownerid": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "DeleteCourseRequest": {
+        "type": "object",
+        "properties": {
+          "courseid": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "LoginData": {
+        "type": "object",
+        "properties": {
+          "login": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        }
+      },
+      "NewUser": {
+        "type": "object",
+        "properties": {
+          "login": {
+            "type": "string"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "passwordHash": {
+            "type": "string"
+          }
+        }
+      },
       "Test": {
         "type": "object",
         "properties": {
@@ -408,12 +648,13 @@
         "properties": {
           "id": {
             "type": "integer",
-            "format": "int32"
+            "format": "int32",
+            "nullable": true
           },
           "login": {
             "type": "string"
           },
-          "password": {
+          "passwordHash": {
             "type": "string"
           },
           "firstName": {
@@ -425,7 +666,7 @@
           "email": {
             "type": "string"
           },
-          "userType": {
+          "userRole": {
             "type": "string"
           },
           "courses": {
@@ -444,13 +685,28 @@
       "name": "TestDatabase"
     },
     {
+      "name": "AddCourse"
+    },
+    {
       "name": "Course"
+    },
+    {
+      "name": "CoursesManager"
+    },
+    {
+      "name": "DeleteCourse"
     },
     {
       "name": "DeleteTest"
     },
     {
+      "name": "Login"
+    },
+    {
       "name": "Main"
+    },
+    {
+      "name": "Registration"
     },
     {
       "name": "SetTestTime"

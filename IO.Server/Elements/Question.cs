@@ -5,6 +5,7 @@ namespace IO.Server.Elements
 {
     public class Question
     {
+        // This is a question class
         public enum QUESTION_TYPE
         {
             Closed,

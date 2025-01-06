@@ -10,11 +10,13 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="src\comps\App.tsx" />
+    <None Remove="src\pages\CourseTests.css" />
     <None Remove="src\pages\index.tsx" />
+    <None Remove="src\pages\RandUsers.tsx" />
     <None Remove="src\pages\Results.tsx" />
+    <None Remove="src\comps\Modal.css" />
     <None Remove="src\pages\TestDB.tsx" />
     <None Remove="src\pages\TestList.css" />
     <None Remove="src\pages\TestList.tsx" />
-    <None Remove="src\pages\UserList.tsx" />
   </ItemGroup>
 </Project>

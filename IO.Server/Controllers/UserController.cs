@@ -39,8 +39,8 @@ namespace IO.Server.Controllers
                             fName: reader.GetString(2),
                             lName: reader.GetString(3),
                             email: reader.GetString(4),
-                            pass: reader.GetString(5),
-                            type: reader.GetString(6)
+                            passwordHash: reader.GetString(5),
+                            role: reader.GetString(6)
                         );
                         users.Add(user);
                     }
