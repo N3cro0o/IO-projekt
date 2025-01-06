@@ -17,7 +17,64 @@
         }
       }
     },
-
+    "/api/test/{courseId}/{testId}/users": {
+      "get": {
+        "tags": [
+          "Test"
+        ],
+        "parameters": [
+          {
+            "name": "courseId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "testId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/Course/list": {
       "get": {
         "tags": [
@@ -52,7 +109,80 @@
                 }
               }
             }
-
+          }
+        }
+      }
+    },
+    "/api/CoursesManager/listCourses": {
+      "get": {
+        "tags": [
+          "CoursesManager"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CourseToReveal"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CourseToReveal"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CourseToReveal"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/DeleteCourse/deleteCourse": {
+      "delete": {
+        "tags": [
+          "DeleteCourse"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteCourseRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteCourseRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteCourseRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/Login/login": {
       "post": {
         "tags": [
@@ -81,7 +211,6 @@
         "responses": {
           "200": {
             "description": "OK"
-
           }
         }
       }
@@ -99,7 +228,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/User"
+                    "$ref": "#/components/schemas/User2"
                   }
                 }
               },
@@ -107,7 +236,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/User"
+                    "$ref": "#/components/schemas/User2"
                   }
                 }
               },
@@ -115,7 +244,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/User"
+                    "$ref": "#/components/schemas/User2"
                   }
                 }
               }
@@ -162,53 +291,6 @@
         }
       }
     },
-
-    "/api/Test/{courseId}/tests": {
-      "get": {
-        "tags": [
-          "Test"
-        ],
-        "parameters": [
-          {
-            "name": "courseId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Test"
-                  }
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Test"
-                  }
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Test"
-                  }
-                }
-              }
-            }
-
     "/api/Registration/register": {
       "post": {
         "tags": [
@@ -237,7 +319,6 @@
         "responses": {
           "200": {
             "description": "OK"
-
           }
         }
       }
@@ -255,7 +336,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/User"
+                    "$ref": "#/components/schemas/User2"
                   }
                 }
               },
@@ -263,7 +344,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/User"
+                    "$ref": "#/components/schemas/User2"
                   }
                 }
               },
@@ -271,7 +352,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/User"
+                    "$ref": "#/components/schemas/User2"
                   }
                 }
               }
@@ -334,28 +415,26 @@
           }
         }
       },
-      "Test": {
+      "CourseToReveal": {
         "type": "object",
         "properties": {
-          "testId": {
+          "courseid": {
             "type": "integer",
             "format": "int32"
           },
-          "name": {
+          "courseName": {
             "type": "string"
           },
-          "startTime": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "endTime": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "category": {
-            "type": "string"
-          },
-          "courseId": {
+          "ownerid": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "DeleteCourseRequest": {
+        "type": "object",
+        "properties": {
+          "courseid": {
             "type": "integer",
             "format": "int32"
           }
@@ -393,6 +472,24 @@
         }
       },
       "User": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "surname": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          }
+        }
+      },
+      "User2": {
         "type": "object",
         "properties": {
           "id": {
@@ -434,19 +531,25 @@
       "name": "TestDatabase"
     },
     {
-
+      "name": "Test"
+    },
+    {
       "name": "Course"
+    },
+    {
+      "name": "CoursesManager"
+    },
+    {
+      "name": "DeleteCourse"
+    },
+    {
       "name": "Login"
-
     },
     {
       "name": "Main"
     },
     {
-
-      "name": "Test"
       "name": "Registration"
-
     },
     {
       "name": "User"

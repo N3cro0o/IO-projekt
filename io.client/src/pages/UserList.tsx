@@ -1,8 +1,17 @@
 import React, { useEffect, useState } from 'react';
+import { Button, Checkbox, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 
-import { User } from '../User';
+interface User {
+    id: number;
+    login: string;
+    email: string;
+}
 
-const UserList: React.FC = () => {
+interface UserListProps {
+    courseId: number;
+}
+
+const UserList: React.FC<UserListProps> = ({ courseId }) => {
     const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [selectedUserIds, setSelectedUserIds] = useState<Set<number>>(new Set());
@@ -38,14 +47,19 @@ const UserList: React.FC = () => {
         });
     };
 
-    const handleAddToCourse = async () => {
+    const handleAddUsers = async () => {
         try {
+            const payload = {
+                courseId,
+                userIds: Array.from(selectedUserIds),
+            };
+
             const response = await fetch('https://localhost:7293/api/CourseUsers/addUsers', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(Array.from(selectedUserIds)),
+                body: JSON.stringify(payload),
             });
 
             if (!response.ok) {
@@ -61,33 +75,39 @@ const UserList: React.FC = () => {
     if (loading) return <div>Loading...</div>;
 
     return (
-        <div>
-            <h1>User List</h1>
-            <table border="1" style={{ borderCollapse: 'collapse', width: '100%' }}>
-                <thead>
-                    <tr>
-                        <th>Select</th>
-                        <th>Login</th>
-                        <th>Email</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {users.map((user) => (
-                        <tr key={user.id}>
-                            <td>
-                                <input
-                                    type="checkbox"
-                                    checked={selectedUserIds.has(user.id)}
-                                    onChange={() => handleCheckboxChange(user.id)}
-                                />
-                            </td>
-                            <td>{user.login}</td>
-                            <td>{user.email}</td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-            <button onClick={handleAddToCourse}>Add to Course</button>
+        <div style={{ backgroundColor: '#333', padding: '20px', borderRadius: '8px', color: '#fff' }}>
+            <h2>Select Users for Course ID: {courseId}</h2>
+            <TableContainer component={Paper} sx={{ backgroundColor: '#444', borderRadius: '8px' }}>
+                <Table sx={{ minWidth: 650 }} aria-label="user table">
+                    <TableHead>
+                        <TableRow>
+                            <TableCell style={{ color: '#fff' }}>Select</TableCell>
+                            <TableCell style={{ color: '#fff' }}>Login</TableCell>
+                            <TableCell style={{ color: '#fff' }}>Email</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {users.map((user) => (
+                            <TableRow key={user.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                                <TableCell component="th" scope="row">
+                                    <Checkbox
+                                        checked={selectedUserIds.has(user.id)}
+                                        onChange={() => handleCheckboxChange(user.id)}
+                                        sx={{ color: '#fff' }}
+                                    />
+                                </TableCell>
+                                <TableCell style={{ color: '#fff' }}>{user.login}</TableCell>
+                                <TableCell style={{ color: '#fff' }}>{user.email}</TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+            <div style={{ marginTop: '20px' }}>
+                <Button variant="contained" color="success" onClick={handleAddUsers}>
+                    Add Users
+                </Button>
+            </div>
         </div>
     );
 };

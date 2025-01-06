@@ -1,8 +1,11 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { ButtonAppBar } from '../comps/AppBar.tsx';
 import { useState } from 'react';
-import '../App.css';
 import Button from '@mui/material/Button';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import TextField from '@mui/material/TextField';
+import { Alert } from '@mui/material';
 
 export const Login = () => {
     const [formData, setFormData] = useState({
@@ -56,47 +59,87 @@ export const Login = () => {
     };
 
     return (
-        <div>
-            <div id="mainContainer">
-                <ButtonAppBar />
-                <div id="loginContainer">
+        <div id="mainContainer" style={{ padding: '20px' }}>
+            <ButtonAppBar />
+            <div id="loginContainer" style={{ marginTop: '20px' }}>
+                <Box
+                    sx={{
+                        maxWidth: '400px',
+                        margin: '0 auto',
+                        padding: '20px',
+                        backgroundColor: '#444',
+                        borderRadius: '8px',
+                        boxShadow: 2,
+                    }}
+                >
+                    <Typography variant="h6" color="white" sx={{ marginBottom: '20px' }}>
+                        Login to your account
+                    </Typography>
+
                     <form onSubmit={checkLogin}>
-                        <label>
-                            <p>Username</p>
-                            <input
-                                type="text"
-                                name="login"
-                                value={formData.login}
-                                onChange={handleChange}
-                            />
-                        </label>
-                        {loginError && <p className="error">{loginError}</p>}
-                        <br />
-                        <label>
-                            <p>Password</p>
-                            <input
-                                type="password"
-                                name="password"
-                                value={formData.password}
-                                onChange={handleChange}
-                            />
-                        </label>
-                        {passwordError && <p className="error">{passwordError}</p>}
-                        <br />
+                        <TextField
+                            label="Username"
+                            name="login"
+                            type="text"
+                            value={formData.login}
+                            onChange={handleChange}
+                            fullWidth
+                            sx={{
+                                marginBottom: '16px',
+                                '& .MuiInputLabel-root': { color: 'white' },
+                                '& .MuiInputBase-root': {
+                                    backgroundColor: '#333',
+                                    color: 'white',
+                                },
+                            }}
+                        />
+                        {loginError && (
+                            <Alert severity="error" sx={{ marginBottom: '16px' }}>
+                                {loginError}
+                            </Alert>
+                        )}
+                        <TextField
+                            label="Password"
+                            name="password"
+                            type="password"
+                            value={formData.password}
+                            onChange={handleChange}
+                            fullWidth
+                            sx={{
+                                marginBottom: '16px',
+                                '& .MuiInputLabel-root': { color: 'white' },
+                                '& .MuiInputBase-root': {
+                                    backgroundColor: '#333',
+                                    color: 'white',
+                                },
+                            }}
+                        />
+                        {passwordError && (
+                            <Alert severity="error" sx={{ marginBottom: '16px' }}>
+                                {passwordError}
+                            </Alert>
+                        )}
                         <Button
                             type="submit"
+                            fullWidth
+                            variant="contained"
                             sx={{
-                                color: '#ffffff',
+                                color: '#fff',
                                 backgroundColor: '#007bff',
                                 '&:hover': { backgroundColor: '#0056b3' },
+                                marginTop: '20px',
                             }}
                         >
                             Login
                         </Button>
                     </form>
-                    <br />
-                    <Link to="/">Go back</Link>
-                </div>
+
+                    <Box sx={{ marginTop: '16px', textAlign: 'center' }}>
+                        <Link to="/" style={{ color: '#fff', textDecoration: 'none' }}>
+                            Go back
+                        </Link>
+                    </Box>
+                </Box>
             </div>
         </div>
     );

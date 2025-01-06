@@ -9,6 +9,7 @@ import UserPanel from './pages/UserPanel';
 
 import CourseTests from './pages/CourseTests';
 import TestResults from './pages/TestResults';
+import Course from './pages/CourseManagment';
 
 import { Registration } from './pages/Registration';
 
@@ -28,6 +29,7 @@ function App() {
                     <Route path="/course/:courseId/test/:testId/results" element={<TestResults />} />
 
                     <Route path="/Registration" element={<Registration />} />
+                    <Route path="/CourseManagment" element={<Course />} />
 
                 </Routes>
             </HRouter>

@@ -12,13 +12,13 @@ const style = {
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    width: '90%',
-    maxWidth: 600,
-    bgcolor: 'background.paper',
-    border: '2px solid #000',
+    width: '80%',
+    maxWidth: 800,
+    bgcolor: '#333',
+    color: '#fff',
+    borderRadius: '16px',
     boxShadow: 24,
     p: 4,
-    borderRadius: '16px', // Zaokr¹glone rogi
     overflow: 'hidden',
 };
 
@@ -27,12 +27,14 @@ const headerStyle = {
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: '16px',
+    borderBottom: '2px solid #555',
+    paddingBottom: '10px',
 };
 
 const contentStyle = {
     overflowY: 'auto',
     maxHeight: '60vh',
-    scrollbarWidth: 'thin', // Dodano stylizacjê scrollbarów
+    scrollbarWidth: 'thin',
     '&::-webkit-scrollbar': {
         width: '8px',
     },
@@ -45,34 +47,29 @@ const contentStyle = {
     },
 };
 
-export default function BasicModal() {
-    const [open, setOpen] = React.useState(false);
-    const handleOpen = () => setOpen(true);
-    const handleClose = () => setOpen(false);
+export default function BasicModal({ courseId, handleClose }: { courseId: number, handleClose: () => void }) {
+    const [open, setOpen] = React.useState(true);  // Modal powinien otwieraæ siê tylko raz po klikniêciu przycisku
 
     return (
-        <div>
-            <Button onClick={handleOpen}>Open modal</Button>
-            <Modal
-                open={open}
-                onClose={handleClose}
-                aria-labelledby="modal-modal-title"
-                aria-describedby="modal-modal-description"
-            >
-                <Box sx={style}>
-                    <div style={headerStyle}>
-                        <Typography id="modal-modal-title" variant="h6" component="h2">
-                            User List
-                        </Typography>
-                        <IconButton onClick={handleClose} style={{ color: 'red' }}>
-                            <CloseIcon />
-                        </IconButton>
-                    </div>
-                    <Box sx={{ ...contentStyle }}> {/* Dodano scrollbar i przewijanie */}
-                        <UserList />
-                    </Box>
+        <Modal
+            open={open}
+            onClose={handleClose}
+            aria-labelledby="modal-modal-title"
+            aria-describedby="modal-modal-description"
+        >
+            <Box sx={style}>
+                <div style={headerStyle}>
+                    <Typography id="modal-modal-title" variant="h6" component="h2">
+                        User List for Course ID: {courseId}
+                    </Typography>
+                    <IconButton onClick={handleClose} style={{ color: 'red' }}>
+                        <CloseIcon />
+                    </IconButton>
+                </div>
+                <Box sx={contentStyle}>
+                    <UserList courseId={courseId} />
                 </Box>
-            </Modal>
-        </div>
+            </Box>
+        </Modal>
     );
 }
