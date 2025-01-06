@@ -13,6 +13,7 @@ import Course from './pages/CourseManagment';
 
 import { Registration } from './pages/Registration';
 import SetTestTimePage from './pages/SetTestTimePage';
+import { UserProfilePage } from './pages/AccountManager';
 
 function App() {
     const [token, setToken] = useState(-1);
@@ -30,6 +31,7 @@ function App() {
                     <Route path="/Registration" element={<Registration />} />
                     <Route path="/CourseManagment" element={<Course />} />
                     <Route path="/course/:courseId/test/:testId/set-time" element={<SetTestTimePage />} />
+                    <Route path="/AccountManager" element={<UserProfilePage />} />
 
                 </Routes>
             </HRouter>
