@@ -4,7 +4,7 @@ import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
-import UserList from '../pages/UserList';
+import ChangeUserList from '../pages/changeUserList';
 
 const style = {
     position: 'absolute',
@@ -46,7 +46,7 @@ const contentStyle = {
     },
 };
 
-export default function BasicModal({ courseId, coursename, handleClose }: { courseId: number, coursename: string, handleClose: () => void }) {
+export default function ModalChangeUsers({ courseId, coursename, handleClose }: { courseId: number, coursename: string, handleClose: () => void }) {
     const [open, setOpen] = React.useState(true);  // Modal powinien otwieraæ siê tylko raz po klikniêciu przycisku
 
     return (
@@ -59,14 +59,14 @@ export default function BasicModal({ courseId, coursename, handleClose }: { cour
             <Box sx={style}>
                 <div style={headerStyle}>
                     <Typography id="modal-modal-title" variant="h6" component="h2">
-                        Add Users to Course: {coursename} {/*przeslac nazwe kursu */ }
+                        Kick Users from Course: {coursename}
                     </Typography>
                     <IconButton onClick={handleClose} style={{ color: 'red' }}>
                         <CloseIcon />
                     </IconButton>
                 </div>
                 <Box sx={contentStyle}>
-                    <UserList courseId={courseId} />
+                    <ChangeUserList courseId={courseId} />
                 </Box>
             </Box>
         </Modal>

@@ -19,11 +19,9 @@ namespace IO.Server.Controllers
         {
             _connection = connection;
         }
-
         [HttpPost("login")]
         public IActionResult Login([FromBody] LoginData data)
         {
-
             if (data == null)
             {
                 return BadRequest("Dane nie mogą być puste");
@@ -48,7 +46,7 @@ namespace IO.Server.Controllers
                         if (!reader.Read())
                         {
                             // Brak użytkownika w bazie danych
-                            return Unauthorized(new { Message = "Invalid Username" });
+                            return Unauthorized(new { Message = "Invalid Username or Password" });
                         }
 
                         // Pobranie hasła z bazy danych
@@ -56,7 +54,7 @@ namespace IO.Server.Controllers
                         if (storedPassword != data.Password)
                         {
                             // Hasło nie pasuje
-                            return Unauthorized(new { Message = "Invalid Password" });
+                            return Unauthorized(new { Message = "Invalid Username or Password" });
                         }
 
                         // Pobranie roli użytkownika
@@ -103,11 +101,8 @@ namespace IO.Server.Controllers
     }
 }
 
-
-
-    public class LoginData
-    {
+public class LoginData
+{
     public string Login { get; set; }
     public string Password { get; set; }
 }
-

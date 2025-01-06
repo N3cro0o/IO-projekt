@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom'; // Import nawigacji
 import './UserPanel.css'; // Plik stylów CSS
+import { ButtonAppBar } from '../comps/AppBar.tsx';
+import { Card, CardContent, Typography, Button, Grid, CircularProgress } from '@mui/material';
 
 interface Course {
     id: number;
@@ -27,31 +29,50 @@ const UserPanel: React.FC = () => {
     }, []);
 
     if (loading) {
-        return <p>£adowanie kursów...</p>;
+        return (
+            <div className="loading-container">
+                <CircularProgress />
+                <p>Loading courses...</p>
+            </div>
+        );
     }
 
     return (
         <div className="user-panel">
-            <h1>Twoje kursy:</h1>
-            {courses.length === 0 ? (
-                <p>Brak kursów do wyœwietlenia.</p>
-            ) : (
-                <div className="courses-container">
-                    {courses.map((course) => (
-                        <div key={course.id} className="course-card">
-                            <h3>{course.name}</h3>
-                            <p>Kategoria: {course.category}</p>
-                            <button
-                                onClick={() => navigate(`/course/${course.id}/tests`)}
-                                className="details-button"
-                            >
-                                Zobacz testy
-                            </button>
+            <ButtonAppBar />
+            <div className="content-container">
+                <Typography color="white" variant="h4" gutterBottom>
+                    Your Courses:
+                </Typography>
+                {courses.length === 0 ? (
+                    <Typography variant="h6">Lack of courses added</Typography>
+                ) : (
+                    <Grid container spacing={3}>
+                        {courses.map((course) => (
+                            <Grid item xs={12} sm={6} md={4} key={course.id}>
+                                <Card sx={{ display: 'flex', flexDirection: 'column' }}>
+                                    <CardContent>
+                                        <Typography variant="h6" component="div">
+                                            {course.name}
+                                        </Typography>
+                                        <Typography variant="body2" color="text.secondary">
+                                            Category: {course.category}
+                                        </Typography>
+                                    </CardContent>
+                                    <Button
+                                        onClick={() => navigate(`/course/${course.id}/tests`)}
+                                        variant="contained"
+                                        sx={{ margin: '1rem', backgroundColor: '#007bff', '&:hover': { backgroundColor: '#0056b3' } }}
+                                    >
 
-                        </div>
-                    ))}
-                </div>
-            )}
+                                        View tests
+                                    </Button>
+                                </Card>
+                            </Grid>
+                        ))}
+                    </Grid>
+                )}
+            </div>
         </div>
     );
 };

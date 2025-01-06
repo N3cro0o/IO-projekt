@@ -1,6 +1,12 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
+import TextField from '@mui/material/TextField';
+import { Alert } from '@mui/material';
+import { ButtonAppBar } from '../comps/AppBar.tsx';
+import { Link} from 'react-router-dom';
 
 export const Registration = () => {
     const [formData, setFormData] = useState({
@@ -12,17 +18,58 @@ export const Registration = () => {
     });
 
     const [error, setError] = useState('');
+    const [errorFields, setErrorFields] = useState({
+        login: '',
+        firstName: '',
+        lastName: '',
+        email: '',
+        password: '',
+    });
     const navigate = useNavigate();
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
+
+        // Reset the error for the specific field when the user starts typing
+        setErrorFields({ ...errorFields, [name]: '' });
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
-        console.log(formData); // Sprawdzenie danych przed wys³aniem
+        let hasError = false;
+
+        // Validate form
+        const newErrorFields = { ...errorFields };
+
+        if (!formData.login) {
+            newErrorFields.login = 'Login is required';
+            hasError = true;
+        }
+        if (!formData.firstName) {
+            newErrorFields.firstName = 'First name is required';
+            hasError = true;
+        }
+        if (!formData.lastName) {
+            newErrorFields.lastName = 'Last name is required';
+            hasError = true;
+        }
+        if (!formData.email) {
+            newErrorFields.email = 'Email is required';
+            hasError = true;
+        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+            newErrorFields.email = 'Please enter a valid email (e.g. something@domain.com)';
+            hasError = true;
+        }
+        if (!formData.password) {
+            newErrorFields.password = 'Password is required';
+            hasError = true;
+        }
+
+        setErrorFields(newErrorFields);
+
+        if (hasError) return; // If there are errors, stop the submission
 
         try {
             const response = await fetch('https://localhost:7293/api/Registration/register', {
@@ -43,58 +90,165 @@ export const Registration = () => {
                 navigate('/loginPage');
             } else {
                 const errorData = await response.json();
-                setError(errorData.Message || 'B³¹d podczas rejestracji');
+                setError(errorData.Message || 'Error during registration');
             }
         } catch (error) {
-            setError('Wyst¹pi³ b³¹d podczas rejestracji');
+            setError('An error occurred during registration');
         }
     };
 
     return (
-        <form onSubmit={handleSubmit}>
-            <input
-                type="text"
-                name="login"
-                placeholder="Login"
-                value={formData.login}
-                onChange={handleChange}
-                required
-            />
-            <input
-                type="text"
-                name="firstName"
-                placeholder="First Name"
-                value={formData.firstName}
-                onChange={handleChange}
-                required
-            />
-            <input
-                type="text"
-                name="lastName"
-                placeholder="Last Name"
-                value={formData.lastName}
-                onChange={handleChange}
-                required
-            />
-            <input
-                type="email"
-                name="email"
-                placeholder="Email"
-                value={formData.email}
-                onChange={handleChange}
-                required
-            />
-            <input
-                type="password"
-                name="password"
-                placeholder="Password"
-                value={formData.password}
-                onChange={handleChange}
-                required
-            />
-            <button type="submit">Register</button>
-            {error && <p>{error}</p>}
-        </form>
-    );
+        <div>
+            <ButtonAppBar />
+            <Box
+                sx={{
+                    maxWidth: '400px',
+                    margin: '0 auto',
+                    padding: '20px',
+                    backgroundColor: '#444',
+                    borderRadius: '8px',
+                    boxShadow: 2,
+                    marginTop: '80px', // Dodajemy margin-top, aby formularz znajdowa³ siê poni¿ej AppBar
+                }}
+            >
 
+                <Typography variant="h6" color="white" sx={{ marginBottom: '20px' }}>
+                    Register an account
+                </Typography>
+
+                <form onSubmit={handleSubmit}>
+                    <TextField
+                        label="Login"
+                        name="login"
+                        type="text"
+                        value={formData.login}
+                        onChange={handleChange}
+                        fullWidth
+                        sx={{
+                            marginBottom: '16px',
+                            '& .MuiInputLabel-root': { color: 'white' },
+                            '& .MuiInputBase-root': {
+                                backgroundColor: '#333',
+                                color: 'white',
+                            },
+                        }}
+                    />
+                    {errorFields.login && (
+                        <Alert severity="error" sx={{ marginBottom: '16px' }}>
+                            {errorFields.login}
+                        </Alert>
+                    )}
+
+                    <TextField
+                        label="First Name"
+                        name="firstName"
+                        type="text"
+                        value={formData.firstName}
+                        onChange={handleChange}
+                        fullWidth
+                        sx={{
+                            marginBottom: '16px',
+                            '& .MuiInputLabel-root': { color: 'white' },
+                            '& .MuiInputBase-root': {
+                                backgroundColor: '#333',
+                                color: 'white',
+                            },
+                        }}
+                    />
+                    {errorFields.firstName && (
+                        <Alert severity="error" sx={{ marginBottom: '16px' }}>
+                            {errorFields.firstName}
+                        </Alert>
+                    )}
+
+                    <TextField
+                        label="Last Name"
+                        name="lastName"
+                        type="text"
+                        value={formData.lastName}
+                        onChange={handleChange}
+                        fullWidth
+                        sx={{
+                            marginBottom: '16px',
+                            '& .MuiInputLabel-root': { color: 'white' },
+                            '& .MuiInputBase-root': {
+                                backgroundColor: '#333',
+                                color: 'white',
+                            },
+                        }}
+                    />
+                    {errorFields.lastName && (
+                        <Alert severity="error" sx={{ marginBottom: '16px' }}>
+                            {errorFields.lastName}
+                        </Alert>
+                    )}
+
+                    <TextField
+                        label="Email"
+                        name="email"
+                        type="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        fullWidth
+                        sx={{
+                            marginBottom: '16px',
+                            '& .MuiInputLabel-root': { color: 'white' },
+                            '& .MuiInputBase-root': {
+                                backgroundColor: '#333',
+                                color: 'white',
+                            },
+                        }}
+                    />
+                    {errorFields.email && (
+                        <Alert severity="error" sx={{ marginBottom: '16px' }}>
+                            {errorFields.email}
+                        </Alert>
+                    )}
+
+                    <TextField
+                        label="Password"
+                        name="password"
+                        type="password"
+                        value={formData.password}
+                        onChange={handleChange}
+                        fullWidth
+                        sx={{
+                            marginBottom: '16px',
+                            '& .MuiInputLabel-root': { color: 'white' },
+                            '& .MuiInputBase-root': {
+                                backgroundColor: '#333',
+                                color: 'white',
+                            },
+                        }}
+                    />
+                    {errorFields.password && (
+                        <Alert severity="error" sx={{ marginBottom: '16px' }}>
+                            {errorFields.password}
+                        </Alert>
+                    )}
+
+                    {error && <Alert severity="error" sx={{ marginBottom: '16px' }}>{error}</Alert>}
+
+                    <Button
+                        type="submit"
+                        fullWidth
+                        variant="contained"
+                        sx={{
+                            color: '#fff',
+                            backgroundColor: '#007bff',
+                            '&:hover': { backgroundColor: '#0056b3' },
+                            marginTop: '20px',
+                        }}
+                    >
+                        Register
+                    </Button>
+                </form>
+                <Box sx={{ marginTop: '16px', textAlign: 'center' }}>
+                    <Link to="/LoginPage" style={{ color: '#fff', textDecoration: 'none' }}>
+                        Have an account? Login
+                    </Link>
+                </Box>
+            </Box>
+        </div>
+    );
 };
