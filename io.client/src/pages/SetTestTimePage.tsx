@@ -59,15 +59,18 @@ const SetTestTimePage: React.FC = () => {
         <div className="set-test-time">
             <h1>Ustaw czas dla testu</h1>
             <label>
-                Czas rozpoczêcia:
+                Czas rozpoczecia:
+
                 <input
                     type="datetime-local"
                     value={startTime}
                     onChange={(e) => setStartTime(e.target.value)}
                 />
             </label>
+
+
             <label>
-                Czas zakoñczenia:
+                Czas zakonczenia:
                 <input
                     type="datetime-local"
                     value={endTime}

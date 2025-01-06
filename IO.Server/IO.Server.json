@@ -197,6 +197,29 @@
         }
       }
     },
+    "/api/StartTest/{testId}": {
+      "put": {
+        "tags": [
+          "StartTest"
+        ],
+        "parameters": [
+          {
+            "name": "testId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/Test/{courseId}/tests": {
       "get": {
         "tags": [
@@ -350,11 +373,13 @@
           },
           "startTime": {
             "type": "string",
-            "format": "date-time"
+            "format": "date-time",
+            "nullable": true
           },
           "endTime": {
             "type": "string",
-            "format": "date-time"
+            "format": "date-time",
+            "nullable": true
           },
           "category": {
             "type": "string"
@@ -429,6 +454,9 @@
     },
     {
       "name": "SetTestTime"
+    },
+    {
+      "name": "StartTest"
     },
     {
       "name": "Test"

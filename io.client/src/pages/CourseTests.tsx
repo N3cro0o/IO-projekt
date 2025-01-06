@@ -11,6 +11,18 @@ interface Test {
     courseId: number;
 }
 
+const formatDate = (dateString: string): string => {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Miesi¹ce s¹ indeksowane od 0
+    const year = date.getFullYear();
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+
+    return `${day}-${month}-${year} ; ${hours}:${minutes}:${seconds}`;
+};
+
 const CourseTests: React.FC = () => {
     const { courseId } = useParams<{ courseId: string }>();
     const navigate = useNavigate();
@@ -39,9 +51,33 @@ const CourseTests: React.FC = () => {
         fetchTests();
     }, [courseId]);
 
-    const handleStartTest = (testName: string) => {
-        setStartedTest(testName);
-        setTimeout(() => setStartedTest(null), 5000);
+    const handleStartTest = async (testName: string, testId: number) => {
+        try {
+            const response = await fetch(`https://localhost:59127/api/starttest/${testId}`, {
+                method: 'PUT',
+            });
+
+            if (response.ok) {
+                setStartedTest(testName);
+                setTests((prevTests) =>
+                    prevTests.map((test) =>
+                        test.testId === testId
+                            ? {
+                                ...test,
+                                startTime: new Date().toISOString(),
+                                endTime: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString()
+                            }
+                            : test
+                    )
+                );
+            } else {
+                console.error(`Failed to start test: ${response.status}`);
+            }
+        } catch (error) {
+            console.error("Error starting test:", error);
+        } finally {
+            setTimeout(() => setStartedTest(null), 5000);
+        }
     };
 
     const handleDeleteTest = async (testId: number, testName: string) => {
@@ -82,12 +118,12 @@ const CourseTests: React.FC = () => {
             <h1>Testy dla kursu: {courseId}</h1>
             {startedTest && (
                 <div className="success-banner">
-                    Test <strong>{startedTest}</strong> rozpoczêty prawid³owo!
+                    Test <strong>{startedTest}</strong> rozpoczêty prawidlowo!
                 </div>
             )}
             {deletedTest && (
                 <div className="error-banner">
-                    Test <strong>{deletedTest}</strong> zosta³ usuniêty!
+                    Test <strong>{deletedTest}</strong> zosta³ usuniety!
                 </div>
             )}
             {tests.length === 0 ? (
@@ -98,19 +134,19 @@ const CourseTests: React.FC = () => {
                         <li key={test.testId} className="test-card">
                             <h3>{test.name}</h3>
                             <p>Kategoria: {test.category}</p>
-                            <p>Data rozpoczêcia: {test.startTime}</p>
-                            <p>Data zakoñczenia: {test.endTime}</p>
+                            <p>Data rozpoczecia: {test.startTime ? formatDate(test.startTime) : "Nie ustawiono"}</p>
+                            <p>Data zakonczenia: {test.endTime ? formatDate(test.endTime) : "Nie ustawiono"}</p>
                             <button className="button" onClick={() => handleSetTime(test.testId)}>
-                                Ustaw czas rozpoczêcia i zakoñczenia testu
+                                Ustaw czas rozpoczecia i zakonczenia testu
                             </button>
-                            <button className="button" onClick={() => handleStartTest(test.name)}>
+                            <button className="button" onClick={() => handleStartTest(test.name, test.testId)}>
                                 Rozpocznij test
                             </button>
                             <button
                                 className="button"
                                 onClick={() => handleDeleteTest(test.testId, test.name)}
                             >
-                                Usuñ test
+                                Usun test
                             </button>
                             <button className="button" onClick={() => handleCheckResults(test.testId)}>
                                 Pobierz raport
