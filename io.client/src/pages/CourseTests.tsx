@@ -1,6 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import './CourseTests.css';
+import {
+    Box,
+    Button,
+    Card,
+    CardContent,
+    Typography,
+    CircularProgress,
+    Snackbar,
+} from '@mui/material';
+import { ButtonAppBar } from '../comps/AppBar.tsx';
 
 interface Test {
     testId: number;
@@ -11,6 +20,17 @@ interface Test {
     courseId: number;
 }
 
+const formatDate = (dateString: string): string => {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+
+    return `${day}-${month}-${year} ${hours}:${minutes}`;
+};
+
 const CourseTests: React.FC = () => {
     const { courseId } = useParams<{ courseId: string }>();
     const navigate = useNavigate();
@@ -20,90 +40,172 @@ const CourseTests: React.FC = () => {
     const [deletedTest, setDeletedTest] = useState<string | null>(null);
 
     useEffect(() => {
-        fetch(`https://localhost:59127/api/test/${courseId}/tests`)
-            .then((response) => response.json())
-            .then((data: Test[]) => {
+        const fetchTests = async () => {
+            try {
+                const response = await fetch(`https://localhost:59127/api/test/${courseId}/tests`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data: Test[] = await response.json();
                 setTests(data);
-                setLoading(false);
-            })
-            .catch((error) => {
-                console.error("B³¹d podczas pobierania testów:", error);
+            } catch (error) {
+                console.error('Error while fetching tests:', error);
                 setTests([]);
+            } finally {
                 setLoading(false);
-            });
+            }
+        };
+
+        fetchTests();
     }, [courseId]);
 
-    const handleStartTest = (testName: string) => {
-        setStartedTest(testName);
-        setTimeout(() => setStartedTest(null), 5000);
+    const handleStartTest = async (testName: string, testId: number) => {
+        try {
+            const response = await fetch(`https://localhost:59127/api/starttest/${testId}`, {
+                method: 'PUT',
+            });
+
+            if (response.ok) {
+                setStartedTest(testName);
+                setTests((prevTests) =>
+                    prevTests.map((test) =>
+                        test.testId === testId
+                            ? {
+                                ...test,
+                                startTime: new Date().toISOString(),
+                                endTime: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(),
+                            }
+                            : test
+                    )
+                );
+            } else {
+                console.error(`Failed to start test: ${response.status}`);
+            }
+        } catch (error) {
+            console.error('Error starting test:', error);
+        } finally {
+            setTimeout(() => setStartedTest(null), 5000);
+        }
     };
 
-    const handleDeleteTest = (testId: number, testName: string) => {
-        const confirmDelete = window.confirm(`Czy na pewno chcesz usun¹æ test "${testName}"?`);
+    const handleDeleteTest = async (testId: number, testName: string) => {
+        const confirmDelete = window.confirm(`Are you sure you want to delete the test "${testName}"?`);
         if (!confirmDelete) return;
 
-        fetch(`https://localhost:59127/api/test/${testId}`, {
-            method: 'DELETE',
-        })
-            .then((response) => {
-                if (response.ok) {
-                    setTests((prevTests) => prevTests.filter((test) => test.testId !== testId));
-                    setDeletedTest(testName);
-                    setTimeout(() => setDeletedTest(null), 5000);
-                } else {
-                    console.error(`B³¹d podczas usuwania testu: ${response.status}`);
-                }
-            })
-            .catch((error) => console.error("B³¹d podczas usuwania testu:", error));
+        try {
+            const response = await fetch(`https://localhost:59127/api/deletetest/${testId}`, {
+                method: 'DELETE',
+            });
+
+            if (response.ok) {
+                setTests((prevTests) => prevTests.filter((test) => test.testId !== testId));
+                setDeletedTest(testName);
+                setTimeout(() => setDeletedTest(null), 5000);
+            } else {
+                console.error(`Error while deleting test: ${response.status}`);
+            }
+        } catch (error) {
+            console.error('Error while deleting test:', error);
+        }
+    };
+
+    const handleSetTime = (testId: number) => {
+        navigate(`/course/${courseId}/test/${testId}/set-time`);
     };
 
     const handleCheckResults = (testId: number) => {
         navigate(`/course/${courseId}/test/${testId}/results`);
     };
 
-    if (loading) {
-        return <p>£adowanie testów...</p>;
-    }
-
     return (
-        <div className="course-tests">
-            <h1>Testy dla kursu: {courseId}</h1>
-            {startedTest && (
-                <div className="success-banner">
-                    Test <strong>{startedTest}</strong> rozpoczêty prawid³owo!
-                </div>
-            )}
-            {deletedTest && (
-                <div className="error-banner">
-                    Test <strong>{deletedTest}</strong> zosta³ usuniêty!
-                </div>
-            )}
-            {tests.length === 0 ? (
-                <p>Brak testów do wyœwietlenia.</p>
-            ) : (
-                <ul>
-                    {tests.map((test) => (
-                        <li key={test.testId} className="test-card">
-                            <h3>{test.name}</h3>
-                            <p>Kategoria: {test.category}</p>
-                            <p>Data rozpoczêcia: {test.startTime}</p>
-                            <p>Data zakoñczenia: {test.endTime}</p>
-                            <button className="button" onClick={() => handleStartTest(test.name)}>
-                                Rozpocznij test
-                            </button>
-                            <button
-                                className="button"
-                                onClick={() => handleDeleteTest(test.testId, test.name)}
+        <div>
+            <ButtonAppBar />
+            <Box sx={{ padding: '60px 20px 20px', maxWidth: '800px', margin: '0 auto' }}>
+                <Typography variant="h4" color="white" align="center" gutterBottom>
+                    Test Panel
+                </Typography>
+                {loading ? (
+                    <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
+                        <CircularProgress />
+                    </Box>
+                ) : tests.length === 0 ? (
+                    <Typography variant="h6" align="center">No tests available.</Typography>
+                ) : (
+                    <Box sx={{ display: 'grid', gap: '16px' }}>
+                        {tests.map((test) => (
+                            <Card
+                                key={test.testId}
+                                sx={{
+                                    backgroundColor: '#444',
+                                    color: 'white',
+                                    textAlign: 'center',
+                                    maxWidth: '600px',
+                                    margin: '0 auto',
+                                }}
                             >
-                                Usuñ test
-                            </button>
-                            <button className="button" onClick={() => handleCheckResults(test.testId)}>
-                                SprawdŸ wyniki
-                            </button>
-                        </li>
-                    ))}
-                </ul>
-            )}
+                                <CardContent>
+                                    <Typography variant="h6">{test.name}</Typography>
+                                    <Typography variant="body2">Category: {test.category}</Typography>
+                                    <Typography variant="body2">
+                                        Dates: {test.startTime ? formatDate(test.startTime) : 'Not set'}{' '}
+                                        - {test.endTime ? formatDate(test.endTime) : 'Not set'}
+                                    </Typography>
+                                    <Box
+                                        sx={{
+                                            display: 'flex',
+                                            flexWrap: 'wrap',
+                                            gap: '8px',
+                                            marginTop: '12px',
+                                            justifyContent: 'center',
+                                        }}
+                                    >
+                                        <Button
+                                            variant="contained"
+                                            color="primary"
+                                            onClick={() => handleSetTime(test.testId)}
+                                        >
+                                            Set time
+                                        </Button>
+                                        <Button
+                                            variant="contained"
+                                            color="success"
+                                            onClick={() => handleStartTest(test.name, test.testId)}
+                                        >
+                                            Start test
+                                        </Button>
+                                        <Button
+                                            variant="contained"
+                                            color="error"
+                                            onClick={() => handleDeleteTest(test.testId, test.name)}
+                                        >
+                                            Delete test
+                                        </Button>
+                                        <Button
+                                            variant="contained"
+                                            color="info"
+                                            onClick={() => handleCheckResults(test.testId)}
+                                        >
+                                            View report
+                                        </Button>
+                                    </Box>
+                                </CardContent>
+                            </Card>
+                        ))}
+                    </Box>
+                )}
+                <Snackbar
+                    open={!!startedTest}
+                    autoHideDuration={5000}
+                    onClose={() => setStartedTest(null)}
+                    message={`Test "${startedTest}" started successfully!`}
+                />
+                <Snackbar
+                    open={!!deletedTest}
+                    autoHideDuration={5000}
+                    onClose={() => setDeletedTest(null)}
+                    message={`Test "${deletedTest}" deleted successfully!`}
+                />
+            </Box>
         </div>
     );
 };

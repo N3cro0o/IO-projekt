@@ -12,6 +12,7 @@ import TestResults from './pages/TestResults';
 import Course from './pages/CourseManagment';
 
 import { Registration } from './pages/Registration';
+import SetTestTimePage from './pages/SetTestTimePage';
 
 function App() {
     const [token, setToken] = useState(-1);
@@ -24,12 +25,11 @@ function App() {
                     <Route path="/randTest" element={<RandomUsers />} />
                     <Route path="/loginPage" element={<Login token={token} setToken={setToken} />} />
                     <Route path="/UserPanel" element={<UserPanel logginToken={token} />} />
-
                     <Route path="/course/:courseId/tests" element={<CourseTests />} />
                     <Route path="/course/:courseId/test/:testId/results" element={<TestResults />} />
-
                     <Route path="/Registration" element={<Registration />} />
                     <Route path="/CourseManagment" element={<Course />} />
+                    <Route path="/course/:courseId/test/:testId/set-time" element={<SetTestTimePage />} />
 
                 </Routes>
             </HRouter>

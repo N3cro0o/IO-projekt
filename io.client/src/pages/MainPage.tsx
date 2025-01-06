@@ -43,12 +43,12 @@ const MainPage = (props) => {
                     Tesaty Wiezy
                 </Typography>
                 <Typography variant="body1" sx={{ lineHeight: '1.6' }}>
-                    Naszym celem jest stworzenie prostej w obs³udze, przejrzystej oraz
-                    kompaktowej aplikacji, która bêdzie u³atwiaæ przeprowadzanie testów,
-                    egzaminów oraz sprawdzaæ wiedzê u¿ytkowników aplikacji. Du¿¹ zalet¹
-                    naszego programu bêdzie zapisywanie pytañ w pulach pytañ podzielonych
-                    na kategorie oraz mo¿liwe wykorzystywanie pytañ w przysz³oœci przy
-                    tworzeniu nowych testów.
+                    Our goal is to create an easy-to-use, transparent and
+                    a compact application that will facilitate testing,
+                    exams and check the knowledge of application users. A big advantage
+                    our program will be writing questions into pools of split questions
+                    into categories and possible use of questions in the future
+                    creating new tests.
                 </Typography>
             </Box>
 

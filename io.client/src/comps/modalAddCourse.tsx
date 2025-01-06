@@ -1,6 +1,5 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import IconButton from '@mui/material/IconButton';
@@ -67,7 +66,7 @@ export default function ModalAddCourse({ ownerId, handleClose }: { ownerId: numb
                     </IconButton>
                 </div>
                 <Box sx={contentStyle}>
-                    <AddCourse />
+                    <AddCourse ownerId={ownerId} />
                 </Box>
             </Box>
         </Modal>

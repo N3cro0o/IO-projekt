@@ -38,7 +38,7 @@ const TemporaryDrawer = ({ open, toggleDrawer, token }) => {
                     <ListItemIcon sx={{ color: '#007bff' }}> {/* Kolor ikon - niebieski */}
                         <DashboardIcon /> {/* Ikona dashboard */}
                     </ListItemIcon>
-                    <ListItemText primary="Course Management" sx={{ color: 'white' }} /> {/* Kolor tekstu - bia造 */}
+                    <ListItemText primary="Courses Management" sx={{ color: 'white' }} /> {/* Kolor tekstu - bia造 */}
                 </ListItem>
             </List>
             <List>
@@ -47,7 +47,7 @@ const TemporaryDrawer = ({ open, toggleDrawer, token }) => {
                     <ListItemIcon sx={{ color: '#007bff' }}> {/* Kolor ikon - niebieski */}
                         <AssignmentIcon /> {/* Ikona panelu u篡tkownika */}
                     </ListItemIcon>
-                    <ListItemText primary="User Panel" sx={{ color: 'white' }} /> {/* Kolor tekstu - bia造 */}
+                    <ListItemText primary="Tests Managment" sx={{ color: 'white' }} /> {/* Kolor tekstu - bia造 */}
                 </ListItem>
             </List>
         </Box>

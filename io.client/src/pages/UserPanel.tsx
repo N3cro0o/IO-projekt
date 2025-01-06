@@ -32,7 +32,7 @@ const UserPanel: React.FC = () => {
         return (
             <div className="loading-container">
                 <CircularProgress />
-                <p>£adowanie kursów...</p>
+                <p>Loading courses...</p>
             </div>
         );
     }
@@ -42,10 +42,10 @@ const UserPanel: React.FC = () => {
             <ButtonAppBar />
             <div className="content-container">
                 <Typography color="white" variant="h4" gutterBottom>
-                    Twoje kursy:
+                    Your Courses:
                 </Typography>
                 {courses.length === 0 ? (
-                    <Typography variant="h6">Brak kursów do wyœwietlenia.</Typography>
+                    <Typography variant="h6">Lack of courses added</Typography>
                 ) : (
                     <Grid container spacing={3}>
                         {courses.map((course) => (
@@ -56,7 +56,7 @@ const UserPanel: React.FC = () => {
                                             {course.name}
                                         </Typography>
                                         <Typography variant="body2" color="text.secondary">
-                                            Kategoria: {course.category}
+                                            Category: {course.category}
                                         </Typography>
                                     </CardContent>
                                     <Button
@@ -64,7 +64,8 @@ const UserPanel: React.FC = () => {
                                         variant="contained"
                                         sx={{ margin: '1rem', backgroundColor: '#007bff', '&:hover': { backgroundColor: '#0056b3' } }}
                                     >
-                                        Zobacz testy
+
+                                        View tests
                                     </Button>
                                 </Card>
                             </Grid>

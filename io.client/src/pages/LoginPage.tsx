@@ -29,8 +29,8 @@ export const Login = () => {
         setPasswordError('');
 
         if (!formData.login || !formData.password) {
-            if (!formData.login) setLoginError('Wprowadź nazwę użytkownika');
-            if (!formData.password) setPasswordError('Wprowadź hasło');
+            if (!formData.login) setLoginError('Enter login');
+            if (!formData.password) setPasswordError('Enter password');
             return;
         }
 
@@ -51,10 +51,10 @@ export const Login = () => {
                 localStorage.setItem('authToken', json_data.Token);
                 navigate('/UserPanel');
             } else {
-                setLoginError('Niepoprawne dane logowania');
+                setLoginError('Incorrect login details');
             }
         } catch (error) {
-            setLoginError('Wystąpił błąd podczas logowania');
+            setLoginError('An error occurred while logging in ');
         }
     };
 

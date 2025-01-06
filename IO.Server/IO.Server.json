@@ -17,64 +17,6 @@
         }
       }
     },
-    "/api/test/{courseId}/{testId}/users": {
-      "get": {
-        "tags": [
-          "Test"
-        ],
-        "parameters": [
-          {
-            "name": "courseId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          },
-          {
-            "name": "testId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/User"
-                  }
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/User"
-                  }
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/User"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/Course/list": {
       "get": {
         "tags": [
@@ -183,6 +125,29 @@
         }
       }
     },
+    "/api/DeleteTest/{testId}": {
+      "delete": {
+        "tags": [
+          "DeleteTest"
+        ],
+        "parameters": [
+          {
+            "name": "testId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/Login/login": {
       "post": {
         "tags": [
@@ -228,7 +193,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/User2"
+                    "$ref": "#/components/schemas/User"
                   }
                 }
               },
@@ -236,7 +201,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/User2"
+                    "$ref": "#/components/schemas/User"
                   }
                 }
               },
@@ -244,7 +209,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/User2"
+                    "$ref": "#/components/schemas/User"
                   }
                 }
               }
@@ -323,6 +288,121 @@
         }
       }
     },
+    "/api/SetTestTime/{testId}": {
+      "put": {
+        "tags": [
+          "SetTestTime"
+        ],
+        "parameters": [
+          {
+            "name": "testId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TestTimeUpdateRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TestTimeUpdateRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/TestTimeUpdateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/StartTest/{testId}": {
+      "put": {
+        "tags": [
+          "StartTest"
+        ],
+        "parameters": [
+          {
+            "name": "testId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Test/{courseId}/tests": {
+      "get": {
+        "tags": [
+          "Test"
+        ],
+        "parameters": [
+          {
+            "name": "courseId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Test"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Test"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Test"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/User/list": {
       "get": {
         "tags": [
@@ -336,7 +416,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/User2"
+                    "$ref": "#/components/schemas/User"
                   }
                 }
               },
@@ -344,7 +424,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/User2"
+                    "$ref": "#/components/schemas/User"
                   }
                 }
               },
@@ -352,7 +432,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/User2"
+                    "$ref": "#/components/schemas/User"
                   }
                 }
               }
@@ -471,25 +551,49 @@
           }
         }
       },
-      "User": {
+      "Test": {
         "type": "object",
         "properties": {
-          "userId": {
+          "testId": {
             "type": "integer",
             "format": "int32"
           },
           "name": {
             "type": "string"
           },
-          "surname": {
+          "startTime": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "endTime": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "category": {
             "type": "string"
           },
-          "email": {
-            "type": "string"
+          "courseId": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },
-      "User2": {
+      "TestTimeUpdateRequest": {
+        "type": "object",
+        "properties": {
+          "startTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endTime": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "User": {
         "type": "object",
         "properties": {
           "id": {
@@ -531,9 +635,6 @@
       "name": "TestDatabase"
     },
     {
-      "name": "Test"
-    },
-    {
       "name": "Course"
     },
     {
@@ -543,6 +644,9 @@
       "name": "DeleteCourse"
     },
     {
+      "name": "DeleteTest"
+    },
+    {
       "name": "Login"
     },
     {
@@ -550,6 +654,15 @@
     },
     {
       "name": "Registration"
+    },
+    {
+      "name": "SetTestTime"
+    },
+    {
+      "name": "StartTest"
+    },
+    {
+      "name": "Test"
     },
     {
       "name": "User"

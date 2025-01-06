@@ -76,7 +76,7 @@ const UserList: React.FC<UserListProps> = ({ courseId }) => {
 
     return (
         <div style={{ backgroundColor: '#333', padding: '20px', borderRadius: '8px', color: '#fff' }}>
-            <h2>Select Users for Course ID: {courseId}</h2>
+            <h2>Kick Users from Course</h2>
             <TableContainer component={Paper} sx={{ backgroundColor: '#444', borderRadius: '8px' }}>
                 <Table sx={{ minWidth: 650 }} aria-label="user table">
                     <TableHead>

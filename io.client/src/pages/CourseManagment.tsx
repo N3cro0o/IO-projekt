@@ -1,27 +1,22 @@
 import Button from '@mui/material/Button';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import BasicModal from '../comps/modal.tsx';
 import ModalChangeUsers from '../comps/modalChangeUsers.tsx';
 import ModalAddCourse from '../comps/modalAddCourse.tsx';
 import { ButtonAppBar } from '../comps/AppBar.tsx';
 
+//dodac pobieranie ID ownera z tokenu i przekazac do add Course
+//dodac usuwanie wsyzstkich testów wraz z kursem
 
 export const Course = () => {
     const [loading, setLoading] = useState<boolean>(true);
     const [courses, setCourses] = useState<Course[]>([]);
     const [deletedCourse, setDeletedCourse] = useState<string | null>(null);
-    const [selectedCourseId, setSelectedCourseId] = useState<number | null>(null);  // Przechowuj tylko ID kursu
+    const [selectedCourseId, setSelectedCourseId] = useState<number | null>(null);
+    const [selectedCourseName, setSelectedCourseName] = useState<string | null>(null);
+    const [selectedCourseName2, setSelectedCourseName2] = useState<string | null>(null)
     const [selectedCourseId2, setSelectedCourseId2] = useState<number | null>(null);  // Przechowuj tylko ID kursu
     const [selectedOwnerId, setSelectedOwnerId] = useState<number | null>(null);
-
-    const [formData, setFormData] = useState({
-        courseid: '',
-    });
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
-    };
 
     interface Course {
         id: number;
@@ -81,12 +76,14 @@ export const Course = () => {
         }
     };
 
-    const handleAddUsers = (courseId: number) => {
+    const handleAddUsers = (courseId: number, coursename: string) => {
         setSelectedCourseId(courseId);  // Ustawiamy tylko raz, nie bêdziemy zmieniaæ wielokrotnie
+        setSelectedCourseName(coursename);   
     };
 
-    const handleChangeUsers = (courseId: number) => {
+    const handleChangeUsers = (courseId: number, coursename: string) => {
         setSelectedCourseId2(courseId);  // Ustawiamy tylko raz, nie bêdziemy zmieniaæ wielokrotnie
+        setSelectedCourseName2(coursename); 
     };
 
     const handleAddCourse = (ownerId: number) => {
@@ -100,7 +97,7 @@ export const Course = () => {
             <ButtonAppBar />
             <div style={{ display: 'flex', justifyContent: 'center', padding: '50px' }}>
                 <div style={{ width: '100%', maxWidth: '1200px' }}>
-                    <h1 style={{ color: 'white', textAlign: 'center' }}>Course List</h1>
+                    <h1 style={{ color: 'white', textAlign: 'center' }}>Course Panel</h1>
                     {deletedCourse && <div style={{ color: 'red' }}>Deleted course: {deletedCourse}</div>}
                     <table
                         style={{
@@ -126,10 +123,10 @@ export const Course = () => {
                                     <td style={{ padding: '10px' }}>{course.name}</td>
                                     <td style={{ padding: '10px' }}>{course.owner}</td>
                                     <td style={{ padding: '10px', display: 'flex', gap: '8px' }}>
-                                        <Button onClick={() => handleAddUsers(course.id)} variant="contained">
+                                        <Button onClick={() => handleAddUsers(course.id, course.name)} variant="contained">
                                             Add Users
                                         </Button>
-                                        <Button onClick={() => handleChangeUsers(course.id)} variant="contained" color="warning">
+                                        <Button onClick={() => handleChangeUsers(course.id, course.name)} variant="contained" color="warning">
                                             Change Users
                                         </Button>
                                         <Button
@@ -152,12 +149,18 @@ export const Course = () => {
                     </div>
 
                     {/* Modal bêdzie siê otwiera³, gdy selectedCourseId nie bêdzie null */}
-                    {selectedCourseId !== null && (
-                        <BasicModal courseId={selectedCourseId} handleClose={() => setSelectedCourseId(null)} />
+                    {selectedCourseId !== null && selectedCourseName !== null && (
+                        <BasicModal courseId={selectedCourseId} coursename={selectedCourseName} handleClose={() => {
+                            setSelectedCourseId(null);  // Zresetuj ID kursu
+                            setSelectedCourseName(null);  // Zresetuj nazwê kursu
+                        }} />
                     )}
                     
-                    {selectedCourseId2 !== null && (
-                        <ModalChangeUsers courseId={selectedCourseId2} handleClose={() => setSelectedCourseId2(null)} />
+                    {selectedCourseId2 !== null && selectedCourseName2 !== null && (
+                        <ModalChangeUsers courseId={selectedCourseId2} coursename={selectedCourseName2} handleClose={() => {
+                            setSelectedCourseId2(null);  // Zresetuj ID kursu
+                            setSelectedCourseName2(null);  // Zresetuj nazwê kursu
+                        }} />
                     )}
 
                     {/*Zmiana na ownerId*/}

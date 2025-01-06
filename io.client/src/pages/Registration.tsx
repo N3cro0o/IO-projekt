@@ -89,10 +89,10 @@ export const Registration = () => {
                 navigate('/loginPage');
             } else {
                 const errorData = await response.json();
-                setError(errorData.Message || 'B³¹d podczas rejestracji');
+                setError(errorData.Message || 'Error during registration');
             }
         } catch (error) {
-            setError('Wyst¹pi³ b³¹d podczas rejestracji');
+            setError('An error occurred during registration');
         }
     };
 

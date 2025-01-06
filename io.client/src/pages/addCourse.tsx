@@ -5,14 +5,17 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import { Alert } from '@mui/material';
-import { ButtonAppBar } from '../comps/AppBar.tsx';
 
-export const AddCourse = () => {
+interface AddCourseProps {
+    ownerId: number;
+}
+
+export const AddCourse: React.FC<AddCourseProps> = ({ownerId}) =>  {
     const [formData, setFormData] = useState({
         name: '',
         category: '',
         description: '',
-        ownerid: ''
+        ownerid: ownerId
     });
 
     const [error, setError] = useState('');
