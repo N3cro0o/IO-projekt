@@ -3,7 +3,7 @@
 namespace IO.Server.Elements
 {
     public class Test
-    {
+    { // This is a test class
         [JsonInclude]
         int ID { get; set; }
 
