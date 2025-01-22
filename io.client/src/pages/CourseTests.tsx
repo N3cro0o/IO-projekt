@@ -10,6 +10,9 @@ import {
     Snackbar,
 } from '@mui/material';
 import { ButtonAppBar } from '../comps/AppBar.tsx';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
+import ModalAddTest from '../comps/modalAddTests'; // Importujemy modal do dodawania testów
+import ModalAddQuestion from '../comps/ModalAddQuestion'; // Importujemy modal do dodawania pytañ
 
 interface Test {
     testId: number;
@@ -38,6 +41,8 @@ const CourseTests: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [startedTest, setStartedTest] = useState<string | null>(null);
     const [deletedTest, setDeletedTest] = useState<string | null>(null);
+    const [modalOpen, setModalOpen] = useState(false); // Zarz¹dzanie stanem modala do testów
+    const [modalQuestionOpen, setModalQuestionOpen] = useState<number | null>(null); // Zarz¹dzanie stanem modala do pytañ
 
     useEffect(() => {
         const fetchTests = async () => {
@@ -117,6 +122,15 @@ const CourseTests: React.FC = () => {
         navigate(`/course/${courseId}/test/${testId}/results`);
     };
 
+    const handleAddTest = (newTest: Test) => {
+        setTests((prevTests) => [...prevTests, newTest]);
+    };
+
+    const handleAddQuestion = (newQuestion: any) => {
+        console.log('New question added:', newQuestion);
+        // Tutaj mo¿na zaktualizowaæ stan lub wykonaæ inne akcje po dodaniu pytania
+    };
+
     return (
         <div>
             <ButtonAppBar />
@@ -124,6 +138,21 @@ const CourseTests: React.FC = () => {
                 <Typography variant="h4" color="white" align="center" gutterBottom>
                     Test Panel
                 </Typography>
+                <Box sx={{ textAlign: 'center', marginBottom: '20px' }}>
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        startIcon={<AddCircleIcon />}
+                        onClick={() => setModalOpen(true)}
+                        sx={{
+                            borderRadius: '50px',
+                            backgroundColor: '#0066CC',
+                            '&:hover': { backgroundColor: '#004C99' },
+                        }}
+                    >
+                        Add Test
+                    </Button>
+                </Box>
                 {loading ? (
                     <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
                         <CircularProgress />
@@ -182,6 +211,13 @@ const CourseTests: React.FC = () => {
                                         </Button>
                                         <Button
                                             variant="contained"
+                                            color="secondary"
+                                            onClick={() => setModalQuestionOpen(test.testId)}
+                                        >
+                                            Add Question
+                                        </Button>
+                                        <Button
+                                            variant="contained"
                                             color="info"
                                             onClick={() => handleCheckResults(test.testId)}
                                         >
@@ -205,6 +241,20 @@ const CourseTests: React.FC = () => {
                     onClose={() => setDeletedTest(null)}
                     message={`Test "${deletedTest}" deleted successfully!`}
                 />
+                <ModalAddTest
+                    open={modalOpen}
+                    handleClose={() => setModalOpen(false)}
+                    courseId={Number(courseId)}
+                    onAddTest={handleAddTest}
+                />
+                {modalQuestionOpen && (
+                    <ModalAddQuestion
+                        open={!!modalQuestionOpen}
+                        handleClose={() => setModalQuestionOpen(null)}
+                        testId={modalQuestionOpen}
+                        onAddQuestion={handleAddQuestion}
+                    />
+                )}
             </Box>
         </div>
     );

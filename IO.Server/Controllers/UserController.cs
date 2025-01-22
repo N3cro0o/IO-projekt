@@ -25,8 +25,8 @@ namespace IO.Server.Controllers
             {
                 _connection.Open();
 
-                string query = "Select * FROM \"User\" WHERE role = \'uczen\' ORDER BY Name ASC";
-
+                string query = "SELECT u.* FROM \"User\" u LEFT JOIN \"UserToCourse\" utc ON u.userid = utc.userid AND utc.courseid = 1 WHERE utc.userid IS NULL;";
+                
                 using (var command = new NpgsqlCommand(query, _connection))
                 using (var reader = command.ExecuteReader())
                 {
