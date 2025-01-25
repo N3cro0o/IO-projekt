@@ -49,6 +49,38 @@
         }
       }
     },
+    "/api/AddTest": {
+      "post": {
+        "tags": [
+          "AddTest"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TestModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/TestModel"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/Course/list": {
       "get": {
         "tags": [
@@ -435,10 +467,21 @@
         }
       }
     },
-    "/api/User/list": {
+    "/api/User/list/{courseid}": {
       "get": {
         "tags": [
           "User"
+        ],
+        "parameters": [
+          {
+            "name": "courseid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
         ],
         "responses": {
           "200": {
@@ -630,6 +673,21 @@
           }
         }
       },
+      "TestModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string"
+          },
+          "courseId": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
       "TestTimeUpdateRequest": {
         "type": "object",
         "properties": {
@@ -686,6 +744,9 @@
     },
     {
       "name": "AddCourse"
+    },
+    {
+      "name": "AddTest"
     },
     {
       "name": "Course"

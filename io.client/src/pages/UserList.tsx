@@ -19,7 +19,7 @@ const UserList: React.FC<UserListProps> = ({ courseId }) => {
     useEffect(() => {
         const fetchUsers = async () => {
             try {
-                const response = await fetch('https://localhost:7293/api/User/list');
+                const response = await fetch('https://localhost:7293/api/User/list/' + courseId);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }

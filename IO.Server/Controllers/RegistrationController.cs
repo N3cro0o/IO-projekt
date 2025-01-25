@@ -4,6 +4,9 @@ using Npgsql;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
 using Microsoft.AspNetCore.Identity;
+using System.Text;
+using System.Security.Cryptography;
+using IO.Server.Utilities;
 
 namespace IO.Server.Controllers
 {
@@ -46,7 +49,7 @@ namespace IO.Server.Controllers
             }
 
             //var hashedPassword = BCrypt.Net.BCrypt.HashPassword(data.PasswordHash);
-            var hashedPassword = data.PasswordHash;
+            var hashedPassword = PasswordHasher.HashPasswordWithSHA256(data.PasswordHash);
 
             //// Wyświetlenie danych w logu serwera
             //Console.WriteLine($"Login: {data.Login}");
@@ -118,9 +121,10 @@ namespace IO.Server.Controllers
             var regex = new Regex(@"^(?=.*[A-Z])(?=.*[\W_]).{8,}$");
             return regex.IsMatch(password);
         }
-    }
- }
 
+       
+        }
+    }
 
 public class NewUser
 {
@@ -129,4 +133,27 @@ public class NewUser
     public string LastName { get; set; }
     public string Email { get; set; }
     public string PasswordHash { get; set; }
+}
+
+
+namespace IO.Server.Utilities
+{
+    public static class PasswordHasher
+    {
+        public static string HashPasswordWithSHA256(string password)
+        {
+            using (SHA256 sha256 = SHA256.Create())
+            {
+                byte[] bytes = Encoding.UTF8.GetBytes(password);
+                byte[] hash = sha256.ComputeHash(bytes);
+
+                StringBuilder builder = new StringBuilder();
+                foreach (byte b in hash)
+                {
+                    builder.Append(b.ToString("x2"));
+                }
+                return builder.ToString();
+            }
+        }
+    }
 }

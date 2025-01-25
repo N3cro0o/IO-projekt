@@ -20,12 +20,23 @@ namespace IO.Server.Controllers
         {
             try
             {
+                // Walidacja: czas rozpoczęcia i zakończenia
+                if (request.StartTime < DateTime.UtcNow)
+                {
+                    return BadRequest("Start time cannot be in the past.");
+                }
+
+                if (request.EndTime <= request.StartTime)
+                {
+                    return BadRequest("End time must be later than start time.");
+                }
+
                 _connection.Open();
 
                 const string query = @"
-                UPDATE ""Test""
-                SET starttime = @StartTime, endtime = @EndTime
-                WHERE testid = @TestId";
+        UPDATE ""Test""
+        SET starttime = @StartTime, endtime = @EndTime
+        WHERE testid = @TestId";
 
                 using (var command = new NpgsqlCommand(query, _connection))
                 {
@@ -54,6 +65,7 @@ namespace IO.Server.Controllers
                 _connection.Close();
             }
         }
+
     }
 
     public class TestTimeUpdateRequest

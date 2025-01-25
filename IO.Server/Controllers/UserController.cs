@@ -15,8 +15,8 @@ namespace IO.Server.Controllers
             _connection = connection;
         }
 
-        [HttpGet("list")]
-        public ActionResult<IEnumerable<User>> GetUser()
+        [HttpGet("list/{courseid}")]
+        public ActionResult<IEnumerable<User>> GetUser(int courseid)
         {
 
             List<User> users = new List<User>();
@@ -25,7 +25,9 @@ namespace IO.Server.Controllers
             {
                 _connection.Open();
 
-                string query = "SELECT u.* FROM \"User\" u LEFT JOIN \"UserToCourse\" utc ON u.userid = utc.userid AND utc.courseid = 1 WHERE utc.userid IS NULL;";
+                //id kursu do poprawy trzeba przesłać
+                //poprawic pobierane dane
+                string query = $"SELECT u.* FROM \"User\" u LEFT JOIN \"UserToCourse\" utc ON u.userid = utc.userid AND utc.courseid = {courseid} WHERE utc.userid IS NULL;";
                 
                 using (var command = new NpgsqlCommand(query, _connection))
                 using (var reader = command.ExecuteReader())

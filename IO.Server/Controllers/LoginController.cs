@@ -6,6 +6,8 @@ using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using IO.Server.Elements;
 using System.Diagnostics;
+using Microsoft.SqlServer.Server;
+using IO.Server.Utilities;
 
 namespace IO.Server.Controllers
 {
@@ -51,7 +53,11 @@ namespace IO.Server.Controllers
 
                         // Pobranie hasła z bazy danych
                         var storedPassword = reader.GetString(1); // Druga kolumna zawiera hasło
-                        if (storedPassword != data.Password)
+
+                        //hasło hashowane podczas rejestracji, ponowne hasowanie hasła podczas logowania i porównanie 2 hashów
+                        var hashedPassword = PasswordHasher.HashPasswordWithSHA256(data.Password);
+                        
+                        if (storedPassword != hashedPassword)
                         {
                             // Hasło nie pasuje
                             return Unauthorized(new { Message = "Invalid Username or Password" });

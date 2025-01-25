@@ -52,7 +52,7 @@ const ModalAddTest: React.FC<ModalAddTestProps> = ({ open, handleClose, courseId
 
     const handleAddTest = async () => {
         try {
-            const response = await fetch(`https://localhost:59127/api/test`, {
+            const response = await fetch(`https://localhost:59127/api/AddTest`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
