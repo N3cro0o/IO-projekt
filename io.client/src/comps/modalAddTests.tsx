@@ -44,9 +44,9 @@ interface ModalAddTestProps {
 const ModalAddTest: React.FC<ModalAddTestProps> = ({ open, handleClose, courseId, onAddTest }) => {
     const [newTest, setNewTest] = useState({
         name: '',
+        category: '',
         startTime: '',
         endTime: '',
-        category: '',
         questionType: 'open',
     });
 
@@ -67,9 +67,9 @@ const ModalAddTest: React.FC<ModalAddTestProps> = ({ open, handleClose, courseId
                 handleClose();
                 setNewTest({
                     name: '',
+                    category: '',
                     startTime: '',
                     endTime: '',
-                    category: '',
                     questionType: 'open',
                 });
             } else {

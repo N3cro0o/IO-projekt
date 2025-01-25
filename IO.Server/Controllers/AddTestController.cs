@@ -23,8 +23,8 @@ namespace IO.Server.Controllers
                 _connection.Open();
 
                 const string query = @"
-                INSERT INTO ""Test"" (name, category, courseid)
-                VALUES (@Name, @Category, @CourseId)
+                INSERT INTO ""Test"" (name, category, courseid, starttime, endtime)
+                VALUES (@Name, @Category, @CourseId, @StartTime, @EndTime)
                 RETURNING testid, name, category, courseid, starttime, endtime";
 
                 using (var command = new NpgsqlCommand(query, _connection))
@@ -32,6 +32,8 @@ namespace IO.Server.Controllers
                     command.Parameters.AddWithValue("@Name", newTest.Name);
                     command.Parameters.AddWithValue("@Category", newTest.Category);
                     command.Parameters.AddWithValue("@CourseId", newTest.CourseId);
+                    command.Parameters.AddWithValue("@StartTime", newTest.StartTime);
+                    command.Parameters.AddWithValue("@EndTime", newTest.EndTime);
 
                     using (var reader = command.ExecuteReader())
                     {
@@ -43,8 +45,8 @@ namespace IO.Server.Controllers
                                 Name = reader.GetString(1),
                                 Category = reader.GetString(2),
                                 CourseId = reader.GetInt32(3),
-                                StartTime = reader.IsDBNull(4) ? (DateTime?)null : reader.GetDateTime(4),
-                                EndTime = reader.IsDBNull(5) ? (DateTime?)null : reader.GetDateTime(5),
+                                StartTime = reader.GetDateTime(4),
+                                EndTime = reader.GetDateTime(5),
                             };
 
                             return Ok(addedTest);
@@ -73,5 +75,7 @@ namespace IO.Server.Controllers
         public string Name { get; set; }
         public string Category { get; set; }
         public int CourseId { get; set; }
+        public DateTime StartTime { get; set; }
+        public DateTime EndTime { get; set; }
     }
 }
