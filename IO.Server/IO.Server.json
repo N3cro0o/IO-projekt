@@ -664,6 +664,38 @@
         }
       }
     },
+    "/api/ShareQuestion": {
+      "post": {
+        "tags": [
+          "ShareQuestion"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ShareRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ShareRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ShareRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/TestManager/CoursesList/{userId}": {
       "get": {
         "tags": [
@@ -1074,6 +1106,18 @@
           }
         }
       },
+      "ShareRequest": {
+        "type": "object",
+        "properties": {
+          "questionIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        }
+      },
       "Test": {
         "type": "object",
         "properties": {
@@ -1235,6 +1279,9 @@
     },
     {
       "name": "Registration"
+    },
+    {
+      "name": "ShareQuestion"
     },
     {
       "name": "TestManager"
