@@ -126,9 +126,8 @@ const CourseTests: React.FC = () => {
         setTests((prevTests) => [...prevTests, newTest]);
     };
 
-    const handleAddQuestion = (newQuestion: any) => {
-        console.log('New question added:', newQuestion);
-        // Tutaj mo¿na zaktualizowaæ stan lub wykonaæ inne akcje po dodaniu pytania
+    const handleEditTest = (testId: number) => {
+        navigate(`/course/${courseId}/test/${testId}/edit`);
     };
 
     return (
@@ -212,9 +211,9 @@ const CourseTests: React.FC = () => {
                                         <Button
                                             variant="contained"
                                             color="secondary"
-                                            onClick={() => setModalQuestionOpen(test.testId)}
+                                            onClick={() => handleEditTest(test.testId)} // Przekierowanie do edycji testu
                                         >
-                                            Add Question
+                                            Edit Test
                                         </Button>
                                         <Button
                                             variant="contained"
@@ -247,14 +246,6 @@ const CourseTests: React.FC = () => {
                     courseId={Number(courseId)}
                     onAddTest={handleAddTest}
                 />
-                {modalQuestionOpen && (
-                    <ModalAddQuestion
-                        open={!!modalQuestionOpen}
-                        handleClose={() => setModalQuestionOpen(null)}
-                        testId={modalQuestionOpen}
-                        onAddQuestion={handleAddQuestion}
-                    />
-                )}
             </Box>
         </div>
     );

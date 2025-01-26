@@ -116,8 +116,8 @@ export const UserProfilePage: React.FC = () => {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    currentPassword: passwordData.currentPassword,
-                    newPassword: passwordData.newPassword,
+                    OldPassword: passwordData.currentPassword,
+                    NewPassword: passwordData.newPassword,
                 }),
             });
 
