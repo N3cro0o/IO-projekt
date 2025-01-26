@@ -217,7 +217,7 @@ const AddQuestionModal: React.FC<{ testId: string; onClose: () => void; onQuesti
                 {error && <Typography color="error" sx={{ mb: 2 }}>{error}</Typography>}
 
                 <Box display="flex" justifyContent="space-between">
-                    <Button onClick={onClose} sx={{ color: '#fff', textTransform: 'none' }}>
+                    <Button  variant="contained" color="error" onClick={onClose} sx={{ textTransform: 'none' }}>
                         Cancel
                     </Button>
                     <Button

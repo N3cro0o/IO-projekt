@@ -90,6 +90,7 @@ export const Course = () => {
             setCourses((prevCourses) => prevCourses.filter((course) => course.id !== courseid));
             setDeletedCourse(name);
             setTimeout(() => setDeletedCourse(null), 5000);
+            alert('Course successfully deleted!');
         } catch (error) {
             console.error('Error deleting course:', error);
         } finally {
@@ -123,7 +124,6 @@ export const Course = () => {
             <div style={{ display: 'flex', justifyContent: 'center', padding: '50px' }}>
                 <div style={{ width: '100%', maxWidth: '1200px' }}>
                     <h1 style={{ color: 'white', textAlign: 'center' }}>Course Panel</h1>
-                    {deletedCourse && <div style={{ color: 'red' }}>Deleted course: {deletedCourse}</div>}
                     <table
                         style={{
                             borderCollapse: 'collapse',
