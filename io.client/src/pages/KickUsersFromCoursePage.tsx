@@ -19,7 +19,7 @@ const ChangeUserList: React.FC<UserListProps & { onUsersRemoved: () => void }> =
     useEffect(() => {
         const fetchUsers = async () => {
             try {
-                const response = await fetch('https://localhost:7293/api/CourseUsers/list/' + courseId);
+                const response = await fetch('https://localhost:7293/api/CoursesManager/KickUsersList/' + courseId);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -54,7 +54,7 @@ const ChangeUserList: React.FC<UserListProps & { onUsersRemoved: () => void }> =
                 userIds: Array.from(selectedUserIds),
             };
 
-            const response = await fetch('https://localhost:7293/api/CourseUsers/kickUsers', {
+            const response = await fetch('https://localhost:7293/api/CoursesManager/KickUsers', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

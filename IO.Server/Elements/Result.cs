@@ -6,7 +6,7 @@ namespace IO.Server.Elements
     {
         int Course { get; set; }
 
-        int Test { get; set; }
+        int TestID { get; set; }
 
         public List<Answer> Answers = new List<Answer>();
 
@@ -16,7 +16,7 @@ namespace IO.Server.Elements
         {
             ID = id;
             Course = course;
-            Test = test;
+            TestID = test;
             Answers = answs;
         }
 
@@ -26,21 +26,9 @@ namespace IO.Server.Elements
             return Environment.Users[id];
         }
 
-        public Test ReturnTest()
+        public int ReturnTestID()
         {
-            return Environment.Tests[Test];
-        }
-
-        public double ReturnPercent()
-        {
-            int pointsMax = ReturnTest().MaxPoints();
-            int points = 0;
-            foreach (Answer answ in Answers)
-            {
-                points += answ.Points;
-            }
-
-            return (double)points / (double)pointsMax;
+            return TestID;
         }
     }
 }

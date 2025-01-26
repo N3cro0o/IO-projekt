@@ -19,7 +19,7 @@ const UserList: React.FC<UserListProps & { onUsersAdded: () => void }> = ({ cour
     useEffect(() => {
         const fetchUsers = async () => {
             try {
-                const response = await fetch('https://localhost:7293/api/User/list/' + courseId);
+                const response = await fetch('https://localhost:7293/api/CoursesManager/AddUsersList/' + courseId);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -54,7 +54,7 @@ const UserList: React.FC<UserListProps & { onUsersAdded: () => void }> = ({ cour
         };
 
         try {
-            const response = await fetch('https://localhost:7293/api/User/addUsers', {
+            const response = await fetch('https://localhost:7293/api/CoursesManager/AddUsers', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

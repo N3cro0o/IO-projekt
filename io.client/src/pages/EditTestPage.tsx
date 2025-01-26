@@ -11,10 +11,11 @@ import {
     Button,
     CircularProgress,
 } from '@mui/material';
-import AddQuestionModal from '../comps/AddQuestionModal';
-import EditQuestionModal from '../comps/EditQuestionModal';
-import DeleteQuestionModal from '../comps/DeleteQuestionModal';
-import ShareQuestionModal from '../comps/ShareQuestionModal';
+import AddQuestionModal from '../comps/ModalAddQuestion';
+import EditQuestionModal from '../comps/ModalEditQuestion';
+import DeleteQuestionModal from '../comps/ModalDeleteQuestion';
+import ShareQuestionModal from '../comps/ModalShareQuestion';
+import { ButtonAppBar } from '../comps/AppBar';
 
 interface Question {
     id: number;
@@ -79,50 +80,68 @@ const EditTestPage: React.FC = () => {
     };
 
     return (
-        <Box sx={{ padding: '20px', backgroundColor: '#000', minHeight: '100vh', color: '#fff' }}>
-            <Box sx={{ backgroundColor: '#000', padding: '10px', display: 'flex', justifyContent: 'flex-end' }}>
+
+        <Box sx={{ backgroundColor: '#121212', color: '#fff', minHeight: '100vh', padding: '80px'  }}>
+            <ButtonAppBar />
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+                <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
+                    Edit Test: {testId} (Course: {courseId})
+                </Typography>
                 <Button
                     variant="contained"
-                    color="secondary"
                     onClick={() => navigate(`/course/${courseId}/tests`)}
-                    sx={{ color: '#fff' }}
+                    sx={{
+                        color: '#fff',
+                        borderColor: '#f44336',
+                        '&:hover': { borderColor: '#d32f2f', backgroundColor: '#d32f2f' },
+                    }}
                 >
                     Go Back
                 </Button>
             </Box>
-            <Typography variant="h4" mb={2} sx={{ color: '#fff' }}>
-                Edit Test: {testId} (Course: {courseId})
-            </Typography>
 
-            {/* Przeniesione przyciski */}
-            <Box sx={{ display: 'flex', gap: 2, marginBottom: 2 }}>
-                <Button variant="contained" color="primary" onClick={handleAddQuestion}>
+            <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
+                <Button
+                    variant="contained"
+                    sx={{
+                        backgroundColor: '#007bff',
+                        '&:hover': { backgroundColor: '#0056b3' },
+                    }}
+                    onClick={handleAddQuestion}
+                >
                     Add New Question
                 </Button>
-                <Button variant="contained" color="success" onClick={() => handleShareQuestion(null)}>
+                <Button
+                    variant="contained"
+                    sx={{
+                        backgroundColor: '#28a745',
+                        '&:hover': { backgroundColor: '#218838' },
+                    }}
+                    onClick={() => handleShareQuestion(null)}
+                >
                     Shared Questions
                 </Button>
             </Box>
 
             {loading ? (
-                <CircularProgress sx={{ color: '#fff' }} />
+                <CircularProgress sx={{ color: '#007bff' }} />
             ) : error ? (
-                <Typography color="error">Error: {error}</Typography>
+                <Typography sx={{ color: '#f44336' }}>Error: {error}</Typography>
             ) : (
-                <Table sx={{ backgroundColor: '#333', marginTop: 2 }}>
+                <Table sx={{ backgroundColor: '#1e1e1e', borderRadius: '8px', overflow: 'hidden' }}>
                     <TableHead>
-                        <TableRow>
-                            <TableCell sx={{ color: '#fff' }}>Question ID</TableCell>
-                            <TableCell sx={{ color: '#fff' }}>Question Content</TableCell>
-                            <TableCell sx={{ color: '#fff' }}>Category</TableCell>
-                            <TableCell sx={{ color: '#fff' }}>Type</TableCell>
-                            <TableCell sx={{ color: '#fff' }}>Shared</TableCell>
-                            <TableCell sx={{ color: '#fff' }}>Actions</TableCell>
+                        <TableRow sx={{ backgroundColor: '#333' }}>
+                            <TableCell sx={{ color: '#fff', fontWeight: 'bold' }}>Question ID</TableCell>
+                            <TableCell sx={{ color: '#fff', fontWeight: 'bold' }}>Question Content</TableCell>
+                            <TableCell sx={{ color: '#fff', fontWeight: 'bold' }}>Category</TableCell>
+                            <TableCell sx={{ color: '#fff', fontWeight: 'bold' }}>Type</TableCell>
+                            <TableCell sx={{ color: '#fff', fontWeight: 'bold' }}>Shared</TableCell>
+                            <TableCell sx={{ color: '#fff', fontWeight: 'bold' }}>Actions</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {questions.map((question) => (
-                            <TableRow key={question.id}>
+                            <TableRow key={question.id} sx={{ '&:hover': { backgroundColor: '#292929' } }}>
                                 <TableCell sx={{ color: '#fff' }}>{question.id}</TableCell>
                                 <TableCell sx={{ color: '#fff' }}>{question.name}</TableCell>
                                 <TableCell sx={{ color: '#fff' }}>{question.category}</TableCell>
@@ -131,17 +150,24 @@ const EditTestPage: React.FC = () => {
                                 <TableCell>
                                     <Button
                                         variant="outlined"
-                                        color="primary"
+                                        sx={{
+                                            color: '#007bff',
+                                            borderColor: '#007bff',
+                                            '&:hover': { backgroundColor: '#0056b3', color: '#fff', borderColor: '#0056b3' },
+                                            mr: 1,
+                                        }}
                                         onClick={() => handleEditQuestion(question)}
-                                        sx={{ marginRight: '10px', color: '#fff', borderColor: '#fff' }}
                                     >
                                         Edit
                                     </Button>
                                     <Button
                                         variant="outlined"
-                                        color="secondary"
+                                        sx={{
+                                            color: '#f44336',
+                                            borderColor: '#f44336',
+                                            '&:hover': { backgroundColor: '#d32f2f', color: '#fff', borderColor: '#d32f2f' },
+                                        }}
                                         onClick={() => handleDeleteQuestion(question.id)}
-                                        sx={{ marginRight: '10px', color: '#fff', borderColor: '#fff' }}
                                     >
                                         Delete
                                     </Button>
@@ -152,7 +178,7 @@ const EditTestPage: React.FC = () => {
                 </Table>
             )}
 
-            {/* Modale */}
+            {/* Modals */}
             {addModalOpen && (
                 <AddQuestionModal testId={testId!} onClose={handleCloseAddModal} onQuestionAdded={handleQuestionAdded} />
             )}
@@ -173,7 +199,7 @@ const EditTestPage: React.FC = () => {
 
             {deleteModalOpen.open && deleteModalOpen.questionId && (
                 <DeleteQuestionModal
-                    testId={parseInt(testId!)} 
+                    testId={parseInt(testId!)}
                     questionId={deleteModalOpen.questionId}
                     onClose={() => setDeleteModalOpen({ open: false, questionId: null })}
                     onQuestionDeleted={handleQuestionDeleted}
@@ -183,7 +209,7 @@ const EditTestPage: React.FC = () => {
             {shareModalOpen.open && (
                 <ShareQuestionModal
                     onClose={() => setShareModalOpen({ open: false, questionId: null })}
-                    questions={questions} // Przekazujemy wszystkie pytania
+                    questions={questions}
                 />
             )}
         </Box>

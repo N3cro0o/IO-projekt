@@ -64,7 +64,7 @@ export const AddCourse: React.FC<AddCourseProps> = ({ ownerId, handleClose, refr
             const userId = localStorage.getItem('userId');
             console.log('User ID from localStorage:', userId);
 
-            const response = await fetch('https://localhost:7293/api/AddCourse/addCourse', {
+            const response = await fetch('https://localhost:7293/api/CoursesManager/AddCourse', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

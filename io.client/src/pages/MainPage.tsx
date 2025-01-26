@@ -1,4 +1,3 @@
-import * as React from 'react';
 import { ButtonAppBar } from '../comps/AppBar.tsx';
 import { IndividualIntervalsExample } from '../comps/Carousel.tsx';
 import Box from '@mui/material/Box';

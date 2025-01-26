@@ -5,50 +5,6 @@
     "version": "1.0.0"
   },
   "paths": {
-    "/api/AddCourse/addCourse": {
-      "post": {
-        "tags": [
-          "AddCourse"
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AddCourse"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AddCourse"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/AddCourse"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/TestDatabase/test-connection": {
-      "get": {
-        "tags": [
-          "TestDatabase"
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
     "/api/Account/showData/{userId}": {
       "get": {
         "tags": [
@@ -218,88 +174,7 @@
         }
       }
     },
-    "/api/AddTest": {
-      "post": {
-        "tags": [
-          "AddTest"
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/TestModel"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/TestModel"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/TestModel"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/Course/list/{userId}": {
-      "get": {
-        "tags": [
-          "Course"
-        ],
-        "parameters": [
-          {
-            "name": "userId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Course"
-                  }
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Course"
-                  }
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Course"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/CoursesManager/listCourses/{userId}": {
+    "/api/CoursesManager/ListCourse/{userId}": {
       "get": {
         "tags": [
           "CoursesManager"
@@ -348,10 +223,74 @@
         }
       }
     },
-    "/api/CourseUsers/list/{courseid}": {
+    "/api/CoursesManager/AddCourse": {
+      "post": {
+        "tags": [
+          "CoursesManager"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddCourse"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddCourse"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddCourse"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/CoursesManager/DeleteCourse": {
+      "delete": {
+        "tags": [
+          "CoursesManager"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteCourseRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteCourseRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteCourseRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/CoursesManager/AddUsersList/{courseid}": {
       "get": {
         "tags": [
-          "CourseUsers"
+          "CoursesManager"
         ],
         "parameters": [
           {
@@ -397,26 +336,26 @@
         }
       }
     },
-    "/api/CourseUsers/kickUsers": {
+    "/api/CoursesManager/AddUsers": {
       "post": {
         "tags": [
-          "CourseUsers"
+          "CoursesManager"
         ],
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ModifyUsersRequest"
+                "$ref": "#/components/schemas/AddUsersRequest"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/ModifyUsersRequest"
+                "$ref": "#/components/schemas/AddUsersRequest"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/ModifyUsersRequest"
+                "$ref": "#/components/schemas/AddUsersRequest"
               }
             }
           },
@@ -429,26 +368,75 @@
         }
       }
     },
-    "/api/DeleteCourse/deleteCourse": {
-      "delete": {
+    "/api/CoursesManager/KickUsersList/{courseid}": {
+      "get": {
         "tags": [
-          "DeleteCourse"
+          "CoursesManager"
+        ],
+        "parameters": [
+          {
+            "name": "courseid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/CoursesManager/KickUsers": {
+      "post": {
+        "tags": [
+          "CoursesManager"
         ],
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/DeleteCourseRequest"
+                "$ref": "#/components/schemas/ModifyUsersRequest"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/DeleteCourseRequest"
+                "$ref": "#/components/schemas/ModifyUsersRequest"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/DeleteCourseRequest"
+                "$ref": "#/components/schemas/ModifyUsersRequest"
               }
             }
           },
@@ -478,29 +466,6 @@
           },
           {
             "name": "questionId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/DeleteTest/{testId}": {
-      "delete": {
-        "tags": [
-          "DeleteTest"
-        ],
-        "parameters": [
-          {
-            "name": "testId",
             "in": "path",
             "required": true,
             "schema": {
@@ -699,76 +664,59 @@
         }
       }
     },
-    "/api/SetTestTime/{testId}": {
-      "put": {
-        "tags": [
-          "SetTestTime"
-        ],
-        "parameters": [
-          {
-            "name": "testId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/TestTimeUpdateRequest"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/TestTimeUpdateRequest"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/TestTimeUpdateRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/StartTest/{testId}": {
-      "put": {
-        "tags": [
-          "StartTest"
-        ],
-        "parameters": [
-          {
-            "name": "testId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/Test/{courseId}/tests": {
+    "/api/TestManager/CoursesList/{userId}": {
       "get": {
         "tags": [
-          "Test"
+          "TestManager"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Course"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Course"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Course"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/TestManager/TestsList/{courseId}/tests": {
+      "get": {
+        "tags": [
+          "TestManager"
         ],
         "parameters": [
           {
@@ -814,14 +762,46 @@
         }
       }
     },
-    "/api/User/list/{courseid}": {
-      "get": {
+    "/api/TestManager/AddTest": {
+      "post": {
         "tags": [
-          "User"
+          "TestManager"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TestModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TestModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/TestModel"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/TestManager/DeleteTest/{testId}": {
+      "delete": {
+        "tags": [
+          "TestManager"
         ],
         "parameters": [
           {
-            "name": "courseid",
+            "name": "testId",
             "in": "path",
             "required": true,
             "schema": {
@@ -832,62 +812,70 @@
         ],
         "responses": {
           "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/User"
-                  }
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/User"
-                  }
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/User"
-                  }
-                }
-              }
-            }
+            "description": "OK"
           }
         }
       }
     },
-    "/api/User/addUsers": {
-      "post": {
+    "/api/TestManager/SetTestTime/{testId}": {
+      "put": {
         "tags": [
-          "User"
+          "TestManager"
+        ],
+        "parameters": [
+          {
+            "name": "testId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
         ],
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/AddUsersRequest"
+                "$ref": "#/components/schemas/TestTimeUpdateRequest"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/AddUsersRequest"
+                "$ref": "#/components/schemas/TestTimeUpdateRequest"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/AddUsersRequest"
+                "$ref": "#/components/schemas/TestTimeUpdateRequest"
               }
             }
           },
           "required": true
         },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/TestManager/StartTest/{testId}": {
+      "put": {
+        "tags": [
+          "TestManager"
+        ],
+        "parameters": [
+          {
+            "name": "testId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK"
@@ -1225,37 +1213,16 @@
   },
   "tags": [
     {
-      "name": "AddCourse"
-    },
-    {
-      "name": "TestDatabase"
-    },
-    {
       "name": "Account"
     },
     {
       "name": "AddQuestion"
     },
     {
-      "name": "AddTest"
-    },
-    {
-      "name": "Course"
-    },
-    {
       "name": "CoursesManager"
     },
     {
-      "name": "CourseUsers"
-    },
-    {
-      "name": "DeleteCourse"
-    },
-    {
       "name": "DeleteQuestion"
-    },
-    {
-      "name": "DeleteTest"
     },
     {
       "name": "EditQuestion"
@@ -1270,16 +1237,7 @@
       "name": "Registration"
     },
     {
-      "name": "SetTestTime"
-    },
-    {
-      "name": "StartTest"
-    },
-    {
-      "name": "Test"
-    },
-    {
-      "name": "User"
+      "name": "TestManager"
     }
   ]
 }

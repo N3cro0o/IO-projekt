@@ -1,8 +1,8 @@
 import Button from '@mui/material/Button';
 import { useEffect, useState } from 'react';
-import BasicModal from '../comps/modal.tsx';
-import ModalChangeUsers from '../comps/modalChangeUsers.tsx';
-import ModalAddCourse from '../comps/modalAddCourse.tsx';
+import BasicModal from '../comps/ModalAddUsersToCourse.tsx';
+import ModalChangeUsers from '../comps/ModalKickUsersFromCourse.tsx';
+import ModalAddCourse from '../comps/ModalAddCourse.tsx';
 import { ButtonAppBar } from '../comps/AppBar.tsx';
 
 export const Course = () => {
@@ -13,7 +13,6 @@ export const Course = () => {
     const [selectedCourseName, setSelectedCourseName] = useState<string | null>(null);
     const [selectedCourseName2, setSelectedCourseName2] = useState<string | null>(null)
     const [selectedCourseId2, setSelectedCourseId2] = useState<number | null>(null);
-    const [selectedOwnerId, setSelectedOwnerId] = useState<number | null>(null);
     const [openModalAddCourse, setOpenModalAddCourse] = useState<boolean>(false); // Stan otwarcia modala
 
     interface Course {
@@ -38,7 +37,7 @@ export const Course = () => {
                 const userId = localStorage.getItem('userId');
                 console.log('User ID from localStorage:', userId);
 
-                const response = await fetch('https://localhost:7293/api/CoursesManager/listCourses/' + userId);
+                const response = await fetch('https://localhost:7293/api/CoursesManager/ListCourse/' + userId);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -60,7 +59,7 @@ export const Course = () => {
         console.log('User ID from localStorage:', userId);
 
         try {
-            const response = await fetch('https://localhost:7293/api/CoursesManager/listCourses/' + userId);
+            const response = await fetch('https://localhost:7293/api/CoursesManager/ListCourse/' + userId);
             const apiData = await response.json();
             const transformedData = transformCourseData(apiData);
             setCourses(transformedData);
@@ -78,7 +77,7 @@ export const Course = () => {
         if (!confirmDelete) return;
 
         try {
-            const response = await fetch('https://localhost:7293/api/DeleteCourse/deleteCourse', {
+            const response = await fetch('https://localhost:7293/api/CoursesManager/DeleteCourse', {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -191,7 +190,7 @@ export const Course = () => {
                     {/* Modal dla dodawania kursu */}
                     {openModalAddCourse && (
                         <ModalAddCourse
-                            ownerId={1}  // Mo¿esz tu dodaæ dynamiczne `ownerId` z tokenu
+                            ownerId={1}  
                             open={openModalAddCourse}
                             handleClose={handleCloseAddCourseModal}
                             refreshCourses={refreshCourses} // Przekazujemy refreshCourses

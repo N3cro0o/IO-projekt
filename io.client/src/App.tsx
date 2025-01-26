@@ -4,12 +4,12 @@ import MainPage from './pages/MainPage';
 import { Login } from './pages/LoginPage';
 import { HashRouter as HRouter, Routes, Route } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import UserPanel from './pages/UserPanel';
+import UserPanel from './pages/TestManager';
 
 import CourseTests from './pages/CourseTests';
-import Course from './pages/CourseManagment';
+import Course from './pages/CourseManager';
 
-import { Registration } from './pages/Registration';
+import { Registration } from './pages/RegistrationPage';
 import SetTestTimePage from './pages/SetTestTimePage';
 import { UserProfilePage } from './pages/AccountManager';
 import EditTestPage from './pages/EditTestPage';

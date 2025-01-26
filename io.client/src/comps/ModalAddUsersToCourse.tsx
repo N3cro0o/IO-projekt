@@ -4,7 +4,7 @@ import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
-import UserList from '../pages/UserList';
+import UserList from '../pages/AddUsersToCoursePage';
 
 const style = {
     position: 'absolute',

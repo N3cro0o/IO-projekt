@@ -21,7 +21,7 @@ const SetTestTimePage: React.FC = () => {
     useEffect(() => {
         const fetchTestTime = async () => {
             try {
-                const response = await fetch(`https://localhost:59127/api/test/${testId}`);
+                const response = await fetch(``);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -39,8 +39,20 @@ const SetTestTimePage: React.FC = () => {
     }, [testId]);
 
     const handleSaveTime = async () => {
+        const now = new Date().toISOString();
+
+        if (new Date(startTime) < new Date(now)) {
+            alert('Start time cannot be in the past.');
+            return;
+        }
+
+        if (new Date(endTime) <= new Date(startTime)) {
+            alert('End time must be later than start time.');
+            return;
+        }
+
         try {
-            const response = await fetch(`https://localhost:59127/api/SetTestTime/${testId}`, {
+            const response = await fetch(`https://localhost:59127/api/TestManager/SetTestTime/${testId}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -53,12 +65,14 @@ const SetTestTimePage: React.FC = () => {
                 alert('Test time saved successfully.');
                 navigate(-1);
             } else {
-                console.error(`Error saving test time: ${response.status}`);
+                const errorMessage = await response.text();
+                alert(`Error saving test time: ${errorMessage}`);
             }
         } catch (error) {
             console.error('Error saving test time:', error);
         }
     };
+
 
     if (loading) {
         return (
