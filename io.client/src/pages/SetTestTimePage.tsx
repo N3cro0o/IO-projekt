@@ -18,6 +18,9 @@ const SetTestTimePage: React.FC = () => {
     const [endTime, setEndTime] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(true);
 
+    // Uzyskaj aktualny czas w formacie 'yyyy-MM-ddTHH:mm'
+    const now = new Date().toISOString().slice(0, 16);
+
     useEffect(() => {
         const fetchTestTime = async () => {
             try {
@@ -39,6 +42,18 @@ const SetTestTimePage: React.FC = () => {
     }, [testId]);
 
     const handleSaveTime = async () => {
+        const now = new Date().toISOString();
+
+        if (new Date(startTime) < new Date(now)) {
+            alert('Start time cannot be in the past.');
+            return;
+        }
+
+        if (new Date(endTime) <= new Date(startTime)) {
+            alert('End time must be later than start time.');
+            return;
+        }
+
         try {
             const response = await fetch(`https://localhost:59127/api/SetTestTime/${testId}`, {
                 method: 'PUT',
@@ -53,7 +68,8 @@ const SetTestTimePage: React.FC = () => {
                 alert('Test time saved successfully.');
                 navigate(-1);
             } else {
-                console.error(`Error saving test time: ${response.status}`);
+                const errorMessage = await response.text();
+                alert(`Error saving test time: ${errorMessage}`);
             }
         } catch (error) {
             console.error('Error saving test time:', error);
@@ -106,6 +122,7 @@ const SetTestTimePage: React.FC = () => {
                             onChange={(e) => setStartTime(e.target.value)}
                             fullWidth
                             InputLabelProps={{ shrink: true }}
+                            inputProps={{ min: now }}
                             sx={{
                                 marginBottom: '16px',
                                 '& .MuiInputLabel-root': { color: 'white' },
@@ -122,6 +139,7 @@ const SetTestTimePage: React.FC = () => {
                             onChange={(e) => setEndTime(e.target.value)}
                             fullWidth
                             InputLabelProps={{ shrink: true }}
+                            inputProps={{ min: startTime || now }}
                             sx={{
                                 marginBottom: '16px',
                                 '& .MuiInputLabel-root': { color: 'white' },

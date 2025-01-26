@@ -30,7 +30,7 @@ namespace IO.Server
             builder.Services.AddScoped<NpgsqlConnection>(provider =>
             {
                 // Connection string do bazy danych PostgreSQL
-                var connectionString = "Host=localhost;Port=5432;Username=postgres;Password=admin;Database=TesatyWiezy";
+                var connectionString = "Host=localhost;Port=5433;Username=postgres;Password=12345;Database=TesatyWiezy";
                 return new NpgsqlConnection(connectionString);
             });
 
@@ -120,6 +120,8 @@ namespace IO.Server
 
                 Environment.Courses.Add(course);
             }
+
+
         }
 
 

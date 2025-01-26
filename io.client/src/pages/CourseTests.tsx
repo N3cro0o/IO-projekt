@@ -10,6 +10,9 @@ import {
     Snackbar,
 } from '@mui/material';
 import { ButtonAppBar } from '../comps/AppBar.tsx';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
+import ModalAddTest from '../comps/modalAddTests'; // Importujemy modal do dodawania testów
+
 
 interface Test {
     testId: number;
@@ -38,6 +41,7 @@ const CourseTests: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [startedTest, setStartedTest] = useState<string | null>(null);
     const [deletedTest, setDeletedTest] = useState<string | null>(null);
+    const [modalOpen, setModalOpen] = useState(false); // Zarz¹dzanie stanem modala do testów
 
     useEffect(() => {
         const fetchTests = async () => {
@@ -117,6 +121,15 @@ const CourseTests: React.FC = () => {
         navigate(`/course/${courseId}/test/${testId}/results`);
     };
 
+    const handleAddTest = (newTest: Test) => {
+        setTests((prevTests) => [...prevTests, newTest]);
+    };
+
+    // Przycisk Edit Test przekierowuje do edycji testu
+    const handleEditTest = (testId: number) => {
+        navigate(`/course/${courseId}/test/${testId}/edit`);
+    };
+
     return (
         <div>
             <ButtonAppBar />
@@ -124,6 +137,21 @@ const CourseTests: React.FC = () => {
                 <Typography variant="h4" color="white" align="center" gutterBottom>
                     Test Panel
                 </Typography>
+                <Box sx={{ textAlign: 'center', marginBottom: '20px' }}>
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        startIcon={<AddCircleIcon />}
+                        onClick={() => setModalOpen(true)}
+                        sx={{
+                            borderRadius: '50px',
+                            backgroundColor: '#0066CC',
+                            '&:hover': { backgroundColor: '#004C99' },
+                        }}
+                    >
+                        Add Test
+                    </Button>
+                </Box>
                 {loading ? (
                     <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
                         <CircularProgress />
@@ -182,6 +210,13 @@ const CourseTests: React.FC = () => {
                                         </Button>
                                         <Button
                                             variant="contained"
+                                            color="secondary"
+                                            onClick={() => handleEditTest(test.testId)} // Przekierowanie do edycji testu
+                                        >
+                                            Edit Test
+                                        </Button>
+                                        <Button
+                                            variant="contained"
                                             color="info"
                                             onClick={() => handleCheckResults(test.testId)}
                                         >
@@ -204,6 +239,12 @@ const CourseTests: React.FC = () => {
                     autoHideDuration={5000}
                     onClose={() => setDeletedTest(null)}
                     message={`Test "${deletedTest}" deleted successfully!`}
+                />
+                <ModalAddTest
+                    open={modalOpen}
+                    handleClose={() => setModalOpen(false)}
+                    courseId={Number(courseId)}
+                    onAddTest={handleAddTest}
                 />
             </Box>
         </div>

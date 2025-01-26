@@ -6,9 +6,11 @@ import { Login } from './pages/LoginPage';
 import { HashRouter as HRouter, Routes, Route } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import UserPanel from './pages/UserPanel';
+import EditTestPage from './pages/EditTestPage';
+
 
 import CourseTests from './pages/CourseTests';
-import TestResults from './pages/TestResults';
+
 import Course from './pages/CourseManagment';
 
 import { Registration } from './pages/Registration';
@@ -27,11 +29,12 @@ function App() {
                     <Route path="/loginPage" element={<Login token={token} setToken={setToken} />} />
                     <Route path="/UserPanel" element={<UserPanel logginToken={token} />} />
                     <Route path="/course/:courseId/tests" element={<CourseTests />} />
-                    <Route path="/course/:courseId/test/:testId/results" element={<TestResults />} />
                     <Route path="/Registration" element={<Registration />} />
                     <Route path="/CourseManagment" element={<Course />} />
                     <Route path="/course/:courseId/test/:testId/set-time" element={<SetTestTimePage />} />
                     <Route path="/AccountManager" element={<UserProfilePage />} />
+                    <Route path="/course/:courseId/test/:testId/edit" element={<EditTestPage />} />
+
 
                 </Routes>
             </HRouter>
