@@ -49,6 +49,11 @@ const contentStyle = {
 export default function BasicModal({ courseId, coursename, handleClose }: { courseId: number, coursename: string, handleClose: () => void }) {
     const [open, setOpen] = React.useState(true);  // Modal powinien otwieraæ siê tylko raz po klikniêciu przycisku
 
+    const closeModal = () => {
+        setOpen(false);
+        handleClose();
+    };
+
     return (
         <Modal
             open={open}
@@ -66,7 +71,7 @@ export default function BasicModal({ courseId, coursename, handleClose }: { cour
                     </IconButton>
                 </div>
                 <Box sx={contentStyle}>
-                    <UserList courseId={courseId} />
+                    <UserList courseId={courseId} onUsersAdded={closeModal}/>
                 </Box>
             </Box>
         </Modal>

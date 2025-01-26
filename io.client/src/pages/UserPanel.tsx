@@ -16,7 +16,10 @@ const UserPanel: React.FC = () => {
     const navigate = useNavigate(); // Hook do nawigacji
 
     useEffect(() => {
-        fetch('https://localhost:59127/api/course/list')
+        const userId = localStorage.getItem('userId');
+        console.log('User ID from localStorage:', userId);
+
+        fetch('https://localhost:59127/api/course/list/' + userId)
             .then((response) => response.json())
             .then((data: Course[]) => {
                 setCourses(data);

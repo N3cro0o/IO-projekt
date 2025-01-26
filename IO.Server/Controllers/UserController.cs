@@ -62,5 +62,47 @@ namespace IO.Server.Controllers
             }
 
         }
+        [HttpPost("addUsers")]
+        public ActionResult AddUsersToCourse([FromBody] AddUsersRequest request)
+        {
+            try
+            {
+                _connection.Open();
+
+                using (var transaction = _connection.BeginTransaction())
+                {
+                    string query = "INSERT INTO \"UserToCourse\" (courseid, userid) VALUES (@courseid, @userid) ON CONFLICT DO NOTHING;";
+
+                    foreach (var userId in request.UserIds)
+                    {
+                        using (var command = new NpgsqlCommand(query, _connection))
+                        {
+                            command.Parameters.AddWithValue("@courseid", request.CourseId);
+                            command.Parameters.AddWithValue("@userid", userId);
+
+                            command.ExecuteNonQuery();
+                        }
+                    }
+
+                    transaction.Commit();
+                }
+
+                return Ok("Users successfully added to the course.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+            finally
+            {
+                _connection.Close();
+            }
+        }
+    }
+
+    public class AddUsersRequest
+    {
+        public int CourseId { get; set; }
+        public List<int> UserIds { get; set; }
     }
 }

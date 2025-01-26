@@ -20,6 +20,7 @@ export const Course = () => {
         id: number;
         name: string;
         owner: number;
+        ownerLogin: string;
     }
 
     const transformCourseData = (apiData: any[]): Course[] => {
@@ -27,13 +28,17 @@ export const Course = () => {
             id: course.courseid,
             name: course.courseName,
             owner: course.ownerid,
+            ownerLogin: course.ownerLogin
         }));
     };
 
     useEffect(() => {
         const fetchCourses = async () => {
             try {
-                const response = await fetch('https://localhost:7293/api/CoursesManager/listCourses');
+                const userId = localStorage.getItem('userId');
+                console.log('User ID from localStorage:', userId);
+
+                const response = await fetch('https://localhost:7293/api/CoursesManager/listCourses/' + userId);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -51,8 +56,11 @@ export const Course = () => {
 
     // Funkcja odœwie¿ania kursów
     const refreshCourses = async () => {
+        const userId = localStorage.getItem('userId');
+        console.log('User ID from localStorage:', userId);
+
         try {
-            const response = await fetch('https://localhost:7293/api/CoursesManager/listCourses');
+            const response = await fetch('https://localhost:7293/api/CoursesManager/listCourses/' + userId);
             const apiData = await response.json();
             const transformedData = transformCourseData(apiData);
             setCourses(transformedData);
@@ -139,7 +147,7 @@ export const Course = () => {
                             {courses.map((course) => (
                                 <tr key={course.id} style={{ borderBottom: '1px solid #555' }}>
                                     <td style={{ padding: '10px' }}>{course.name}</td>
-                                    <td style={{ padding: '10px' }}>{course.owner}</td>
+                                    <td style={{ padding: '10px' }}>{course.ownerLogin}</td>
                                     <td style={{ padding: '10px', display: 'flex', gap: '8px' }}>
                                         <Button onClick={() => handleAddUsers(course.id, course.name)} variant="contained">
                                             Add Users

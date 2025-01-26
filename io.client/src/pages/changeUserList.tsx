@@ -11,7 +11,7 @@ interface UserListProps {
     courseId: number;
 }
 
-const UserList: React.FC<UserListProps> = ({ courseId }) => {
+const ChangeUserList: React.FC<UserListProps & { onUsersRemoved: () => void }> = ({ courseId, onUsersRemoved }) => {
     const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [selectedUserIds, setSelectedUserIds] = useState<Set<number>>(new Set());
@@ -19,7 +19,7 @@ const UserList: React.FC<UserListProps> = ({ courseId }) => {
     useEffect(() => {
         const fetchUsers = async () => {
             try {
-                const response = await fetch('https://localhost:7293/api/User/list');
+                const response = await fetch('https://localhost:7293/api/CourseUsers/list/' + courseId);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -47,14 +47,14 @@ const UserList: React.FC<UserListProps> = ({ courseId }) => {
         });
     };
 
-    const handleAddUsers = async () => {
+    const handleKickUsers = async () => {
         try {
             const payload = {
                 courseId,
                 userIds: Array.from(selectedUserIds),
             };
 
-            const response = await fetch('https://localhost:7293/api/ChangeCourseUsers/kickUsers', {
+            const response = await fetch('https://localhost:7293/api/CourseUsers/kickUsers', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -66,9 +66,10 @@ const UserList: React.FC<UserListProps> = ({ courseId }) => {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
 
-            alert('Users successfully added to the course!');
+            alert('Users successfully kicked from the course!');
+            onUsersRemoved(); // Close the modal
         } catch (error) {
-            console.error('Error adding users to the course:', error);
+            console.error('Error kicking users from the course:', error);
         }
     };
 
@@ -104,7 +105,7 @@ const UserList: React.FC<UserListProps> = ({ courseId }) => {
                 </Table>
             </TableContainer>
             <div style={{ marginTop: '20px' }}>
-                <Button variant="contained" color="warning" onClick={handleAddUsers}>
+                <Button variant="contained" color="warning" onClick={handleKickUsers}>
                     Kick Users
                 </Button>
             </div>
@@ -112,4 +113,4 @@ const UserList: React.FC<UserListProps> = ({ courseId }) => {
     );
 };
 
-export default UserList;
+export default ChangeUserList;

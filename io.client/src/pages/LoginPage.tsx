@@ -47,8 +47,9 @@ export const Login = () => {
             });
 
             if (response.ok) {
-                const json_data = await response.json();
-                localStorage.setItem('authToken', json_data.Token);
+                const data = await response.json();
+                localStorage.setItem('userId', String(data.userId)); // Zapisz ID użytkownika
+                localStorage.setItem('authToken', data.token); // Zapisz token
                 navigate('/UserPanel');
             } else {
                 setLoginError('Incorrect login details');

@@ -1,75 +1,83 @@
 ﻿using IO.Server.Elements;
 using Microsoft.AspNetCore.Mvc;
 using Npgsql;
-using System;
-using System.Collections.Generic;
 
-namespace IO.Server.Controllers
+[ApiController]
+[Route("api/[controller]")]
+public class AddCourseController : ControllerBase
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class AddCourseController : ControllerBase
+    private readonly NpgsqlConnection _connection;
+
+    public AddCourseController(NpgsqlConnection connection)
     {
-        private readonly NpgsqlConnection _connection;
+        _connection = connection;
+    }
 
-        public AddCourseController(NpgsqlConnection connection)
+    // POST: api/AddCourse/addCourse
+    [HttpPost("addCourse")]
+    public ActionResult AddCourse([FromBody] AddCourse course)
+    {
+        try
         {
-            _connection = connection;
-        }
+            //Odczytaj OwnerId z tokenu
+           // var ownerIdClaim = User.FindFirst("userid"); // Użyj klucza claimu, np. "userid"
+           // if (ownerIdClaim == null)
+           // {
+           //     return Unauthorized(new { message = "User ID not found in token." });
+           // }
 
-        // POST: api/AddCourse/addCourse
-        [HttpPost("addCourse")]
-        public ActionResult AddCourse([FromBody] AddCourse course)
-        {
-            try
+           // if (!int.TryParse(ownerIdClaim.Value, out int ownerId))
+           // {
+           //     return BadRequest(new { message = "Invalid User ID in token." });
+           // }
+
+           // //Przypisz OwnerId do kursu
+
+           //course.OwnerId = ownerId;
+
+            _connection.Open();
+
+            // Insert the new course into the database
+            string query = "INSERT INTO \"Course\" (name, category, description, ownerid) VALUES (@name, @category, @description, @ownerid)";
+
+            using (var command = new NpgsqlCommand(query, _connection))
             {
-                _connection.Open();
+                command.Parameters.AddWithValue("@name", course.Name);
+                command.Parameters.AddWithValue("@category", course.Category);
+                command.Parameters.AddWithValue("@description", course.Description);
+                command.Parameters.AddWithValue("@ownerid", course.OwnerId);
 
-                // Insert the new course into the database
-                string query = "INSERT INTO \"Course\" (name, category, description, ownerid) VALUES (@name, @category, @description, @ownerid)";
+                int rowsAffected = command.ExecuteNonQuery();
 
-                using (var command = new NpgsqlCommand(query, _connection))
+                if (rowsAffected > 0)
                 {
-                    command.Parameters.AddWithValue("@name", course.Name);
-                    command.Parameters.AddWithValue("@category", course.Category);
-                    command.Parameters.AddWithValue("@description", course.Description);
-                    command.Parameters.AddWithValue("@ownerid", course.OwnerId);
-
-                    // Execute the query
-                    int rowsAffected = command.ExecuteNonQuery();
-
-                    // Check if a course was added successfully
-                    if (rowsAffected > 0)
-                    {
-                        return Ok(new { message = "Course created successfully." });
-                    }
-                    else
-                    {
-                        return BadRequest(new { message = "Failed to create the course." });
-                    }
+                    return Ok(new { message = "Course created successfully." });
                 }
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = "An error occurred while creating the course.", details = ex.Message });
-            }
-            finally
-            {
-                // Ensure the connection is closed
-                if (_connection.State == System.Data.ConnectionState.Open)
+                else
                 {
-                    _connection.Close();
+                    return BadRequest(new { message = "Failed to create the course." });
                 }
             }
         }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = "An error occurred while creating the course.", details = ex.Message });
+        }
+        finally
+        {
+            if (_connection.State == System.Data.ConnectionState.Open)
+            {
+                _connection.Close();
+            }
+        }
     }
+}
 
-    // Define the Course model class for the course input
-    public class AddCourse
-    {
-        public string Name { get; set; }
-        public string Category { get; set; }
-        public string Description { get; set; }
-        public int OwnerId { get; set; }
-    }
+// Define the Course model class for the course input
+public class AddCourse
+{
+    public string Name { get; set; }
+    public string Category { get; set; }
+    public string Description { get; set; }
+    public int OwnerId { get; set; } // This will be set from the token, not the request body
 }

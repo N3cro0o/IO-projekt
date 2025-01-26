@@ -25,29 +25,50 @@ namespace IO.Server.Controllers
 
             try
             {
-                // Zapytanie SQL
-                string query = "DELETE FROM \"Course\" WHERE courseid = @courseid";
-
                 using (var connection = _connection)
                 {
                     connection.Open();
-                    using (var command = new NpgsqlCommand(query, connection))
-                    {
-                        command.Parameters.AddWithValue("@courseid", request.courseid); // Przypisanie parametru
-                        int rowsAffected = command.ExecuteNonQuery();
 
-                        if (rowsAffected == 0)
+                    using (var transaction = connection.BeginTransaction())
+                    {
+                        try
                         {
-                            return NotFound(new { message = "Course not found." });
+                            // Usuwanie testów przypisanych do kursu
+                            string deleteTestsQuery = "DELETE FROM \"Test\" WHERE courseid = @courseid";
+                            using (var deleteTestsCommand = new NpgsqlCommand(deleteTestsQuery, connection))
+                            {
+                                deleteTestsCommand.Parameters.AddWithValue("@courseid", request.courseid);
+                                deleteTestsCommand.ExecuteNonQuery();
+                            }
+
+                            // Usuwanie kursu
+                            string deleteCourseQuery = "DELETE FROM \"Course\" WHERE courseid = @courseid";
+                            using (var deleteCourseCommand = new NpgsqlCommand(deleteCourseQuery, connection))
+                            {
+                                deleteCourseCommand.Parameters.AddWithValue("@courseid", request.courseid);
+                                int rowsAffected = deleteCourseCommand.ExecuteNonQuery();
+
+                                if (rowsAffected == 0)
+                                {
+                                    transaction.Rollback();
+                                    return NotFound(new { message = "Course not found." });
+                                }
+                            }
+
+                            transaction.Commit();
+                            return Ok(new { message = "Course and associated tests deleted successfully." });
+                        }
+                        catch (Exception)
+                        {
+                            transaction.Rollback();
+                            throw;
                         }
                     }
                 }
-
-                return Ok(new { message = "Course deleted successfully." });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An error occurred while deleting the course.", details = ex.Message });
+                return StatusCode(500, new { message = "An error occurred while deleting the Course.", details = ex.Message });
             }
         }
     }

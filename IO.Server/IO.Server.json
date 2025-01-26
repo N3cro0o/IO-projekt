@@ -5,18 +5,6 @@
     "version": "1.0.0"
   },
   "paths": {
-    "/api/TestDatabase/test-connection": {
-      "get": {
-        "tags": [
-          "TestDatabase"
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
     "/api/AddCourse/addCourse": {
       "post": {
         "tags": [
@@ -42,6 +30,18 @@
           },
           "required": true
         },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/TestDatabase/test-connection": {
+      "get": {
+        "tags": [
+          "TestDatabase"
+        ],
         "responses": {
           "200": {
             "description": "OK"
@@ -81,10 +81,21 @@
         }
       }
     },
-    "/api/Course/list": {
+    "/api/Course/list/{userId}": {
       "get": {
         "tags": [
           "Course"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
         ],
         "responses": {
           "200": {
@@ -119,10 +130,21 @@
         }
       }
     },
-    "/api/CoursesManager/listCourses": {
+    "/api/CoursesManager/listCourses/{userId}": {
       "get": {
         "tags": [
           "CoursesManager"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
         ],
         "responses": {
           "200": {
@@ -153,6 +175,87 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/api/CourseUsers/list/{courseid}": {
+      "get": {
+        "tags": [
+          "CourseUsers"
+        ],
+        "parameters": [
+          {
+            "name": "courseid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/CourseUsers/kickUsers": {
+      "post": {
+        "tags": [
+          "CourseUsers"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ModifyUsersRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ModifyUsersRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ModifyUsersRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
           }
         }
       }
@@ -515,6 +618,38 @@
           }
         }
       }
+    },
+    "/api/User/addUsers": {
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddUsersRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddUsersRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddUsersRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -534,6 +669,22 @@
           "ownerId": {
             "type": "integer",
             "format": "int32"
+          }
+        }
+      },
+      "AddUsersRequest": {
+        "type": "object",
+        "properties": {
+          "courseId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "userIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
           }
         }
       },
@@ -601,6 +752,9 @@
           "ownerid": {
             "type": "integer",
             "format": "int32"
+          },
+          "ownerLogin": {
+            "type": "string"
           }
         }
       },
@@ -621,6 +775,22 @@
           },
           "password": {
             "type": "string"
+          }
+        }
+      },
+      "ModifyUsersRequest": {
+        "type": "object",
+        "properties": {
+          "courseId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "userIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
           }
         }
       },
@@ -748,10 +918,10 @@
   },
   "tags": [
     {
-      "name": "TestDatabase"
+      "name": "AddCourse"
     },
     {
-      "name": "AddCourse"
+      "name": "TestDatabase"
     },
     {
       "name": "AddTest"
@@ -761,6 +931,9 @@
     },
     {
       "name": "CoursesManager"
+    },
+    {
+      "name": "CourseUsers"
     },
     {
       "name": "DeleteCourse"

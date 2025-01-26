@@ -16,8 +16,8 @@ namespace IO.Server.Controllers
         }
    
 
-        [HttpGet("list")]
-        public ActionResult<IEnumerable<Course>> GetCourses()
+        [HttpGet("list/{userId}")]
+        public ActionResult<IEnumerable<Course>> GetCourses(int userId)
         {
             List<Course> courses = new List<Course>();
 
@@ -26,7 +26,7 @@ namespace IO.Server.Controllers
                 _connection.Open();
                 Console.WriteLine("Połączenie z bazą danych otwarte.");
 
-                string query = "SELECT courseid, name, category, description, ownerid FROM \"Course\" ORDER BY courseid ASC";
+                string query = $"SELECT courseid, name, category, description, ownerid FROM \"Course\" WHERE ownerid = {userId} ORDER BY courseid ASC";
 
                 using (var command = new NpgsqlCommand(query, _connection))
                 using (var reader = command.ExecuteReader())

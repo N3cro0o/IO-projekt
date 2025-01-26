@@ -37,7 +37,7 @@ namespace IO.Server.Controllers
                 _connection.Open();
 
                 // Zapytanie SQL w celu pobrania użytkownika na podstawie loginu
-                string query = "SELECT login, password, role FROM \"User\" WHERE login = @login";
+                string query = "SELECT login, password, role, userId FROM \"User\" WHERE login = @login";
                 using (var command = new NpgsqlCommand(query, _connection))
                 {
                     // Dodanie parametru zapytania SQL
@@ -50,6 +50,8 @@ namespace IO.Server.Controllers
                             // Brak użytkownika w bazie danych
                             return Unauthorized(new { Message = "Invalid Username or Password" });
                         }
+                        
+                        
 
                         // Pobranie hasła z bazy danych
                         var storedPassword = reader.GetString(1); // Druga kolumna zawiera hasło
@@ -65,10 +67,13 @@ namespace IO.Server.Controllers
 
                         // Pobranie roli użytkownika
                         var userRole = reader.GetString(2); // Trzecia kolumna zawiera rolę
+                        var userId = reader.GetInt32(3);
 
                         // Wygenerowanie tokenu JWT
                         var token = GenerateJwtToken(data.Login, userRole);
-                        return Ok(new { Message = "Login successful", Token = token });
+                        return Ok(new { Message = "Login successful", Token = token, userId = userId});
+
+
                     }
                 }
             }
