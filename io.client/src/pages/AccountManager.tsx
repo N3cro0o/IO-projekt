@@ -16,23 +16,28 @@ export const UserProfilePage: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(true);
     const [updateError, setUpdateError] = useState<string>('');
     const [updateSuccess, setUpdateSuccess] = useState<string>('');
-    const [formData, setFormData] = useState({
-        username: '',
+    const [fieldToUpdate, setFieldToUpdate] = useState({
+        login: '',
         email: '',
-        password: '',
+        name: '',
+        surname: '',
+    });
+    const [passwordData, setPasswordData] = useState({
+        currentPassword: '',
         newPassword: '',
+        confirmPassword: '',
     });
 
     const navigate = useNavigate();
+    const userId = localStorage.getItem('userId');
 
-    // Pobranie danych u¿ytkownika z API
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const response = await fetch('https://localhost:7293/api/Account/showData', {
+                const response = await fetch(`https://localhost:7293/api/Account/showData/${userId}`, {
                     method: 'GET',
                     headers: {
-                        //'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+                        'Content-Type': 'application/json',
                     },
                 });
 
@@ -42,62 +47,98 @@ export const UserProfilePage: React.FC = () => {
 
                 const data = await response.json();
                 setUserData(data);
-                setFormData({
-                    username: data.username,
-                    email: data.email,
-                    password: '',
-                    newPassword: '',
+                setFieldToUpdate({
+                    login: '',
+                    email: '',
+                    name: '',
+                    surname: '',
                 });
             } catch (error) {
                 setUpdateError('An error occurred while fetching user data.');
-                console.error(error);
             } finally {
                 setLoading(false);
             }
         };
 
         fetchUserData();
-    }, []);
+    }, [userId]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
+        setFieldToUpdate({ ...fieldToUpdate, [name]: value });
     };
 
-    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
+    const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setPasswordData({ ...passwordData, [name]: value });
+    };
 
-        setUpdateError('');
-        setUpdateSuccess('');
-
+    const handleUpdate = async (fieldName: string) => {
         try {
-            const response = await fetch('https://localhost:7293/api/UserProfile', {
+            setUpdateError('');
+            setUpdateSuccess('');
+            const response = await fetch(`https://localhost:7293/api/Account/updateField/${userId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
-                    //'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
                 },
                 body: JSON.stringify({
-                    username: formData.username,
-                    email: formData.email,
-                    password: formData.password,
-                    newPassword: formData.newPassword,
+                    fieldName,
+                    value: fieldToUpdate[fieldName],
                 }),
             });
 
             if (!response.ok) {
-                throw new Error('Failed to update user data');
+                throw new Error(`Failed to update ${fieldName}`);
             }
 
-            setUpdateSuccess('User data updated successfully!');
+            const updatedData = await response.json();
+            setUserData(updatedData);
+            setUpdateSuccess(`${fieldName} updated successfully!`);
+            setFieldToUpdate({ ...fieldToUpdate, [fieldName]: '' });
         } catch (error) {
-            setUpdateError('An error occurred while updating user data.');
-            console.error(error);
+            setUpdateError(`An error occurred while updating ${fieldName}.`);
+        }
+    };
+
+    const handlePasswordUpdate = async () => {
+        if (passwordData.newPassword !== passwordData.confirmPassword) {
+            setUpdateError('New password and confirmation do not match.');
+            return;
+        }
+
+        try {
+            setUpdateError('');
+            setUpdateSuccess('');
+            const response = await fetch(`https://localhost:7293/api/Account/changePassword/${userId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    currentPassword: passwordData.currentPassword,
+                    newPassword: passwordData.newPassword,
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to update password');
+            }
+
+            setUpdateSuccess('Password updated successfully!');
+            setPasswordData({
+                currentPassword: '',
+                newPassword: '',
+                confirmPassword: '',
+            });
+        } catch (error) {
+            setUpdateError('An error occurred while updating the password.');
         }
     };
 
     const handleLogout = () => {
         localStorage.removeItem('authToken');
+        localStorage.removeItem('userId');
         navigate('/login');
     };
 
@@ -146,85 +187,108 @@ export const UserProfilePage: React.FC = () => {
                         </Alert>
                     )}
 
-                    <form onSubmit={handleSubmit}>
-                        <TextField
-                            label="Username"
-                            name="username"
-                            type="text"
-                            value={formData.username}
-                            onChange={handleChange}
-                            fullWidth
-                            sx={{
-                                marginBottom: '16px',
-                                '& .MuiInputLabel-root': { color: 'white' },
-                                '& .MuiInputBase-root': {
-                                    backgroundColor: '#333',
-                                    color: 'white',
-                                },
-                            }}
-                        />
-                        <TextField
-                            label="Email"
-                            name="email"
-                            type="email"
-                            value={formData.email}
-                            onChange={handleChange}
-                            fullWidth
-                            sx={{
-                                marginBottom: '16px',
-                                '& .MuiInputLabel-root': { color: 'white' },
-                                '& .MuiInputBase-root': {
-                                    backgroundColor: '#333',
-                                    color: 'white',
-                                },
-                            }}
-                        />
-                        <TextField
-                            label="Current Password"
-                            name="password"
-                            type="password"
-                            value={formData.password}
-                            onChange={handleChange}
-                            fullWidth
-                            sx={{
-                                marginBottom: '16px',
-                                '& .MuiInputLabel-root': { color: 'white' },
-                                '& .MuiInputBase-root': {
-                                    backgroundColor: '#333',
-                                    color: 'white',
-                                },
-                            }}
-                        />
-                        <TextField
-                            label="New Password"
-                            name="newPassword"
-                            type="password"
-                            value={formData.newPassword}
-                            onChange={handleChange}
-                            fullWidth
-                            sx={{
-                                marginBottom: '16px',
-                                '& .MuiInputLabel-root': { color: 'white' },
-                                '& .MuiInputBase-root': {
-                                    backgroundColor: '#333',
-                                    color: 'white',
-                                },
-                            }}
-                        />
-                        <Button
-                            type="submit"
-                            fullWidth
-                            variant="contained"
-                            sx={{
-                                color: '#fff',
-                                backgroundColor: '#007bff',
-                                '&:hover': { backgroundColor: '#0056b3' },
-                                marginTop: '20px',
-                            }}
-                        >
-                            Save Changes
-                        </Button>
-                    </form>
+                    {userData && (
+                        <>
+                            {['login', 'email', 'name', 'surname'].map((field) => (
+                                <Box key={field} sx={{ marginBottom: '20px' }}>
+                                    <Typography variant="subtitle1" color="white">
+                                        {field.charAt(0).toUpperCase() + field.slice(1)}:
+                                    </Typography>
+                                    <TextField
+                                        value={userData[field]}
+                                        InputProps={{ readOnly: true }}
+                                        fullWidth
+                                        sx={{
+                                            marginBottom: '8px',
+                                            '& .MuiInputBase-root': {
+                                                backgroundColor: '#333',
+                                                color: 'white',
+                                            },
+                                        }}
+                                    />
+                                    <TextField
+                                        label={`Change ${field}`}
+                                        name={field}
+                                        value={fieldToUpdate[field]}
+                                        onChange={handleChange}
+                                        fullWidth
+                                        sx={{
+                                            '& .MuiInputLabel-root': { color: 'white' },
+                                            '& .MuiInputBase-root': {
+                                                backgroundColor: '#333',
+                                                color: 'white',
+                                            },
+                                        }}
+                                    />
+                                    <Button
+                                        variant="contained"
+                                        sx={{ marginTop: '8px', backgroundColor: '#007bff', color: '#fff' }}
+                                        onClick={() => handleUpdate(field)}
+                                    >
+                                        Update {field.charAt(0).toUpperCase() + field.slice(1)}
+                                    </Button>
+                                </Box>
+                            ))}
+
+                            <Box sx={{ marginBottom: '20px' }}>
+                                <Typography variant="subtitle1" color="white">Change Password:</Typography>
+                                <TextField
+                                    label="Current Password"
+                                    name="currentPassword"
+                                    value={passwordData.currentPassword}
+                                    onChange={handlePasswordChange}
+                                    type="password"
+                                    fullWidth
+                                    sx={{
+                                        marginBottom: '8px',
+                                        '& .MuiInputLabel-root': { color: 'white' },
+                                        '& .MuiInputBase-root': {
+                                            backgroundColor: '#333',
+                                            color: 'white',
+                                        },
+                                    }}
+                                />
+                                <TextField
+                                    label="New Password"
+                                    name="newPassword"
+                                    value={passwordData.newPassword}
+                                    onChange={handlePasswordChange}
+                                    type="password"
+                                    fullWidth
+                                    sx={{
+                                        marginBottom: '8px',
+                                        '& .MuiInputLabel-root': { color: 'white' },
+                                        '& .MuiInputBase-root': {
+                                            backgroundColor: '#333',
+                                            color: 'white',
+                                        },
+                                    }}
+                                />
+                                <TextField
+                                    label="Confirm Password"
+                                    name="confirmPassword"
+                                    value={passwordData.confirmPassword}
+                                    onChange={handlePasswordChange}
+                                    type="password"
+                                    fullWidth
+                                    sx={{
+                                        '& .MuiInputLabel-root': { color: 'white' },
+                                        '& .MuiInputBase-root': {
+                                            backgroundColor: '#333',
+                                            color: 'white',
+                                        },
+                                    }}
+                                />
+                                <Button
+                                    variant="contained"
+                                    sx={{ marginTop: '8px', backgroundColor: '#007bff', color: '#fff' }}
+                                    onClick={handlePasswordUpdate}
+                                >
+                                    Update Password
+                                </Button>
+                            </Box>
+                        </>
+                    )}
 
                     <Button
                         fullWidth
@@ -244,4 +308,3 @@ export const UserProfilePage: React.FC = () => {
         </div>
     );
 };
-
