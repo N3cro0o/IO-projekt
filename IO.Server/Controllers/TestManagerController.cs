@@ -1,6 +1,7 @@
 ﻿using IO.Server.Elements;
 using Microsoft.AspNetCore.Mvc;
 using Npgsql;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace IO.Server.Controllers
 {
@@ -48,6 +49,7 @@ namespace IO.Server.Controllers
                 }
 
                 Console.WriteLine($"Łączna liczba kursów: {courses.Count}");
+                
                 return Ok(courses);
             }
             catch (Exception ex)

@@ -29,12 +29,18 @@ namespace IO.Server.Controllers
 
                 // Query to fetch courses
                 string query = @"
-                    SELECT t.testid, t.name, t.category 
-                    FROM ""UserToCourse"" utc
-                    JOIN ""Course"" c ON utc.courseid = c.courseid
-                    JOIN ""Test"" t ON t.courseid = c.courseid
-                    JOIN ""User"" u ON utc.userid = u.userid
-                    WHERE u.userid = @userId";
+                    SELECT 
+                        t.testid, 
+                        t.name AS test_name, 
+                        t.category AS test_category
+                    FROM 
+                        ""UserToCourse"" utc
+                    JOIN
+                        ""Course"" c ON utc.courseid = c.courseid
+                    JOIN
+                        ""Test"" t ON c.courseid = t.courseid";
+
+
 
                 using (var command = new NpgsqlCommand(query, _connection))
                 using (var reader = command.ExecuteReader())
@@ -51,14 +57,19 @@ namespace IO.Server.Controllers
                         {
                             testid = testId,
                             testName = testName,
-                            cattegory = cattegory
+                            testCattegory = cattegory
                         };
 
                         test.Add(testToReveal);
+                        
                     }
                 }
-
+                foreach (var item in test)
+                {
+                    Console.WriteLine($"TestId: {item.testid}, TestName: {item.testName}, TestCategory: {item.testCattegory}");
+                }
                 return Ok(test);
+
             }
             catch (Exception ex)
             {
@@ -73,85 +84,87 @@ namespace IO.Server.Controllers
                     _connection.Close();
                 }
             }
+            
         }
-        public ActionResult<IEnumerable<QuestionToReveal>> GetQuestion(int testId)
-        {
-            List<QuestionToReveal> question = new List<QuestionToReveal>();
+        
+    //public ActionResult<IEnumerable<QuestionToReveal>> GetQuestion(int testId)
+    //{
+    //    List<QuestionToReveal> question = new List<QuestionToReveal>();
 
-            try
-            {
-                _connection.Open();
+    //    try
+    //    {
+    //        _connection.Open();
 
-                // Query to fetch courses
-                string query = @"SELECT q.*, t.testid
-                    FROM  ""Question"" q, ""QuestionToTest"" qtt, ""Test"" t
-                    WHERE qtt.testid = t.testid AND qtt.questionid = q.questionid AND t.testid = @testId";
+    //        // Query to fetch courses
+    //        string query = @"SELECT q.*, t.testid
+    //            FROM  ""Question"" q, ""QuestionToTest"" qtt, ""Test"" t
+    //            WHERE qtt.testid = t.testid AND qtt.questionid = q.questionid AND t.testid = @testId";
 
-                using (var command = new NpgsqlCommand(query, _connection))
-                using (var reader = command.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        int questionId = reader.GetFieldValue<int>(0);
-                        string questionName = reader.GetFieldValue<string>(1);
-                        string questionCattegory = reader.GetFieldValue<string>(2);
-                        string questionType = reader.GetFieldValue<string>(3);
-                        bool questionShared = reader.GetFieldValue<bool>(4);
-                        string questionAnswer = reader.GetFieldValue<string>(5);
-                        bool a = reader.GetFieldValue<bool>(6);
-                        bool b = reader.GetFieldValue<bool>(7);
-                        bool c = reader.GetFieldValue<bool>(8);
-                        bool d = reader.GetFieldValue<bool>(9);
-                        string questionQ = reader.GetFieldValue<string>(10);
-                        int maxPoint = reader.GetFieldValue<int>(11);
+    //        using (var command = new NpgsqlCommand(query, _connection))
+    //        using (var reader = command.ExecuteReader())
+    //        {
+    //            while (reader.Read())
+    //            {
+    //                int questionId = reader.GetFieldValue<int>(0);
+    //                string questionName = reader.GetFieldValue<string>(1);
+    //                string questionCattegory = reader.GetFieldValue<string>(2);
+    //                string questionType = reader.GetFieldValue<string>(3);
+    //                bool questionShared = reader.GetFieldValue<bool>(4);
+    //                string questionAnswer = reader.GetFieldValue<string>(5);
+    //                bool a = reader.GetFieldValue<bool>(6);
+    //                bool b = reader.GetFieldValue<bool>(7);
+    //                bool c = reader.GetFieldValue<bool>(8);
+    //                bool d = reader.GetFieldValue<bool>(9);
+    //                string questionQ = reader.GetFieldValue<string>(10);
+    //                int maxPoint = reader.GetFieldValue<int>(11);
 
-                        // Create the QuestionToReveal object
-                        QuestionToReveal questionToReveal = new QuestionToReveal
-                        {
-                            questionid = questionId,
-                            questionName = questionName,
-                            cattegory = questionCattegory,
-                            questiontype = questionType,
-                            shared = questionShared,
-                            answer = questionAnswer,
-                            a = a,
-                            b = b,
-                            c = c,
-                            d = d,
-                            question = questionQ,
-                            maxpoint = maxPoint
-                        };
-                        question.Add(questionToReveal);
-                    }
-                }
-                return Ok(question);
-            } 
-                
-            catch (Exception ex)
-            {
-                Debug.Print(ex.ToString());
-                return BadRequest(new { message = "An error occurred while fetching courses.", details = ex.Message });
-            }
-            finally
-            {
-                // Ensure the connection is closed
-                if (_connection.State == System.Data.ConnectionState.Open)
-                {
-                    _connection.Close();
-                }
-            }
-        }
+    //                // Create the QuestionToReveal object
+    //                QuestionToReveal questionToReveal = new QuestionToReveal
+    //                {
+    //                    questionid = questionId,
+    //                    questionName = questionName,
+    //                    cattegory = questionCattegory,
+    //                    questiontype = questionType,
+    //                    shared = questionShared,
+    //                    answer = questionAnswer,
+    //                    a = a,
+    //                    b = b,
+    //                    c = c,
+    //                    d = d,
+    //                    question = questionQ,
+    //                    maxpoint = maxPoint
+    //                };
+    //                question.Add(questionToReveal);
+    //            }
+    //        }
+    //        return Ok(question);
+    //    }
 
-
-
+    //    catch (Exception ex)
+    //    {
+    //        Debug.Print(ex.ToString());
+    //        return BadRequest(new { message = "An error occurred while fetching courses.", details = ex.Message });
+    //    }
+    //    finally
+    //    {
+    //        // Ensure the connection is closed
+    //        if (_connection.State == System.Data.ConnectionState.Open)
+    //        {
+    //            _connection.Close();
+    //        }
+    //    }
+    //}
 
 
 
-        public class TestToReveal
+
+
+
+    public class TestToReveal
         {
             public int testid { get; set; }
             public string testName { get; set; }
-            public string cattegory { get; set; }
+            public string testCattegory { get; set; }
         }
         public class QuestionToReveal
         {

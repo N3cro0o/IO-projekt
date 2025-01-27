@@ -14,8 +14,6 @@ export const TestSolver = () => {
     const [questions, setQuestions] = useState<Question[]>([]);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
     const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
-    const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-    const [selectedAnswer, setSelectedAnswer] = useState(null);
     const [score, setScore] = useState(0); // Œledzenie punktów
 
     // Funkcja do transformacji danych

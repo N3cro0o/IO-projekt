@@ -914,6 +914,55 @@
           }
         }
       }
+    },
+    "/api/TestViev/ListTest/{userId}": {
+      "get": {
+        "tags": [
+          "TestViev"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TestToReveal"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TestToReveal"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TestToReveal"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1183,6 +1232,21 @@
           }
         }
       },
+      "TestToReveal": {
+        "type": "object",
+        "properties": {
+          "testid": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "testName": {
+            "type": "string"
+          },
+          "testCattegory": {
+            "type": "string"
+          }
+        }
+      },
       "UpdateFieldRequest": {
         "type": "object",
         "properties": {
@@ -1285,6 +1349,9 @@
     },
     {
       "name": "TestManager"
+    },
+    {
+      "name": "TestViev"
     }
   ]
 }

@@ -6,6 +6,7 @@ import { HashRouter as HRouter, Routes, Route } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import UserPanel from './pages/TestManager';
 
+
 import CourseTests from './pages/CourseTests';
 import Course from './pages/CourseManager';
 
@@ -13,6 +14,9 @@ import { Registration } from './pages/RegistrationPage';
 import SetTestTimePage from './pages/SetTestTimePage';
 import { UserProfilePage } from './pages/AccountManager';
 import EditTestPage from './pages/EditTestPage';
+
+import { TestView } from './pages/TestViev';
+import { TestSolver } from './pages/TestSolver';
 
 function App() {
     const [token, setToken] = useState(-1);
@@ -30,7 +34,8 @@ function App() {
                     <Route path="/course/:courseId/test/:testId/set-time" element={<SetTestTimePage />} />
                     <Route path="/AccountManager" element={<UserProfilePage />} />
                     <Route path="/course/:courseId/test/:testId/edit" element={<EditTestPage />} />
-
+                    <Route path="/TestViev" element={<TestView />} />
+                    <Route path="/test-solver/:testId" element={<TestSolver />} />
                 </Routes>
             </HRouter>
         </div>
