@@ -1,57 +1,33 @@
-import React, { useState } from 'react';
-import { Box, Button, Modal, Typography, CircularProgress } from '@mui/material';
+import React from 'react';
+import { Modal, Box, Typography, Button } from '@mui/material';
 
 interface DeleteQuestionModalProps {
-    testId: number;  
-    questionId: number;
+    open: boolean;
     onClose: () => void;
-    onQuestionDeleted: () => void;
+    onConfirm: () => void;
+    questionName: string;
 }
 
-const DeleteQuestionModal: React.FC<DeleteQuestionModalProps> = ({
-    testId,
-    questionId,
-    onClose,
-    onQuestionDeleted
-}) => {
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
-
-    const handleDelete = async () => {
-        setLoading(true);
-        setError('');
-
-        try {
-            const response = await fetch(`/api/DeleteQuestion/${testId}/${questionId}`, { 
-                method: 'DELETE',
-            });
-
-            if (!response.ok) {
-                const errorMessage = await response.text();
-                throw new Error(errorMessage);
-            }
-
-            onQuestionDeleted();
-            onClose();
-        } catch (err) {
-            console.error(err);
-            setError('Failed to delete question. Please try again.');
-        } finally {
-            setLoading(false);
-        }
-    };
-
+const DeleteQuestionModal: React.FC<DeleteQuestionModalProps> = ({ open, onClose, onConfirm, questionName }) => {
     return (
-        <Modal open onClose={onClose}>
-            <Box sx={{ backgroundColor: '#fff', padding: '20px', margin: 'auto', width: '400px', borderRadius: '8px' }}>
+        <Modal open={open} onClose={onClose}>
+            <Box sx={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                width: 400,
+                bgcolor: 'background.paper',
+                boxShadow: 24,
+                p: 4,
+                borderRadius: 2,
+                textAlign: 'center'
+            }}>
                 <Typography variant="h6" mb={2}>Confirm Deletion</Typography>
-                <Typography mb={2}>Are you sure you want to delete this question?</Typography>
-                {error && <Typography color="error">{error}</Typography>}
-                <Box mt={2} display="flex" justifyContent="flex-end">
-                    <Button onClick={onClose} sx={{ marginRight: '10px' }}>Cancel</Button>
-                    <Button variant="contained" color="error" onClick={handleDelete} disabled={loading}>
-                        {loading ? <CircularProgress size={24} /> : 'Delete'}
-                    </Button>
+                <Typography mb={2}>Are you sure you want to delete "{questionName}"?</Typography>
+                <Box display="flex" justifyContent="space-between">
+                    <Button variant="contained" color="secondary" onClick={onClose}>Cancel</Button>
+                    <Button variant="contained" color="error" onClick={onConfirm}>Delete</Button>
                 </Box>
             </Box>
         </Modal>

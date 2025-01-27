@@ -1,16 +1,17 @@
 ﻿using IO.Server.Elements;
 using Microsoft.AspNetCore.Mvc;
 using Npgsql;
+using System;
 
 namespace IO.Server.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class AddQuestionController : ControllerBase
+    public class QuestionController : ControllerBase
     {
         private readonly NpgsqlConnection _connection;
 
-        public AddQuestionController(NpgsqlConnection connection)
+        public QuestionController(NpgsqlConnection connection)
         {
             _connection = connection;
         }
@@ -22,12 +23,11 @@ namespace IO.Server.Controllers
             {
                 _connection.Open();
 
-                // 1. Dodanie nowego pytania do tabeli Question
+                // Wstawienie nowego pytania do tabeli Question
                 string insertQuestionQuery = @"
-    INSERT INTO ""Question"" (name, category, questiontype, shared)
-    VALUES (@name, @category, @questionType::qtype, @shared)
-    RETURNING questionid";
-
+                    INSERT INTO ""Question"" (name, category, questiontype, shared, answer, a, b, c, d, maxpoints)
+                    VALUES(@name, @category, @questionType::qtype, @shared, @answer, @a, @b, @c, @d, @maxpoints)
+                    RETURNING questionid; ";
 
                 int newQuestionId;
                 using (var command = new NpgsqlCommand(insertQuestionQuery, _connection))
@@ -36,14 +36,20 @@ namespace IO.Server.Controllers
                     command.Parameters.AddWithValue("@category", newQuestion.Category);
                     command.Parameters.AddWithValue("@questionType", newQuestion.QuestionType);
                     command.Parameters.AddWithValue("@shared", newQuestion.Shared);
+                    command.Parameters.AddWithValue("@answer", (object)newQuestion.Answer ?? DBNull.Value);
+                    command.Parameters.AddWithValue("@a", (object)newQuestion.A ?? DBNull.Value);
+                    command.Parameters.AddWithValue("@b", (object)newQuestion.B ?? DBNull.Value);
+                    command.Parameters.AddWithValue("@c", (object)newQuestion.C ?? DBNull.Value);
+                    command.Parameters.AddWithValue("@d", (object)newQuestion.D ?? DBNull.Value);
+                    command.Parameters.AddWithValue("@maxpoints", (object)newQuestion.MaxPoints ?? DBNull.Value);
 
                     newQuestionId = Convert.ToInt32(command.ExecuteScalar());
                 }
 
-                // 2. Powiązanie nowego pytania z testem w tabeli QuestionToTest
+                // Powiązanie pytania z testem w tabeli QuestionToTest
                 string insertQuestionToTestQuery = @"
-            INSERT INTO ""QuestionToTest"" (testid, questionid)
-            VALUES (@testId, @questionId)";
+                    INSERT INTO ""QuestionToTest"" (testid, questionid)
+                    VALUES(@testId, @questionId); ";
 
                 using (var command = new NpgsqlCommand(insertQuestionToTestQuery, _connection))
                 {
@@ -52,8 +58,7 @@ namespace IO.Server.Controllers
                     command.ExecuteNonQuery();
                 }
 
-                // Zwracamy informację o powodzeniu operacji
-                return Ok(new { QuestionId = newQuestionId, Message = "Question added successfully." });
+                return Ok(new { QuestionId = newQuestionId, Message = "Question added and linked to test successfully." });
             }
             catch (Exception ex)
             {
@@ -65,14 +70,71 @@ namespace IO.Server.Controllers
             }
         }
 
-        // Klasa modelu pytania
+        [HttpGet("{testId}")]
+        public IActionResult GetQuestionsForTest(int testId)
+        {
+            try
+            {
+                _connection.Open();
+
+                string query = @"
+            SELECT q.questionid, q.name, q.category, q.questiontype, q.shared, 
+                   q.answer, q.a, q.b, q.c, q.d, q.maxpoints
+            FROM ""Question"" q
+            INNER JOIN ""QuestionToTest"" qt ON q.questionid = qt.questionid
+            WHERE qt.testid = @testId;";
+
+                var questions = new List<Question>();
+
+                using (var command = new NpgsqlCommand(query, _connection))
+                {
+                    command.Parameters.AddWithValue("@testId", testId);
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            questions.Add(new Question
+                            {
+                                Name = reader["name"].ToString(),
+                                Category = reader["category"].ToString(),
+                                QuestionType = reader["questiontype"].ToString(),
+                                Shared = (bool)reader["shared"],
+                                Answer = reader["answer"] as string,
+                                A = reader["a"] as bool?,
+                                B = reader["b"] as bool?,
+                                C = reader["c"] as bool?,
+                                D = reader["d"] as bool?,
+                                MaxPoints = reader["maxpoints"] as int?
+                            });
+                        }
+                    }
+                }
+
+                return Ok(questions);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+            finally
+            {
+                _connection.Close();
+            }
+        }
+
+
         public class Question
         {
             public string Name { get; set; }
             public string Category { get; set; }
             public string QuestionType { get; set; }
             public bool Shared { get; set; }
+            public string Answer { get; set; }
+            public bool? A { get; set; }
+            public bool? B { get; set; }
+            public bool? C { get; set; }
+            public bool? D { get; set; }
+            public int? MaxPoints { get; set; }
         }
-
     }
 }

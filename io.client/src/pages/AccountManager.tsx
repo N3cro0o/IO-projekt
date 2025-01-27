@@ -31,35 +31,36 @@ export const UserProfilePage: React.FC = () => {
     const navigate = useNavigate();
     const userId = localStorage.getItem('userId');
 
-    useEffect(() => {
-        const fetchUserData = async () => {
-            try {
-                const response = await fetch(`https://localhost:7293/api/Account/showData/${userId}`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                });
+    const fetchUserData = async () => {
+        try {
+            setLoading(true); // Start the loading spinner
+            const response = await fetch(`https://localhost:7293/api/Account/showData/${userId}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
 
-                if (!response.ok) {
-                    throw new Error('Failed to fetch user data');
-                }
-
-                const data = await response.json();
-                setUserData(data);
-                setFieldToUpdate({
-                    login: '',
-                    email: '',
-                    name: '',
-                    surname: '',
-                });
-            } catch (error) {
-                setUpdateError('An error occurred while fetching user data.');
-            } finally {
-                setLoading(false);
+            if (!response.ok) {
+                throw new Error('Failed to fetch user data');
             }
-        };
 
+            const data = await response.json();
+            setUserData(data);
+            setFieldToUpdate({
+                login: '',
+                email: '',
+                name: '',
+                surname: '',
+            });
+        } catch (error) {
+            setUpdateError('An error occurred while fetching user data.');
+        } finally {
+            setLoading(false); // Stop the loading spinner
+        }
+    };
+
+    useEffect(() => {
         fetchUserData();
     }, [userId]);
 
@@ -92,10 +93,9 @@ export const UserProfilePage: React.FC = () => {
                 throw new Error(`Failed to update ${fieldName}`);
             }
 
-            const updatedData = await response.json();
-            setUserData(updatedData);
             setUpdateSuccess(`${fieldName} updated successfully!`);
             setFieldToUpdate({ ...fieldToUpdate, [fieldName]: '' });
+            await fetchUserData(); // Refetch user data after success
         } catch (error) {
             setUpdateError(`An error occurred while updating ${fieldName}.`);
         }
@@ -131,6 +131,7 @@ export const UserProfilePage: React.FC = () => {
                 newPassword: '',
                 confirmPassword: '',
             });
+            await fetchUserData(); // Refetch user data after success
         } catch (error) {
             setUpdateError('An error occurred while updating the password.');
         }
