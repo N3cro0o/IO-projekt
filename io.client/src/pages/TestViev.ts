@@ -56,10 +56,10 @@ export const TestView = () => {
         <ButtonAppBar />
         < div style = {{ display: 'flex', justifyContent: 'center', padding: '50px' }
         }>
-    <div style={ { width: '100%', maxWidth: '1200px' } }>
+     <div style={ { width: '100%', maxWidth: '1200px' } }>
         <h1 style={ { color: 'white', textAlign: 'center' } }> Test Panel </h1>
             < table
-style = {{
+        style = {{
     borderCollapse: 'collapse',
         width: '100%',
             backgroundColor: '#333',
@@ -77,7 +77,7 @@ style = {{
                     </tr>
                     </thead>
                     <tbody>
-{
+        {
     tests.map((test) => (
         <tr key= { test.id } style = {{ borderBottom: '1px solid #555' }}>
             <td style={ { padding: '10px' } }> { test.name } </td>
@@ -85,20 +85,20 @@ style = {{
                     < td style = {{ padding: '10px', display: 'flex', justifyContent: 'center' }}>
                         <Button
                                             onClick={ () => handleStartTest(test.id) }
-variant = "contained"
-color = "primary"
-    >
-    Start Test
-        </Button>
-        </td>
-        </tr>
-                            ))}
-</tbody>
-    </table>
-    </div>
-    </div>
-    </div>
-    );
+        variant = "contained"
+        color = "primary"
+            >
+            Start Test
+                </Button>
+                </td>
+                </tr>
+                                    ))}
+        </tbody>
+            </table>
+            </div>
+            </div>
+            </div>
+            );
 };
 
 export default TestView;
