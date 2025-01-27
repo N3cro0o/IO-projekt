@@ -14,6 +14,9 @@ export const TestSolver = () => {
     const [questions, setQuestions] = useState<Question[]>([]);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
     const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
+    const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+    const [selectedAnswer, setSelectedAnswer] = useState(null);
+    const [score, setScore] = useState(0); // Œledzenie punktów
 
     // Funkcja do transformacji danych
     const transformQuestionData = (apiData: any[]): Question[] => {
@@ -71,12 +74,33 @@ export const TestSolver = () => {
     // Pobieramy bie¿¹ce pytanie
     const currentQuestion = questions[currentQuestionIndex];
 
+    // Funkcja do obs³ugi wyboru odpowiedzi
+    const handleAnswerSelect = (option) => {
+        setSelectedAnswer(option);
+
+        // Jeœli odpowiedŸ jest poprawna, zwiêkszamy wynik
+        if (option === currentQuestion.correctAnswer) {
+            setScore((prevScore) => prevScore + 1);
+        }
+    };
+
+    // Funkcja do obs³ugi przejœcia do nastêpnego pytania
+    const handleNextQuestion = () => {
+        setSelectedAnswer(null); // Resetujemy zaznaczon¹ odpowiedŸ
+        setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
+    };
+
+    // Funkcja do obs³ugi wys³ania testu
+    const handleSubmitTest = () => {
+        alert(`Test submitted! Your score: ${score}/${questions.length}`);
+    };
+
     return (
         <div>
             <ButtonAppBar />
             <div style={{ display: 'flex', justifyContent: 'center', padding: '50px' }}>
                 <div style={{ width: '100%', maxWidth: '800px' }}>
-                    <h1 style={{ color: 'white', textAlign: 'center' }}> Test Solver </h1>
+                    <h1 style={{ color: 'white', textAlign: 'center' }}>Test Solver</h1>
                     <div style={{ backgroundColor: '#333', padding: '20px', borderRadius: '8px', color: '#fff' }}>
                         <h2>{currentQuestion.questionText}</h2>
                         <div>
@@ -102,7 +126,7 @@ export const TestSolver = () => {
                             >
                                 Next Question
                             </Button>
-                            <Button variant="contained" color="secondary" onClick={() => alert('Test submitted!')}>
+                            <Button variant="contained" color="secondary" onClick={handleSubmitTest}>
                                 Submit Test
                             </Button>
                         </div>
@@ -112,5 +136,7 @@ export const TestSolver = () => {
         </div>
     );
 };
+
+export default TestSolver;
 
 export default TestSolver;
