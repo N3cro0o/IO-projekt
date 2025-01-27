@@ -51,9 +51,7 @@ export const TestSolver = () => {
         fetchQuestions();
     }, []);
 
-    const handleAnswerSelect = (answer: string) => {
-        setSelectedAnswer(answer);
-    };
+    
 
     const handleNextQuestion = () => {
         if (selectedAnswer) {
@@ -78,17 +76,14 @@ export const TestSolver = () => {
     const handleAnswerSelect = (option) => {
         setSelectedAnswer(option);
 
-        // Jeœli odpowiedŸ jest poprawna, zwiêkszamy wynik
-        if (option === currentQuestion.correctAnswer) {
-            setScore((prevScore) => prevScore + 1);
+        // Sprawdzamy, czy odpowiedŸ jest poprawna
+        if (option === currentQuestion.answer) {
+            // Dodajemy punkty za poprawn¹ odpowiedŸ
+            setScore((prevScore) => prevScore + currentQuestion.maxpoint);
         }
     };
 
-    // Funkcja do obs³ugi przejœcia do nastêpnego pytania
-    const handleNextQuestion = () => {
-        setSelectedAnswer(null); // Resetujemy zaznaczon¹ odpowiedŸ
-        setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
-    };
+    
 
     // Funkcja do obs³ugi wys³ania testu
     const handleSubmitTest = () => {
@@ -139,4 +134,3 @@ export const TestSolver = () => {
 
 export default TestSolver;
 
-export default TestSolver;
