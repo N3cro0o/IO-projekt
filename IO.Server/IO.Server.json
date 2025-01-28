@@ -764,55 +764,6 @@
         }
       }
     },
-    "/api/TestManager/CoursesList/{userId}": {
-      "get": {
-        "tags": [
-          "TestManager"
-        ],
-        "parameters": [
-          {
-            "name": "userId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Course"
-                  }
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Course"
-                  }
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Course"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/TestManager/TestsList/{courseId}/tests": {
       "get": {
         "tags": [
@@ -1140,38 +1091,36 @@
           "name": {
             "type": "string"
           },
-          "category": {
+          "text": {
             "type": "string"
           },
           "questionType": {
             "type": "string"
           },
+          "answers": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string"
+          },
           "shared": {
             "type": "boolean"
           },
-          "answer": {
-            "type": "string"
+          "points": {
+            "type": "number",
+            "format": "double"
           },
-          "a": {
-            "type": "boolean",
-            "nullable": true
-          },
-          "b": {
-            "type": "boolean",
-            "nullable": true
-          },
-          "c": {
-            "type": "boolean",
-            "nullable": true
-          },
-          "d": {
-            "type": "boolean",
-            "nullable": true
-          },
-          "maxPoints": {
+          "correctAnswers": {
             "type": "integer",
-            "format": "int32",
+            "format": "int32"
+          },
+          "correctAnswersBinary": {
+            "type": "string",
             "nullable": true
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },

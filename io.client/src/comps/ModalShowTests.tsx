@@ -5,6 +5,7 @@ import Modal from '@mui/material/Modal';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import { Button, Checkbox, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
+import { Link, useNavigate } from 'react-router-dom';
 
 const style = {
     position: 'absolute',
@@ -58,7 +59,8 @@ export default function ModalShowTestsStudent({ courseID, coursename, handleClos
     const [open, setOpen] = React.useState(true);  // Modal powinien otwieraæ siê tylko raz po klikniêciu przycisku
     const [tests, setTests] = useState<Test[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
-    /*const [selectedUserIds, setSelectedUserIds] = useState<Set<number>>(new Set());*/
+    const navigate = useNavigate(); // hook do nawigacji w React Router v6
+
 
     const closeModal = () => {
         setOpen(false);
@@ -131,15 +133,9 @@ export default function ModalShowTestsStudent({ courseID, coursename, handleClos
                                 <TableBody>
                                     {tests.map((test) => (
                                         <TableRow key={test.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                                            {/*<TableCell component="th" scope="row">*/}
-                                            {/*    <Checkbox*/}
-                                            {/*        checked={selectedUserIds.has(user.id)}*/}
-                                            {/*        onChange={() => handleCheckboxChange(user.id)}*/}
-                                            {/*        sx={{ color: '#fff' }}*/}
-                                            {/*    />*/}
-                                            {/*</TableCell>*/}
                                             <TableCell style={{ color: '#fff' }}>
-                                                <Button variant="contained" color="success" onClick={() => console.log(test.id)}>
+                                                {/*Add button turning off when test is not ready*/}
+                                                <Button variant="contained" color="success" onClick={() => navigate('/student/' + test.id + '/start')}>
                                                     Start test
                                                 </Button>
 
@@ -152,11 +148,6 @@ export default function ModalShowTestsStudent({ courseID, coursename, handleClos
                                 </TableBody>
                             </Table>
                         </TableContainer>
-                        {/*<div style={{ marginTop: '20px' }}>*/}
-                        {/*    <Button variant="contained" color="success" onClick={handleAddUsers}>*/}
-                        {/*        Add Users*/}
-                        {/*    </Button>*/}
-                        {/*</div>*/}
                     </div>
                 </Box>
             </Box>

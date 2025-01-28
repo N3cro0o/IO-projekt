@@ -123,7 +123,6 @@ export const CourseUser = () => {
                     </table>
 
 
-                    {/* Modal bêdzie siê otwiera³, gdy selectedCourseId nie bêdzie null */}
                     {selectedCourseId !== null && selectedCourseName !== null && (
                         <ModalShowTestsStudent courseID={selectedCourseId} coursename={selectedCourseName} handleClose={() => {
                             setSelectedCourseId(null);

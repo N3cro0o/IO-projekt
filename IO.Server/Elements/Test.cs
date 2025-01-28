@@ -64,13 +64,8 @@ namespace IO.Server.Elements
 
         public int MaxPoints()
         {
-            int p = 0;
-            foreach (int i in Questions)
-            {
-                Question q = Environment.QuestionPool[i];
-                p += q.ReturnPoints();
-            }
-            return p;
+            
+            return 2137;
         }
 
         public void ChangeCategory(int cat)
