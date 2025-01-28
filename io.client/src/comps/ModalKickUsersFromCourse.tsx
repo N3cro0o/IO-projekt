@@ -4,7 +4,7 @@ import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
-import ChangeUserList from '../pages/changeUserList';
+import ChangeUserList from '../pages/KickUsersFromCoursePage';
 
 const style = {
     position: 'absolute',
@@ -49,6 +49,11 @@ const contentStyle = {
 export default function ModalChangeUsers({ courseId, coursename, handleClose }: { courseId: number, coursename: string, handleClose: () => void }) {
     const [open, setOpen] = React.useState(true);  // Modal powinien otwieraæ siê tylko raz po klikniêciu przycisku
 
+    const closeModal = () => {
+        setOpen(false);
+        handleClose();
+    };
+
     return (
         <Modal
             open={open}
@@ -66,7 +71,7 @@ export default function ModalChangeUsers({ courseId, coursename, handleClose }: 
                     </IconButton>
                 </div>
                 <Box sx={contentStyle}>
-                    <ChangeUserList courseId={courseId} />
+                    <ChangeUserList courseId={courseId} onUsersRemoved={closeModal}/>
                 </Box>
             </Box>
         </Modal>

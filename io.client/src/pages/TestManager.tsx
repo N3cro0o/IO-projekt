@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom'; // Import nawigacji
-import './UserPanel.css'; // Plik stylów CSS
+import './TestManager.css'; // Plik stylów CSS
 import { ButtonAppBar } from '../comps/AppBar.tsx';
 import { Card, CardContent, Typography, Button, Grid, CircularProgress } from '@mui/material';
 
@@ -16,7 +16,10 @@ const UserPanel: React.FC = () => {
     const navigate = useNavigate(); // Hook do nawigacji
 
     useEffect(() => {
-        fetch('https://localhost:59127/api/course/list')
+        const userId = localStorage.getItem('userId');
+        console.log('User ID from localStorage:', userId);
+
+        fetch('https://localhost:59127/api/TestManager/CoursesList/' + userId)
             .then((response) => response.json())
             .then((data: Course[]) => {
                 setCourses(data);

@@ -11,8 +11,7 @@ import {
 } from '@mui/material';
 import { ButtonAppBar } from '../comps/AppBar.tsx';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
-import ModalAddTest from '../comps/modalAddTests'; // Importujemy modal do dodawania testów
-import ModalAddQuestion from '../comps/ModalAddQuestion'; // Importujemy modal do dodawania pytañ
+import ModalAddTest from '../comps/ModalAddTests'; // Importujemy modal do dodawania testów
 
 interface Test {
     testId: number;
@@ -42,12 +41,11 @@ const CourseTests: React.FC = () => {
     const [startedTest, setStartedTest] = useState<string | null>(null);
     const [deletedTest, setDeletedTest] = useState<string | null>(null);
     const [modalOpen, setModalOpen] = useState(false); // Zarz¹dzanie stanem modala do testów
-    const [modalQuestionOpen, setModalQuestionOpen] = useState<number | null>(null); // Zarz¹dzanie stanem modala do pytañ
 
     useEffect(() => {
         const fetchTests = async () => {
             try {
-                const response = await fetch(`https://localhost:59127/api/test/${courseId}/tests`);
+                const response = await fetch(`https://localhost:59127/api/TestManager/TestsList/${courseId}/tests`);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -66,7 +64,7 @@ const CourseTests: React.FC = () => {
 
     const handleStartTest = async (testName: string, testId: number) => {
         try {
-            const response = await fetch(`https://localhost:59127/api/starttest/${testId}`, {
+            const response = await fetch(`https://localhost:59127/api/TestManager/StartTest/${testId}`, {
                 method: 'PUT',
             });
 
@@ -98,7 +96,7 @@ const CourseTests: React.FC = () => {
         if (!confirmDelete) return;
 
         try {
-            const response = await fetch(`https://localhost:59127/api/deletetest/${testId}`, {
+            const response = await fetch(`https://localhost:59127/api/TestManager/DeleteTest/${testId}`, {
                 method: 'DELETE',
             });
 
@@ -126,9 +124,8 @@ const CourseTests: React.FC = () => {
         setTests((prevTests) => [...prevTests, newTest]);
     };
 
-    const handleAddQuestion = (newQuestion: any) => {
-        console.log('New question added:', newQuestion);
-        // Tutaj mo¿na zaktualizowaæ stan lub wykonaæ inne akcje po dodaniu pytania
+    const handleEditTest = (testId: number) => {
+        navigate(`/course/${courseId}/test/${testId}/edit`);
     };
 
     return (
@@ -212,9 +209,9 @@ const CourseTests: React.FC = () => {
                                         <Button
                                             variant="contained"
                                             color="secondary"
-                                            onClick={() => setModalQuestionOpen(test.testId)}
+                                            onClick={() => handleEditTest(test.testId)} // Przekierowanie do edycji testu
                                         >
-                                            Add Question
+                                            Edit Test
                                         </Button>
                                         <Button
                                             variant="contained"
@@ -247,14 +244,6 @@ const CourseTests: React.FC = () => {
                     courseId={Number(courseId)}
                     onAddTest={handleAddTest}
                 />
-                {modalQuestionOpen && (
-                    <ModalAddQuestion
-                        open={!!modalQuestionOpen}
-                        handleClose={() => setModalQuestionOpen(null)}
-                        testId={modalQuestionOpen}
-                        onAddQuestion={handleAddQuestion}
-                    />
-                )}
             </Box>
         </div>
     );

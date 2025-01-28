@@ -56,10 +56,15 @@ export const AddCourse: React.FC<AddCourseProps> = ({ ownerId, handleClose, refr
 
         setErrorFields(newErrorFields);
 
+
+
         if (hasError) return;
 
         try {
-            const response = await fetch('https://localhost:7293/api/AddCourse/addCourse', {
+            const userId = localStorage.getItem('userId');
+            console.log('User ID from localStorage:', userId);
+
+            const response = await fetch('https://localhost:7293/api/CoursesManager/AddCourse', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -68,7 +73,7 @@ export const AddCourse: React.FC<AddCourseProps> = ({ ownerId, handleClose, refr
                     Name: formData.name,
                     Category: formData.category,
                     Description: formData.description,
-                    OwnerId: formData.ownerid,
+                    OwnerId: userId,
                 }),
             });
 

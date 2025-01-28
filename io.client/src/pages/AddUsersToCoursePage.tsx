@@ -11,7 +11,7 @@ interface UserListProps {
     courseId: number;
 }
 
-const UserList: React.FC<UserListProps> = ({ courseId }) => {
+const UserList: React.FC<UserListProps & { onUsersAdded: () => void }> = ({ courseId, onUsersAdded }) => {
     const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [selectedUserIds, setSelectedUserIds] = useState<Set<number>>(new Set());
@@ -19,7 +19,7 @@ const UserList: React.FC<UserListProps> = ({ courseId }) => {
     useEffect(() => {
         const fetchUsers = async () => {
             try {
-                const response = await fetch('https://localhost:7293/api/User/list');
+                const response = await fetch('https://localhost:7293/api/CoursesManager/AddUsersList/' + courseId);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -54,7 +54,7 @@ const UserList: React.FC<UserListProps> = ({ courseId }) => {
         };
 
         try {
-            const response = await fetch('https://localhost:7293/api/CourseUsers/addUsers', {
+            const response = await fetch('https://localhost:7293/api/CoursesManager/AddUsers', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -67,6 +67,7 @@ const UserList: React.FC<UserListProps> = ({ courseId }) => {
             }
 
             alert('Users successfully added to the course!');
+            onUsersAdded();
         } catch (error) {
             console.error('Error adding users to the course:', error);
         }

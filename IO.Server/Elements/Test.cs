@@ -32,6 +32,10 @@ namespace IO.Server.Elements
             EndDate = end;
             Category = cat;
         }
+        
+        public Test()
+        {
+        }
 
         public List<Question> ReturnQuestions()
         {

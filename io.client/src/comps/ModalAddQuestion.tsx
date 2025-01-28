@@ -1,231 +1,280 @@
 import React, { useState } from 'react';
 import {
     Box,
-    Typography,
+    Button,
     Modal,
     TextField,
-    MenuItem,
-    Button,
-    Radio,
-    RadioGroup,
+    Typography,
+    CircularProgress,
+    Switch,
     FormControlLabel,
+    Checkbox,
+    FormGroup,
+    MenuItem,
+    Select,
 } from '@mui/material';
 
-const modalStyle = {
-    position: 'absolute' as 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: '90%',
-    maxWidth: 500,
-    bgcolor: '#333', // Ciemne t³o
-    color: 'white', // Bia³y tekst
-    borderRadius: '16px',
-    boxShadow: 24,
-    p: 4,
-    overflowY: 'auto', // Dodanie przewijania zawartoœci
-};
-
-const inputStyle = {
-    mb: 2,
-    '& .MuiInputLabel-root': { color: 'white' }, // Kolor etykiety
-    '& .MuiOutlinedInput-root': {
-        backgroundColor: '#444', // Ciemne pole wejœciowe
-        color: 'white', // Bia³y tekst
-        '& fieldset': { borderColor: '#555' }, // Kolor obramowania
-        '&:hover fieldset': { borderColor: '#777' }, // Kolor obramowania w hover
-        '&.Mui-focused fieldset': { borderColor: '#007bff' }, // Kolor obramowania w focus
-    },
-};
-
-interface ModalAddQuestionProps {
-    open: boolean;
-    handleClose: () => void;
-    testId: number;
-    onAddQuestion: (question: any) => void;
+interface NewQuestion {
+    name: string;
+    category: string;
+    questionType: string; // "open" or "close"
+    answer?: string; // Dla pytania otwartego
+    a?: boolean;
+    b?: boolean;
+    c?: boolean;
+    d?: boolean;
+    shared: boolean;
+    maxPoints?: number;
 }
 
-const ModalAddQuestion: React.FC<ModalAddQuestionProps> = ({ open, handleClose, testId, onAddQuestion }) => {
-    const [newQuestion, setNewQuestion] = useState({
+const AddQuestionModal: React.FC<{
+    testId: string;
+    onClose: () => void;
+    onQuestionAdded: () => void;
+}> = ({ testId, onClose, onQuestionAdded }) => {
+    const [formData, setFormData] = useState<NewQuestion>({
         name: '',
         category: '',
-        questionContent: '',
         questionType: 'open',
+        answer: '',
         shared: false,
-        maxPoints: 1,
-        openAnswer: '',
-        answers: ['', '', '', ''],
-        correctAnswer: 'A',
+        maxPoints: undefined,
     });
 
-    const handleAddQuestion = async () => {
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
+
+    const handleChange = (field: keyof NewQuestion, value: any) => {
+        setFormData({ ...formData, [field]: value });
+    };
+
+    const handleCheckboxChange = (option: 'a' | 'b' | 'c' | 'd', checked: boolean) => {
+        setFormData((prev) => ({ ...prev, [option]: checked }));
+    };
+
+    const handleSubmit = async () => {
+        if (!formData.name || !formData.category || !formData.questionType) {
+            setError('Please fill in all required fields.');
+            return;
+        }
+
+        setLoading(true);
+        setError('');
+
         try {
-            const response = await fetch(`https://localhost:59127/api/question`, {
+            const response = await fetch(`/api/question/${testId}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    ...newQuestion,
-                    testId,
-                }),
+                body: JSON.stringify(formData),
             });
 
-            if (response.ok) {
-                const createdQuestion = await response.json();
-                onAddQuestion(createdQuestion);
-                handleClose();
-                setNewQuestion({
-                    name: '',
-                    category: '',
-                    questionContent: '',
-                    questionType: 'open',
-                    shared: false,
-                    maxPoints: 1,
-                    openAnswer: '',
-                    answers: ['', '', '', ''],
-                    correctAnswer: 'A',
-                });
-            } else {
-                console.error(`Failed to add question: ${response.status}`);
+            if (!response.ok) {
+                const errorMessage = await response.text();
+                throw new Error(errorMessage);
             }
-        } catch (error) {
-            console.error('Error adding question:', error);
+
+            onQuestionAdded();
+            onClose();
+        } catch (err: any) {
+            console.error(err);
+            setError(err.message || 'Failed to add question. Please try again.');
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
-        <Modal
-            open={open}
-            onClose={handleClose}
-            aria-labelledby="modal-add-question"
-            aria-describedby="modal-add-question-description"
-        >
-            <Box sx={modalStyle}>
-                <Typography variant="h6" mb={2}>
+        <Modal open onClose={onClose}>
+            <Box
+                sx={{
+                    backgroundColor: '#333',
+                    padding: '32px',
+                    margin: 'auto',
+                    width: '90%',
+                    maxWidth: '500px',
+                    borderRadius: '16px',
+                    maxHeight: '90vh',
+                    overflowY: 'auto',
+                    boxShadow: '0px 10px 20px rgba(0, 0, 0, 0.5)',
+                    color: '#fff',
+                }}
+            >
+                <Typography
+                    variant="h5"
+                    fontWeight="bold"
+                    mb={3}
+                    textAlign="center"
+                    sx={{ color: '#fff' }}
+                >
                     Add New Question
                 </Typography>
                 <TextField
-                    fullWidth
                     label="Question Name"
+                    fullWidth
+                    margin="normal"
                     variant="outlined"
-                    value={newQuestion.name}
-                    onChange={(e) => setNewQuestion({ ...newQuestion, name: e.target.value })}
-                    sx={inputStyle}
+                    onChange={(e) => handleChange('name', e.target.value)}
+                    value={formData.name}
+                    sx={{
+                        mb: 2,
+                        backgroundColor: '#444',
+                        borderRadius: 1,
+                        input: { color: '#fff' },
+                        label: { color: '#aaa' },
+                    }}
                 />
                 <TextField
-                    fullWidth
                     label="Category"
-                    variant="outlined"
-                    value={newQuestion.category}
-                    onChange={(e) => setNewQuestion({ ...newQuestion, category: e.target.value })}
-                    sx={inputStyle}
-                />
-                <TextField
                     fullWidth
-                    label="Question Content"
+                    margin="normal"
                     variant="outlined"
-                    value={newQuestion.questionContent}
-                    onChange={(e) => setNewQuestion({ ...newQuestion, questionContent: e.target.value })}
-                    sx={inputStyle}
+                    onChange={(e) => handleChange('category', e.target.value)}
+                    value={formData.category}
+                    sx={{
+                        mb: 2,
+                        backgroundColor: '#444',
+                        borderRadius: 1,
+                        input: { color: '#fff' },
+                        label: { color: '#aaa' },
+                    }}
                 />
                 <TextField
                     select
                     fullWidth
                     label="Question Type"
-                    value={newQuestion.questionType}
-                    onChange={(e) =>
-                        setNewQuestion({
-                            ...newQuestion,
-                            questionType: e.target.value,
-                            openAnswer: '',
-                            answers: ['', '', '', ''],
-                        })
-                    }
-                    sx={inputStyle}
+                    variant="outlined"
+                    value={formData.questionType}
+                    onChange={(e) => handleChange('questionType', e.target.value)}
+                    sx={{
+                        mb: 2,
+                        backgroundColor: '#444',
+                        borderRadius: 1,
+                        input: { color: '#fff' },
+                        label: { color: '#aaa' },
+                        '.MuiSelect-select': {
+                            color: '#fff',
+                        },
+                        '.MuiPaper-root': {
+                            backgroundColor: '#444',
+                            color: '#fff',
+                        },
+                    }}
+                    SelectProps={{
+                        MenuProps: {
+                            PaperProps: {
+                                sx: {
+                                    bgcolor: '#444',
+                                    color: '#fff',
+                                },
+                            },
+                        },
+                    }}
                 >
                     <MenuItem value="open">Open</MenuItem>
-                    <MenuItem value="closed">Closed</MenuItem>
+                    <MenuItem value="closed">Close</MenuItem>
                 </TextField>
 
-                {newQuestion.questionType === 'open' && (
+                {formData.questionType === 'open' ? (
                     <TextField
+                        label="Answer"
                         fullWidth
-                        label="Open Answer"
+                        margin="normal"
                         variant="outlined"
-                        multiline
-                        rows={3}
-                        value={newQuestion.openAnswer}
-                        onChange={(e) => setNewQuestion({ ...newQuestion, openAnswer: e.target.value })}
-                        sx={inputStyle}
+                        onChange={(e) => handleChange('answer', e.target.value)}
+                        value={formData.answer || ''}
+                        sx={{
+                            mb: 2,
+                            backgroundColor: '#444',
+                            borderRadius: 1,
+                            input: { color: '#fff' },
+                            label: { color: '#aaa' },
+                        }}
                     />
-                )}
-
-                {newQuestion.questionType === 'closed' && (
-                    <>
-                        {['A', 'B', 'C', 'D'].map((label, index) => (
-                            <TextField
-                                key={label}
-                                fullWidth
-                                label={`Answer ${label}`}
-                                variant="outlined"
-                                value={newQuestion.answers[index]}
-                                onChange={(e) => {
-                                    const updatedAnswers = [...newQuestion.answers];
-                                    updatedAnswers[index] = e.target.value;
-                                    setNewQuestion({ ...newQuestion, answers: updatedAnswers });
-                                }}
-                                sx={inputStyle}
+                ) : (
+                    <FormGroup sx={{ mb: 2 }}>
+                        <Typography variant="subtitle1" mb={1}>
+                            Possible Answers
+                        </Typography>
+                        {(['a', 'b', 'c', 'd'] as const).map((option) => (
+                            <FormControlLabel
+                                key={option}
+                                control={
+                                    <Checkbox
+                                        checked={!!formData[option]}
+                                        onChange={(e) => handleCheckboxChange(option, e.target.checked)}
+                                        sx={{
+                                            color: '#fff',
+                                            '&.Mui-checked': { color: '#007bff' },
+                                        }}
+                                    />
+                                }
+                                label={`Option ${option.toUpperCase()}`}
                             />
                         ))}
-                        <Typography variant="body1" mb={1}>
-                            Select Correct Answer:
-                        </Typography>
-                        <RadioGroup
-                            row
-                            value={newQuestion.correctAnswer}
-                            onChange={(e) => setNewQuestion({ ...newQuestion, correctAnswer: e.target.value })}
-                        >
-                            {['A', 'B', 'C', 'D'].map((label) => (
-                                <FormControlLabel
-                                    key={label}
-                                    value={label}
-                                    control={<Radio sx={{ color: 'white' }} />}
-                                    label={label}
-                                    sx={{ color: 'white' }}
-                                />
-                            ))}
-                        </RadioGroup>
-                    </>
+                    </FormGroup>
                 )}
 
                 <TextField
-                    fullWidth
                     label="Max Points"
                     type="number"
+                    fullWidth
+                    margin="normal"
                     variant="outlined"
-                    value={newQuestion.maxPoints}
-                    onChange={(e) => setNewQuestion({ ...newQuestion, maxPoints: Number(e.target.value) })}
-                    sx={inputStyle}
+                    onChange={(e) => handleChange('maxPoints', Number(e.target.value))}
+                    value={formData.maxPoints || ''}
+                    sx={{
+                        mb: 2,
+                        backgroundColor: '#444',
+                        borderRadius: 1,
+                        input: { color: '#fff' },
+                        label: { color: '#aaa' },
+                    }}
+                    InputProps={{
+                        inputProps: {
+                            min: 0,
+                            pattern: '\\d*',
+                        },
+                    }}
                 />
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3 }}>
+
+                <FormControlLabel
+                    control={
+                        <Switch
+                            checked={formData.shared}
+                            onChange={(e) => handleChange('shared', e.target.checked)}
+                            sx={{
+                                color: '#fff',
+                                '& .Mui-checked': { color: '#007bff' },
+                            }}
+                        />
+                    }
+                    label="Shared"
+                    sx={{ mb: 2 }}
+                />
+
+                {error && (
+                    <Typography color="error" sx={{ mb: 2 }}>
+                        {error}
+                    </Typography>
+                )}
+
+                <Box display="flex" justifyContent="space-between">
                     <Button
                         variant="contained"
                         color="error"
-                        onClick={handleClose}
-                        sx={{ borderRadius: '8px', borderColor: '#d32f2f', color: 'white' }}
+                        onClick={onClose}
+                        sx={{ backgroundColor: '#d32f2f', '&:hover': { backgroundColor: '#9a0007' } }}
                     >
                         Cancel
                     </Button>
                     <Button
                         variant="contained"
                         color="primary"
-                        onClick={handleAddQuestion}
-                        sx={{
-                            borderRadius: '8px',
-                            backgroundColor: '#007bff',
-                            '&:hover': { backgroundColor: '#0056b3' },
-                        }}
+                        onClick={handleSubmit}
+                        disabled={loading}
+                        sx={{ backgroundColor: '#007bff', '&:hover': { backgroundColor: '#0056b3' } }}
                     >
-                        Add Question
+                        {loading ? <CircularProgress size={24} sx={{ color: '#fff' }} /> : 'Add'}
                     </Button>
                 </Box>
             </Box>
@@ -233,4 +282,4 @@ const ModalAddQuestion: React.FC<ModalAddQuestionProps> = ({ open, handleClose, 
     );
 };
 
-export default ModalAddQuestion;
+export default AddQuestionModal;

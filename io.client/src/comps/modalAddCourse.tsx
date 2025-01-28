@@ -4,7 +4,7 @@ import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
-import AddCourse from '../pages/addCourse'; // Twoja logika dodawania kursu
+import AddCourse from '../pages/AddCoursePage'; // Twoja logika dodawania kursu
 
 const style = {
     position: 'absolute',

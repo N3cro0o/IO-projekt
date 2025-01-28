@@ -6,6 +6,8 @@ using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using IO.Server.Elements;
 using System.Diagnostics;
+using Microsoft.SqlServer.Server;
+using IO.Server.Utilities;
 
 namespace IO.Server.Controllers
 {
@@ -35,7 +37,7 @@ namespace IO.Server.Controllers
                 _connection.Open();
 
                 // Zapytanie SQL w celu pobrania użytkownika na podstawie loginu
-                string query = "SELECT login, password, role FROM \"User\" WHERE login = @login";
+                string query = "SELECT login, password, role, userId FROM \"User\" WHERE login = @login";
                 using (var command = new NpgsqlCommand(query, _connection))
                 {
                     // Dodanie parametru zapytania SQL
@@ -48,10 +50,16 @@ namespace IO.Server.Controllers
                             // Brak użytkownika w bazie danych
                             return Unauthorized(new { Message = "Invalid Username or Password" });
                         }
+                        
+                        
 
                         // Pobranie hasła z bazy danych
                         var storedPassword = reader.GetString(1); // Druga kolumna zawiera hasło
-                        if (storedPassword != data.Password)
+
+                        //hasło hashowane podczas rejestracji, ponowne hasowanie hasła podczas logowania i porównanie 2 hashów
+                        var hashedPassword = PasswordHasher.HashPasswordWithSHA256(data.Password);
+                        
+                        if (storedPassword != hashedPassword)
                         {
                             // Hasło nie pasuje
                             return Unauthorized(new { Message = "Invalid Username or Password" });
@@ -59,10 +67,13 @@ namespace IO.Server.Controllers
 
                         // Pobranie roli użytkownika
                         var userRole = reader.GetString(2); // Trzecia kolumna zawiera rolę
+                        var userId = reader.GetInt32(3);
 
                         // Wygenerowanie tokenu JWT
                         var token = GenerateJwtToken(data.Login, userRole);
-                        return Ok(new { Message = "Login successful", Token = token });
+                        return Ok(new { Message = "Login successful", Token = token, userId = userId});
+
+
                     }
                 }
             }

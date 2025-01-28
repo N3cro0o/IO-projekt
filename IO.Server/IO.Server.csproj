@@ -29,7 +29,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Remove="Controllers\AddCourseController.cs" />
+	  <Compile Remove="Controllers\AddTestController.cs" />
+	  <Compile Remove="Controllers\CourseUsersController.cs" />
+	  <Compile Remove="Controllers\DeleteCourseController.cs" />
 	  <Compile Remove="Controllers\RegisterController.cs" />
+	  <Compile Remove="Controllers\UserController.cs" />
 
 	</ItemGroup>
 

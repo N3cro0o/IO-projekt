@@ -1,8 +1,8 @@
 import Button from '@mui/material/Button';
 import { useEffect, useState } from 'react';
-import BasicModal from '../comps/modal.tsx';
-import ModalChangeUsers from '../comps/modalChangeUsers.tsx';
-import ModalAddCourse from '../comps/modalAddCourse.tsx';
+import BasicModal from '../comps/ModalAddUsersToCourse.tsx';
+import ModalChangeUsers from '../comps/ModalKickUsersFromCourse.tsx';
+import ModalAddCourse from '../comps/ModalAddCourse.tsx';
 import { ButtonAppBar } from '../comps/AppBar.tsx';
 
 export const Course = () => {
@@ -13,13 +13,13 @@ export const Course = () => {
     const [selectedCourseName, setSelectedCourseName] = useState<string | null>(null);
     const [selectedCourseName2, setSelectedCourseName2] = useState<string | null>(null)
     const [selectedCourseId2, setSelectedCourseId2] = useState<number | null>(null);
-    const [selectedOwnerId, setSelectedOwnerId] = useState<number | null>(null);
     const [openModalAddCourse, setOpenModalAddCourse] = useState<boolean>(false); // Stan otwarcia modala
 
     interface Course {
         id: number;
         name: string;
         owner: number;
+        ownerLogin: string;
     }
 
     const transformCourseData = (apiData: any[]): Course[] => {
@@ -27,13 +27,17 @@ export const Course = () => {
             id: course.courseid,
             name: course.courseName,
             owner: course.ownerid,
+            ownerLogin: course.ownerLogin
         }));
     };
 
     useEffect(() => {
         const fetchCourses = async () => {
             try {
-                const response = await fetch('https://localhost:7293/api/CoursesManager/listCourses');
+                const userId = localStorage.getItem('userId');
+                console.log('User ID from localStorage:', userId);
+
+                const response = await fetch('https://localhost:7293/api/CoursesManager/ListCourse/' + userId);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -51,8 +55,11 @@ export const Course = () => {
 
     // Funkcja odœwie¿ania kursów
     const refreshCourses = async () => {
+        const userId = localStorage.getItem('userId');
+        console.log('User ID from localStorage:', userId);
+
         try {
-            const response = await fetch('https://localhost:7293/api/CoursesManager/listCourses');
+            const response = await fetch('https://localhost:7293/api/CoursesManager/ListCourse/' + userId);
             const apiData = await response.json();
             const transformedData = transformCourseData(apiData);
             setCourses(transformedData);
@@ -70,7 +77,7 @@ export const Course = () => {
         if (!confirmDelete) return;
 
         try {
-            const response = await fetch('https://localhost:7293/api/DeleteCourse/deleteCourse', {
+            const response = await fetch('https://localhost:7293/api/CoursesManager/DeleteCourse', {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -83,6 +90,7 @@ export const Course = () => {
             setCourses((prevCourses) => prevCourses.filter((course) => course.id !== courseid));
             setDeletedCourse(name);
             setTimeout(() => setDeletedCourse(null), 5000);
+            alert('Course successfully deleted!');
         } catch (error) {
             console.error('Error deleting course:', error);
         } finally {
@@ -116,7 +124,6 @@ export const Course = () => {
             <div style={{ display: 'flex', justifyContent: 'center', padding: '50px' }}>
                 <div style={{ width: '100%', maxWidth: '1200px' }}>
                     <h1 style={{ color: 'white', textAlign: 'center' }}>Course Panel</h1>
-                    {deletedCourse && <div style={{ color: 'red' }}>Deleted course: {deletedCourse}</div>}
                     <table
                         style={{
                             borderCollapse: 'collapse',
@@ -139,7 +146,7 @@ export const Course = () => {
                             {courses.map((course) => (
                                 <tr key={course.id} style={{ borderBottom: '1px solid #555' }}>
                                     <td style={{ padding: '10px' }}>{course.name}</td>
-                                    <td style={{ padding: '10px' }}>{course.owner}</td>
+                                    <td style={{ padding: '10px' }}>{course.ownerLogin}</td>
                                     <td style={{ padding: '10px', display: 'flex', gap: '8px' }}>
                                         <Button onClick={() => handleAddUsers(course.id, course.name)} variant="contained">
                                             Add Users
@@ -183,7 +190,7 @@ export const Course = () => {
                     {/* Modal dla dodawania kursu */}
                     {openModalAddCourse && (
                         <ModalAddCourse
-                            ownerId={1}  // Mo¿esz tu dodaæ dynamiczne `ownerId` z tokenu
+                            ownerId={1}  
                             open={openModalAddCourse}
                             handleClose={handleCloseAddCourseModal}
                             refreshCourses={refreshCourses} // Przekazujemy refreshCourses
