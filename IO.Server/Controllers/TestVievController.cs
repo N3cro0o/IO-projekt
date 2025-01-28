@@ -2,6 +2,7 @@ using System.Diagnostics;
 using IO.Server.Elements;
 using Microsoft.AspNetCore.Mvc;
 using Npgsql;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace IO.Server.Controllers
 {
@@ -64,10 +65,10 @@ namespace IO.Server.Controllers
                         
                     }
                 }
-                foreach (var item in test)
-                {
-                    Console.WriteLine($"TestId: {item.testid}, TestName: {item.testName}, TestCategory: {item.testCattegory}");
-                }
+                //foreach (var item in test)
+                //{
+                //    Console.WriteLine($"TestId: {item.testid}, TestName: {item.testName}, TestCategory: {item.testCattegory}");
+                //}
                 return Ok(test);
 
             }
@@ -99,9 +100,12 @@ namespace IO.Server.Controllers
                 // Query to fetch questions related to the test
                 string query = @"SELECT q.*, t.testid
                          FROM  ""Question"" q
-                         JOIN ""QuestionToTest"" qtt ON qtt.questionid = q.questionid
-                         JOIN ""Test"" t ON qtt.testid = t.testid
-                         WHERE t.testid = @testId";
+                        JOIN
+                            ""QuestionToTest"" qt ON q.questionid = qt.questionid
+                        JOIN
+                            ""Test"" t ON qt.testid = t.testid
+                        WHERE
+                            t.testid = 10";
 
                 using (var command = new NpgsqlCommand(query, _connection))
                 using (var reader = command.ExecuteReader())
@@ -122,6 +126,10 @@ namespace IO.Server.Controllers
                         };
                         question.Add(questionToReveal);
                     }
+                }
+                foreach (var item in question)
+                {
+                    Console.WriteLine($"TestId: {item.questionid}, TestName: {item.questionName}, TestCategory: {item.question}");
                 }
                 return Ok(question);
             }

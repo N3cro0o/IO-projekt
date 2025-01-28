@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { ButtonAppBar } from '../comps/AppBar.tsx';
 import Button from '@mui/material/Button';
 
@@ -32,6 +32,7 @@ export const TestSolver = () => {
 
     // £adowanie pytañ z API
     useEffect(() => {
+        console.log('useEffect running');
         const fetchQuestions = async () => {
             try {
                 const testId = localStorage.getItem('selectedTestId');
@@ -42,7 +43,11 @@ export const TestSolver = () => {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 const apiData = await response.json();
+                console.log('Raw API Data:', apiData); // Wyœwietlenie danych surowych z API
+
                 const transformedData = transformQuestionData(apiData);
+                console.log('Transformed Questions:', transformedData); // Wyœwietlenie przetworzonych danych
+
                 setQuestions(transformedData);
             } catch (error) {
                 console.error('Error fetching questions:', error);
@@ -80,7 +85,7 @@ export const TestSolver = () => {
     if (loading) return <div>Loading...</div>;
 
     // Sprawdzamy, czy mamy pytania do wyœwietlenia
-    if (questions.length === 0) return <div>No questions available.</div>;
+    if (questions.length === 0) return <div>No questions available</div>;
 
     // Pobieramy bie¿¹ce pytanie
     const currentQuestion = questions[currentQuestionIndex];
