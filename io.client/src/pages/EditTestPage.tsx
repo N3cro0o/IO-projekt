@@ -3,11 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import {
     Box,
     Typography,
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableRow,
     Button,
     CircularProgress,
 } from '@mui/material';
@@ -37,7 +32,7 @@ const EditTestPage: React.FC = () => {
 
     const [addModalOpen, setAddModalOpen] = useState<boolean>(false);
     const [editModalOpen, setEditModalOpen] = useState<{ open: boolean; question: Question | null }>({ open: false, question: null });
-    const [shareModalOpen, setShareModalOpen] = useState<{ open: boolean; questionId: number | null }>({ open: false, questionId: null });
+    const [shareModalOpen, setShareModalOpen] = useState<boolean>(false);
 
     const fetchQuestions = async () => {
         try {
@@ -65,7 +60,7 @@ const EditTestPage: React.FC = () => {
     const handleAddQuestion = () => setAddModalOpen(true);
     const handleCloseAddModal = () => setAddModalOpen(false);
     const handleEditQuestion = (question: Question) => setEditModalOpen({ open: true, question });
-    const handleShareQuestion = (questionId: number | null) => setShareModalOpen({ open: true, questionId });
+    const handleShareQuestion = () => setShareModalOpen(true);
 
     const handleOpenDeleteModal = (question: Question) => {
         setDeleteModalOpen({ open: true, question });
@@ -79,7 +74,7 @@ const EditTestPage: React.FC = () => {
         if (!deleteModalOpen.question) return;
 
         try {
-            const response = await fetch(`/api/DeleteQuestion/DeleteQuestion/${deleteModalOpen.question.id}`, {
+            const response = await fetch(`/api/DeleteQuestion/DeleteQuestionByName/${encodeURIComponent(deleteModalOpen.question.name)}`, {
                 method: 'DELETE',
             });
 
@@ -88,7 +83,7 @@ const EditTestPage: React.FC = () => {
             }
 
             setQuestions((prevQuestions) =>
-                prevQuestions.filter((q) => q.id !== deleteModalOpen.question?.id)
+                prevQuestions.filter((q) => q.name !== deleteModalOpen.question?.name)
             );
             setDeleteModalOpen({ open: false, question: null });
         } catch (err) {
@@ -100,8 +95,16 @@ const EditTestPage: React.FC = () => {
     return (
         <div>
             <ButtonAppBar />
-            <Box sx={{ padding: '20px', minHeight: '100vh', color: '#fff', marginTop: '64px' }}>
-                <Box sx={{ padding: '10px', display: 'flex', justifyContent: 'flex-end' }}>
+            <Box sx={{ padding: '20px', minHeight: '100vh', color: '#fff', marginTop: '40px' }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2 }}>
+                    <Box sx={{ display: 'flex', gap: 2 }}>
+                        <Button variant="contained" color="primary" onClick={handleAddQuestion}>
+                            Add New Question
+                        </Button>
+                        <Button variant="contained" color="success" onClick={() => handleShareQuestion()}>
+                            Shared Questions
+                        </Button>
+                    </Box>
                     <Button
                         variant="contained"
                         color="secondary"
@@ -110,64 +113,65 @@ const EditTestPage: React.FC = () => {
                         Go Back
                     </Button>
                 </Box>
-                <Typography variant="h4" mb={2}>
-                    Edit Test: {testId} (Course: {courseId})
+
+                <Typography variant="h4" mb={2} textAlign="center" sx={{ color: '#fff' }}>
+                    Edit Test: {testId}
                 </Typography>
 
-                <Box sx={{ display: 'flex', gap: 2, marginBottom: 2 }}>
-                    <Button variant="contained" color="primary" onClick={handleAddQuestion}>
-                        Add New Question
-                    </Button>
-                    <Button variant="contained" color="success" onClick={() => handleShareQuestion(null)}>
-                        Shared Questions
-                    </Button>
-                </Box>
-
                 {loading ? (
-                    <CircularProgress />
+                    <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
+                        <CircularProgress />
+                    </Box>
                 ) : error ? (
                     <Typography color="error">Error: {error}</Typography>
                 ) : (
-                    <Table sx={{ marginTop: 2 }}>
-                        <TableHead>
-                            <TableRow>
-                                <TableCell>Question ID</TableCell>
-                                <TableCell>Question Content</TableCell>
-                                <TableCell>Category</TableCell>
-                                <TableCell>Type</TableCell>
-                                <TableCell>Shared</TableCell>
-                                <TableCell>Actions</TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
+                    <table
+                        style={{
+                            borderCollapse: 'collapse',
+                            width: '100%',
+                            backgroundColor: '#333',
+                            color: '#fff',
+                            borderRadius: '8px',
+                            overflow: 'hidden',
+                            tableLayout: 'fixed',
+                        }}
+                    >
+                        <thead>
+                            <tr style={{ borderBottom: '2px solid #555' }}>
+                                <th style={{ padding: '10px' }}>Question Content</th>
+                                <th style={{ padding: '10px' }}>Category</th>
+                                <th style={{ padding: '10px' }}>Type</th>
+                                <th style={{ padding: '10px' }}>Shared</th>
+                                <th style={{ padding: '10px' }}>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
                             {questions.map((question) => (
-                                <TableRow key={question.id}>
-                                    <TableCell>{question.id}</TableCell>
-                                    <TableCell>{question.name}</TableCell>
-                                    <TableCell>{question.category}</TableCell>
-                                    <TableCell>{question.questionType}</TableCell>
-                                    <TableCell>{question.shared ? 'Yes' : 'No'}</TableCell>
-                                    <TableCell>
+                                <tr key={question.id} style={{ borderBottom: '1px solid #555' }}>
+                                    <td style={{ padding: '10px' }}>{question.name}</td>
+                                    <td style={{ padding: '10px' }}>{question.category}</td>
+                                    <td style={{ padding: '10px' }}>{question.questionType}</td>
+                                    <td style={{ padding: '10px' }}>{question.shared ? 'Yes' : 'No'}</td>
+                                    <td style={{ padding: '10px', display: 'flex', gap: '8px' }}>
                                         <Button
-                                            variant="outlined"
+                                            variant="contained"
                                             color="primary"
                                             onClick={() => handleEditQuestion(question)}
-                                            sx={{ marginRight: '10px' }}
                                         >
                                             Edit
                                         </Button>
                                         <Button
-                                            variant="outlined"
-                                            color="secondary"
+                                            variant="contained"
+                                            color="error"
                                             onClick={() => handleOpenDeleteModal(question)}
                                         >
                                             Delete
                                         </Button>
-                                    </TableCell>
-                                </TableRow>
+                                    </td>
+                                </tr>
                             ))}
-                        </TableBody>
-                    </Table>
+                        </tbody>
+                    </table>
                 )}
 
                 {addModalOpen && (
@@ -183,14 +187,14 @@ const EditTestPage: React.FC = () => {
                     />
                 )}
 
-                {shareModalOpen.open && (
+                {shareModalOpen && (
                     <ShareQuestionModal
-                        onClose={() => setShareModalOpen({ open: false, questionId: null })}
+                        open={shareModalOpen}
+                        onClose={() => setShareModalOpen(false)}
                         questions={questions}
                         onShareUpdate={fetchQuestions}
                     />
                 )}
-
 
                 {deleteModalOpen.open && deleteModalOpen.question && (
                     <DeleteQuestionModal

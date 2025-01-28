@@ -1,124 +1,130 @@
 import React, { useState } from 'react';
-import { Modal, Box, Typography, Button, Checkbox, Divider } from '@mui/material';
+import {
+    Box,
+    Modal,
+    Typography,
+    Button,
+    Checkbox,
+    Table,
+    TableBody,
+    TableCell,
+    TableRow,
+} from '@mui/material';
 
 interface Question {
-    id: number;
     name: string;
     shared: boolean;
 }
 
 interface ShareQuestionModalProps {
-    questions: Question[];
+    open: boolean;
     onClose: () => void;
-    onShareUpdate: () => void;
+    questions: Question[];
+    onShareUpdate: () => Promise<void>;
 }
 
-const ShareQuestionModal: React.FC<ShareQuestionModalProps> = ({ questions, onClose, onShareUpdate }) => {
-    // Tworzymy stan dla wszystkich pytañ i ich wartoœci 'shared'
-    const [selectedQuestions, setSelectedQuestions] = useState<Record<number, boolean>>(
-        questions.reduce((acc, question) => {
-            acc[question.id] = question.shared;
-            return acc;
-        }, {})
+const modalStyle = {
+    position: 'absolute' as 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: '90%',
+    maxWidth: 600,
+    bgcolor: '#3a3a3a', // Ciemny odcieñ szarego (jak w modal "Add Question")
+    color: 'white',
+    borderRadius: '16px',
+    boxShadow: 24,
+    p: 4,
+};
+
+const tableCellStyle = {
+    color: 'white',
+    borderBottom: '1px solid #555',
+    fontWeight: 'bold', // Pogrubienie dla nazw testów
+};
+
+const ShareQuestionModal: React.FC<ShareQuestionModalProps> = ({ open, onClose, questions, onShareUpdate }) => {
+    const [updates, setUpdates] = useState<{ name: string; shared: boolean }[]>(
+        questions.map((q) => ({ name: q.name, shared: q.shared }))
     );
 
-    // Funkcja prze³¹czaj¹ca stan zaznaczenia pytania
-    const handleToggle = (id: number) => {
-        setSelectedQuestions((prev) => ({
-            ...prev,
-            [id]: !prev[id], // Odwracamy wartoœæ tylko dla wybranego ID
-        }));
+    const handleCheckboxChange = (name: string) => {
+        setUpdates((prev) =>
+            prev.map((q) => (q.name === name ? { ...q, shared: !q.shared } : q))
+        );
     };
 
-    // Funkcja do wys³ania zmian do API
-    const handleSubmit = async () => {
-        const updates = Object.entries(selectedQuestions).map(([id, shared]) => ({
-            id: Number(id),
-            shared,
-        }));
-
+    const handleSave = async () => {
         try {
             const response = await fetch('/api/ShareQuestion/UpdateSharedStatus', {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                },
                 body: JSON.stringify(updates),
             });
 
-            if (response.ok) {
-                console.log('Shared status updated successfully.');
-                onShareUpdate(); // Aktualizujemy dane w aplikacji
-                onClose(); // Zamykamy modal
-            } else {
-                console.error('Failed to update shared status:', await response.text());
-                throw new Error('API response was not OK');
+            if (!response.ok) {
+                throw new Error('Failed to update shared status');
             }
-        } catch (error) {
-            console.error('Error while updating shared status:', error);
+
+            await onShareUpdate();
+            onClose();
+        } catch (err) {
+            console.error(err);
         }
     };
 
     return (
-        <Modal open onClose={onClose}>
-            <Box
-                sx={{
-                    width: 500,
-                    bgcolor: 'background.paper',
-                    p: 4,
-                    borderRadius: 2,
-                    margin: 'auto',
-                    mt: 5,
-                    boxShadow: 24,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                }}
-            >
-                <Typography variant="h5" mb={2} sx={{ fontWeight: 'bold', color: 'primary.main' }}>
-                    Share Questions
+        <Modal open={open} onClose={onClose}>
+            <Box sx={modalStyle}>
+                <Typography
+                    variant="h6"
+                    mb={3}
+                    align="center"
+                    fontWeight="bold" // Wyboldowany tekst nag³ówka
+                >
+                    Manage Shared Questions
                 </Typography>
-                <Divider sx={{ width: '100%', mb: 2 }} />
-                <Box sx={{ maxHeight: 300, overflowY: 'auto', width: '100%' }}>
-                    {questions.map((q) => (
-                        <Box
-                            key={q.id}
-                            sx={{
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                                alignItems: 'center',
-                                mb: 2,
-                                borderBottom: '1px solid #ddd',
-                                padding: '8px 0',
-                            }}
-                        >
-                            <Box sx={{ flex: 1 }}>
-                                <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
-                                    {q.name}
-                                </Typography>
-                            </Box>
-                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                <Typography variant="body2" sx={{ mr: 2 }}>
-                                    {selectedQuestions[q.id] ? 'Shared' : 'Not Shared'}
-                                </Typography>
-                                <Checkbox
-                                    checked={selectedQuestions[q.id]} // Stan tylko dla tego pytania
-                                    onChange={() => handleToggle(q.id)} // Zmieniamy tylko to pytanie
-                                />
-                            </Box>
-                        </Box>
-                    ))}
-                </Box>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3, width: '100%' }}>
-                    <Button variant="outlined" color="secondary" onClick={onClose} sx={{ flex: 1 }}>
+                <Table>
+                    <TableBody>
+                        {updates.map((question) => (
+                            <TableRow key={question.name}>
+                                <TableCell sx={tableCellStyle}>{question.name}</TableCell>
+                                <TableCell align="right" sx={tableCellStyle}>
+                                    <Checkbox
+                                        checked={question.shared}
+                                        onChange={() => handleCheckboxChange(question.name)}
+                                        sx={{
+                                            color: 'white',
+                                            '&.Mui-checked': {
+                                                color: '#007bff',
+                                            },
+                                        }}
+                                    />
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+                <Box mt={3} display="flex" justifyContent="flex-end" gap={2}>
+                    <Button
+                        variant="contained" // Zmieniono na contained
+                        color="error" // Kolor ustawiony na error
+                        onClick={onClose}
+                    >
                         Cancel
                     </Button>
                     <Button
                         variant="contained"
-                        color="primary"
-                        onClick={handleSubmit}
-                        sx={{ flex: 1, ml: 2 }}
+                        sx={{
+                            backgroundColor: '#007bff',
+                            color: 'white',
+                            '&:hover': { backgroundColor: '#0056b3' },
+                        }}
+                        onClick={handleSave}
                     >
-                        Save
+                        Save Changes
                     </Button>
                 </Box>
             </Box>

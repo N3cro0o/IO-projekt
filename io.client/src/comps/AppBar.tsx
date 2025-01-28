@@ -32,6 +32,7 @@ export function ButtonAppBar() {
     // Funkcja do wylogowania
     const handleLogout = () => {
         localStorage.removeItem('authToken'); // Usuwamy token z localStorage
+        localStorage.removeItem('userId');
         setIsLoggedIn(false); // Ustawiamy stan na niezalogowanego
         navigate('/'); // Przekierowanie na stronê g³ówn¹
     };

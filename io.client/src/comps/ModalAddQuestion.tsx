@@ -10,7 +10,8 @@ import {
     FormControlLabel,
     Checkbox,
     FormGroup,
-    MenuItem
+    MenuItem,
+    Select,
 } from '@mui/material';
 
 interface NewQuestion {
@@ -26,7 +27,11 @@ interface NewQuestion {
     maxPoints?: number;
 }
 
-const AddQuestionModal: React.FC<{ testId: string; onClose: () => void; onQuestionAdded: () => void; }> = ({ testId, onClose, onQuestionAdded }) => {
+const AddQuestionModal: React.FC<{
+    testId: string;
+    onClose: () => void;
+    onQuestionAdded: () => void;
+}> = ({ testId, onClose, onQuestionAdded }) => {
     const [formData, setFormData] = useState<NewQuestion>({
         name: '',
         category: '',
@@ -49,7 +54,7 @@ const AddQuestionModal: React.FC<{ testId: string; onClose: () => void; onQuesti
 
     const handleSubmit = async () => {
         if (!formData.name || !formData.category || !formData.questionType) {
-            setError("Please fill in all required fields.");
+            setError('Please fill in all required fields.');
             return;
         }
 
@@ -72,7 +77,7 @@ const AddQuestionModal: React.FC<{ testId: string; onClose: () => void; onQuesti
             onClose();
         } catch (err: any) {
             console.error(err);
-            setError(err.message || "Failed to add question. Please try again.");
+            setError(err.message || 'Failed to add question. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -82,10 +87,11 @@ const AddQuestionModal: React.FC<{ testId: string; onClose: () => void; onQuesti
         <Modal open onClose={onClose}>
             <Box
                 sx={{
-                    backgroundColor: '#2c2c2c',
+                    backgroundColor: '#333',
                     padding: '32px',
                     margin: 'auto',
-                    width: '450px',
+                    width: '90%',
+                    maxWidth: '500px',
                     borderRadius: '16px',
                     maxHeight: '90vh',
                     overflowY: 'auto',
@@ -93,26 +99,44 @@ const AddQuestionModal: React.FC<{ testId: string; onClose: () => void; onQuesti
                     color: '#fff',
                 }}
             >
-                <Typography variant="h5" fontWeight="bold" mb={2} textAlign="center">
+                <Typography
+                    variant="h5"
+                    fontWeight="bold"
+                    mb={3}
+                    textAlign="center"
+                    sx={{ color: '#fff' }}
+                >
                     Add New Question
                 </Typography>
                 <TextField
                     label="Question Name"
                     fullWidth
                     margin="normal"
-                    variant="filled"
+                    variant="outlined"
                     onChange={(e) => handleChange('name', e.target.value)}
                     value={formData.name}
-                    sx={{ mb: 2 }}
+                    sx={{
+                        mb: 2,
+                        backgroundColor: '#444',
+                        borderRadius: 1,
+                        input: { color: '#fff' },
+                        label: { color: '#aaa' },
+                    }}
                 />
                 <TextField
                     label="Category"
                     fullWidth
                     margin="normal"
-                    variant="filled"
+                    variant="outlined"
                     onChange={(e) => handleChange('category', e.target.value)}
                     value={formData.category}
-                    sx={{ mb: 2 }}
+                    sx={{
+                        mb: 2,
+                        backgroundColor: '#444',
+                        borderRadius: 1,
+                        input: { color: '#fff' },
+                        label: { color: '#aaa' },
+                    }}
                 />
                 <TextField
                     select
@@ -121,7 +145,30 @@ const AddQuestionModal: React.FC<{ testId: string; onClose: () => void; onQuesti
                     variant="outlined"
                     value={formData.questionType}
                     onChange={(e) => handleChange('questionType', e.target.value)}
-                    sx={{ mb: 2 }}
+                    sx={{
+                        mb: 2,
+                        backgroundColor: '#444',
+                        borderRadius: 1,
+                        input: { color: '#fff' },
+                        label: { color: '#aaa' },
+                        '.MuiSelect-select': {
+                            color: '#fff',
+                        },
+                        '.MuiPaper-root': {
+                            backgroundColor: '#444',
+                            color: '#fff',
+                        },
+                    }}
+                    SelectProps={{
+                        MenuProps: {
+                            PaperProps: {
+                                sx: {
+                                    bgcolor: '#444',
+                                    color: '#fff',
+                                },
+                            },
+                        },
+                    }}
                 >
                     <MenuItem value="open">Open</MenuItem>
                     <MenuItem value="closed">Close</MenuItem>
@@ -132,21 +179,33 @@ const AddQuestionModal: React.FC<{ testId: string; onClose: () => void; onQuesti
                         label="Answer"
                         fullWidth
                         margin="normal"
-                        variant="filled"
+                        variant="outlined"
                         onChange={(e) => handleChange('answer', e.target.value)}
                         value={formData.answer || ''}
-                        sx={{ mb: 2 }}
+                        sx={{
+                            mb: 2,
+                            backgroundColor: '#444',
+                            borderRadius: 1,
+                            input: { color: '#fff' },
+                            label: { color: '#aaa' },
+                        }}
                     />
                 ) : (
                     <FormGroup sx={{ mb: 2 }}>
-                        <Typography variant="subtitle1" mb={1}>Possible Answers</Typography>
-                        {(['a', 'b', 'c', 'd'] as const).map(option => (
+                        <Typography variant="subtitle1" mb={1}>
+                            Possible Answers
+                        </Typography>
+                        {(['a', 'b', 'c', 'd'] as const).map((option) => (
                             <FormControlLabel
                                 key={option}
                                 control={
                                     <Checkbox
                                         checked={!!formData[option]}
                                         onChange={(e) => handleCheckboxChange(option, e.target.checked)}
+                                        sx={{
+                                            color: '#fff',
+                                            '&.Mui-checked': { color: '#007bff' },
+                                        }}
                                     />
                                 }
                                 label={`Option ${option.toUpperCase()}`}
@@ -160,10 +219,22 @@ const AddQuestionModal: React.FC<{ testId: string; onClose: () => void; onQuesti
                     type="number"
                     fullWidth
                     margin="normal"
-                    variant="filled"
+                    variant="outlined"
                     onChange={(e) => handleChange('maxPoints', Number(e.target.value))}
                     value={formData.maxPoints || ''}
-                    sx={{ mb: 2 }}
+                    sx={{
+                        mb: 2,
+                        backgroundColor: '#444',
+                        borderRadius: 1,
+                        input: { color: '#fff' },
+                        label: { color: '#aaa' },
+                    }}
+                    InputProps={{
+                        inputProps: {
+                            min: 0,
+                            pattern: '\\d*',
+                        },
+                    }}
                 />
 
                 <FormControlLabel
@@ -171,16 +242,29 @@ const AddQuestionModal: React.FC<{ testId: string; onClose: () => void; onQuesti
                         <Switch
                             checked={formData.shared}
                             onChange={(e) => handleChange('shared', e.target.checked)}
+                            sx={{
+                                color: '#fff',
+                                '& .Mui-checked': { color: '#007bff' },
+                            }}
                         />
                     }
                     label="Shared"
                     sx={{ mb: 2 }}
                 />
 
-                {error && <Typography color="error" sx={{ mb: 2 }}>{error}</Typography>}
+                {error && (
+                    <Typography color="error" sx={{ mb: 2 }}>
+                        {error}
+                    </Typography>
+                )}
 
                 <Box display="flex" justifyContent="space-between">
-                    <Button variant="contained" color="error" onClick={onClose}>
+                    <Button
+                        variant="contained"
+                        color="error"
+                        onClick={onClose}
+                        sx={{ backgroundColor: '#d32f2f', '&:hover': { backgroundColor: '#9a0007' } }}
+                    >
                         Cancel
                     </Button>
                     <Button
@@ -188,8 +272,9 @@ const AddQuestionModal: React.FC<{ testId: string; onClose: () => void; onQuesti
                         color="primary"
                         onClick={handleSubmit}
                         disabled={loading}
+                        sx={{ backgroundColor: '#007bff', '&:hover': { backgroundColor: '#0056b3' } }}
                     >
-                        {loading ? <CircularProgress size={24} /> : 'Add'}
+                        {loading ? <CircularProgress size={24} sx={{ color: '#fff' }} /> : 'Add'}
                     </Button>
                 </Box>
             </Box>

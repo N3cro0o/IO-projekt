@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Npgsql;
 using System;
+using System.Threading.Tasks;
 
 [Route("api/EditQuestion")]
 [ApiController]
@@ -13,84 +14,88 @@ public class EditQuestionController : ControllerBase
         _connection = connection;
     }
 
-    [HttpPut("EditQuestion/{questionId}")]
-    public ActionResult EditQuestion(int questionId, [FromBody] QuestionUpdateModel updatedQuestion)
+    [HttpPut("EditQuestionByName/{name}")]
+    public async Task<IActionResult> EditQuestionByName(string name, [FromBody] QuestionUpdateRequest request)
     {
+        if (request == null || string.IsNullOrWhiteSpace(name))
+        {
+            return BadRequest(new { message = "Invalid data provided." });
+        }
+
+        // Valid question types
+        var validQuestionTypes = new[] { "open", "closed", "multiple" };
+
+        if (!validQuestionTypes.Contains(request.QuestionType))
+        {
+            return BadRequest(new { message = $"Invalid question type. Allowed types: {string.Join(", ", validQuestionTypes)}" });
+        }
+
         try
         {
-            _connection.Open();
+            await _connection.OpenAsync();
 
             const string query = @"
-            UPDATE ""Question"" 
-            SET name = @Name, category = @Category, questionType = @QuestionType, 
-                shared = @Shared, maxPoints = @MaxPoints
-            WHERE id = @QuestionId";
+            UPDATE ""Question""
+            SET
+                category = @Category,
+                questiontype = @QuestionType::qtype,
+                shared = @Shared,
+                maxpoints = @MaxPoints,
+                answer = @Answer,
+                a = @A,
+                b = @B,
+                c = @C,
+                d = @D,
+                question = @Question
+            WHERE name = @Name";
 
             using (var command = new NpgsqlCommand(query, _connection))
             {
-                command.Parameters.AddWithValue("@QuestionId", questionId);
-                command.Parameters.AddWithValue("@Name", updatedQuestion.Name);
-                command.Parameters.AddWithValue("@Category", updatedQuestion.Category);
-                command.Parameters.AddWithValue("@QuestionType", updatedQuestion.QuestionType);
-                command.Parameters.AddWithValue("@Shared", updatedQuestion.Shared);
-                command.Parameters.AddWithValue("@MaxPoints", updatedQuestion.MaxPoints);
+                command.Parameters.AddWithValue("@Name", name);
+                command.Parameters.AddWithValue("@Category", request.Category);
+                command.Parameters.AddWithValue("@QuestionType", request.QuestionType);
+                command.Parameters.AddWithValue("@Shared", request.Shared);
+                command.Parameters.AddWithValue("@MaxPoints", request.MaxPoints);
+                command.Parameters.AddWithValue("@Answer", (object?)request.Answer ?? DBNull.Value);
+                command.Parameters.AddWithValue("@A", (object?)request.A ?? DBNull.Value);
+                command.Parameters.AddWithValue("@B", (object?)request.B ?? DBNull.Value);
+                command.Parameters.AddWithValue("@C", (object?)request.C ?? DBNull.Value);
+                command.Parameters.AddWithValue("@D", (object?)request.D ?? DBNull.Value);
+                command.Parameters.AddWithValue("@Question", (object?)request.Question ?? DBNull.Value);
 
-                int rowsAffected = command.ExecuteNonQuery();
+                int rowsAffected = await command.ExecuteNonQueryAsync();
 
                 if (rowsAffected == 0)
                 {
-                    return NotFound($"No question found with ID {questionId}.");
+                    return NotFound(new { message = "Question not found." });
                 }
             }
 
-            // Obsługa pytań zamkniętych
-            if (updatedQuestion.QuestionType == "closed")
-            {
-                const string answerQuery = @"
-                UPDATE ""Answers"" 
-                SET answerA = @AnswerA, answerB = @AnswerB, answerC = @AnswerC, 
-                    answerD = @AnswerD, correctAnswer = @CorrectAnswer
-                WHERE questionId = @QuestionId";
-
-                using (var command = new NpgsqlCommand(answerQuery, _connection))
-                {
-                    command.Parameters.AddWithValue("@QuestionId", questionId);
-                    command.Parameters.AddWithValue("@AnswerA", updatedQuestion.AnswerA ?? (object)DBNull.Value);
-                    command.Parameters.AddWithValue("@AnswerB", updatedQuestion.AnswerB ?? (object)DBNull.Value);
-                    command.Parameters.AddWithValue("@AnswerC", updatedQuestion.AnswerC ?? (object)DBNull.Value);
-                    command.Parameters.AddWithValue("@AnswerD", updatedQuestion.AnswerD ?? (object)DBNull.Value);
-                    command.Parameters.AddWithValue("@CorrectAnswer", updatedQuestion.CorrectAnswer ?? (object)DBNull.Value);
-
-                    command.ExecuteNonQuery();
-                }
-            }
-
-            return Ok($"Question with ID {questionId} has been updated.");
+            return Ok(new { message = "Question updated successfully." });
         }
         catch (Exception ex)
         {
-            return StatusCode(500, $"Internal server error: {ex.Message}");
+            Console.WriteLine($"Error updating question: {ex.Message}");
+            return StatusCode(500, new { message = "An error occurred while updating the question.", details = ex.Message });
         }
         finally
         {
-            _connection.Close();
+            await _connection.CloseAsync();
         }
     }
 }
 
-
-public class QuestionUpdateModel
+public class QuestionUpdateRequest
 {
     public string Name { get; set; }
     public string Category { get; set; }
     public string QuestionType { get; set; }
     public bool Shared { get; set; }
     public int MaxPoints { get; set; }
-
-    // Pola wymagane dla pytań zamkniętych
-    public string? AnswerA { get; set; }
-    public string? AnswerB { get; set; }
-    public string? AnswerC { get; set; }
-    public string? AnswerD { get; set; }
-    public string? CorrectAnswer { get; set; }
+    public string? Answer { get; set; }
+    public bool? A { get; set; }
+    public bool? B { get; set; }
+    public bool? C { get; set; }
+    public bool? D { get; set; }
+    public string? Question { get; set; }
 }
