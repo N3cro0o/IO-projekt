@@ -34,9 +34,10 @@ export const Course = () => {
 
     useEffect(() => {
         // Check token
-        const token = localStorage.getItem('authToken');
-        const decoded = jwtDecode(token);
-        console.log(decoded);
+        const tokenJWT = localStorage.getItem('authToken');
+        console.log('Course\n' + tokenJWT);
+        const decoded = jwtDecode(tokenJWT);
+        console.log(decoded.role);
 
         const fetchCourses = async () => {
             try {

@@ -9,11 +9,13 @@ import MenuIcon from '@mui/icons-material/Menu';
 import { Link, useNavigate } from 'react-router-dom';
 import TemporaryDrawer from './Drawer.tsx'; // Import poprawionego Drawer
 import React, { useState, useEffect } from 'react';
+import { jwtDecode } from "jwt-decode";
 
 export function ButtonAppBar() {
     // Stan do kontrolowania otwierania/zamykania Drawer
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [tokenJwt, setToken] = useState('XD');
 
     const navigate = useNavigate(); // Hook do nawigacji
 
@@ -36,16 +38,20 @@ export function ButtonAppBar() {
         setIsLoggedIn(false); // Ustawiamy stan na niezalogowanego
         navigate('/'); // Przekierowanie na stronê g³ówn¹
     };
-
     // Sprawdzanie, czy u¿ytkownik jest zalogowany
     useEffect(() => {
         const token = localStorage.getItem('authToken');
         if (token) {
             setIsLoggedIn(true); // Je¿eli token istnieje, u¿ytkownik jest zalogowany
+            console.log('AppBar\n' + token);
+            setToken(token);
+            console.log('Hook\n' + tokenJwt);
+            //const d = jwtDecode(tokenJwt);
+            //console.log(d);
         } else {
             setIsLoggedIn(false); // Jeœli token nie istnieje, u¿ytkownik nie jest zalogowany
         }
-    }, []);
+    }, [tokenJwt]);
 
     return (
         <Box sx={{ flexGrow: 1 }}>
@@ -127,7 +133,7 @@ export function ButtonAppBar() {
             </AppBar>
 
             {/* Drawer umieszczony poza Toolbar */}
-            <TemporaryDrawer open={drawerOpen} toggleDrawer={toggleDrawer} />
+            <TemporaryDrawer open={drawerOpen} toggleDrawer={toggleDrawer} token={tokenJwt} />
         </Box>
     );
 }

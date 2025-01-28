@@ -11,9 +11,24 @@ import AssignmentIcon from '@mui/icons-material/Assignment';
 import HomeIcon from '@mui/icons-material/Home'; // Ikona dla ekranu g³ównego
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
+import { jwtDecode } from "jwt-decode";
 
 
 const TemporaryDrawer = ({ open, toggleDrawer, token }) => {
+    let user_check = false;
+
+    if (token) {
+        try {
+            const decoded = jwtDecode(token);
+            console.log(decoded.role);
+            if (decoded.role == 'student' || decoded.role == 'uczen') {
+                user_check = true;
+            }
+        } catch (error) {
+            console.error('Piedolony lag muzgu:', error);
+        }
+    }
+
     const DrawerList = (
         <Box
             sx={{
@@ -42,15 +57,17 @@ const TemporaryDrawer = ({ open, toggleDrawer, token }) => {
                     <ListItemText primary="Courses Management" sx={{ color: 'white' }} /> {/* Kolor tekstu - bia³y */}
                 </ListItem>
             </List>
-            <List>
-                {/* Link do Course Management */}
-                <ListItem button component={Link} to="/CourseManagment">
-                    <ListItemIcon sx={{ color: '#007bff' }}> {/* Kolor ikon - niebieski */}
-                        <DashboardIcon /> {/* Ikona dashboard */}
-                    </ListItemIcon>
-                    <ListItemText primary="Your courses" sx={{ color: 'white' }} /> {/* Kolor tekstu - bia³y */}
-                </ListItem>
-            </List>
+            {/* Your Courses link */}
+            {user_check && (
+                <List>
+                    <ListItem button component={Link} to="/CourseManagment">
+                        <ListItemIcon sx={{ color: '#007bff' }}> {/* Kolor ikon - niebieski */}
+                            <DashboardIcon /> {/* Ikona dashboard */}
+                        </ListItemIcon>
+                        <ListItemText primary="Your courses" sx={{ color: 'white' }} /> {/* Kolor tekstu - bia³y */}
+                    </ListItem>
+                </List>
+            )}
             <List>
                 {/* Link do User Panel */}
                 <ListItem button component={Link} to="/UserPanel">
