@@ -25,19 +25,14 @@ export const Course = () => {
 
     const transformCourseData = (apiData: any[]): Course[] => {
         return apiData.map((course) => ({
-            id: course.courseid,
-            name: course.courseName,
-            owner: course.ownerid,
-            ownerLogin: course.ownerLogin
+            id: course.id,
+            name: course.name,
+            owner: course.teachers[0],
+            ownerLogin: course.headTeacherName
         }));
     };
 
     useEffect(() => {
-        // Check token
-        const tokenJWT = localStorage.getItem('authToken');
-        console.log('Course\n' + tokenJWT);
-        const decoded = jwtDecode(tokenJWT);
-        console.log(decoded.role);
 
         const fetchCourses = async () => {
             try {

@@ -18,7 +18,7 @@ namespace IO.Server.Controllers
         }
 
         [HttpGet("Student/{id}/courses")]
-        public ActionResult<IEnumerable<Course>> GetStudentCourses(int id) 
+        public ActionResult<IEnumerable<Course>> GetStudentCourses(int id)
         {
             List<Course> courses = new List<Course>();
 
@@ -43,7 +43,7 @@ namespace IO.Server.Controllers
                         string cat = reader.GetString(4);
                         userNameF += userNameL;
 
-                        courses.Add(new Course(courseID, courseName,cat, userNameF));
+                        courses.Add(new Course(courseID, courseName, cat, userNameF));
                     }
                 }
 
@@ -67,16 +67,17 @@ namespace IO.Server.Controllers
         }
 
         [HttpGet("ListCourse/{userId}")]
-        public ActionResult<IEnumerable<CourseToReveal>> GetCourse(int userId)
+        public ActionResult<IEnumerable<Course>> GetCourse(int userId)
         {
-            List<CourseToReveal> courses = new List<CourseToReveal>();
+            List<Course> courses = new List<Course>();
 
             try
             {
                 _connection.Open();
 
                 // Query to fetch courses
-                string query = $"SELECT c.courseid, c.name, c.ownerid, u.login FROM \"Course\" c JOIN \"User\" u ON c.ownerid = u.userid WHERE c.ownerid = {userId} ORDER BY c.name ASC";
+                string query = $"SELECT c.courseid, c.name, c.ownerid, u.name, u.surname, c.category, c.ownerid FROM \"Course\" c " +
+                    $"JOIN \"User\" u ON c.ownerid = u.userid WHERE c.ownerid = {userId} ORDER BY c.name ASC";
 
 
                 using (var command = new NpgsqlCommand(query, _connection))
@@ -87,17 +88,12 @@ namespace IO.Server.Controllers
                         // Safely retrieve data and handle nullability
                         int courseId = reader.GetFieldValue<int>(0);
                         string courseName = reader.GetFieldValue<string>(1);
-                        int ownerId = reader.GetFieldValue<int>(2);
-                        string ownerLogin = reader.GetString(3);
+                        string teachLogin = reader.GetString(3) + " " + reader.GetString(4);
+                        string cat = reader.GetString(5);
+                        var list = new List<int>([reader.GetInt32(6)]);
 
-                        var courseToReveal = new CourseToReveal
-                        {
-                            courseid = courseId,
-                            courseName = courseName,
-                            ownerid = ownerId,
-                            ownerLogin = ownerLogin
-                        };
-
+                        var courseToReveal = new Course(reader.GetInt32(0), reader.GetString(1), cat, teachLogin);
+                        courseToReveal.Teachers = list;
                         courses.Add(courseToReveal);
                     }
                 }
@@ -391,7 +387,7 @@ namespace IO.Server.Controllers
     }
 }
 
-    // MNIEKURWAPOJEBIE,COTOKURWAJESTAAAAAAAAAAAAAAAAAAAAAAAAA
+// MNIEKURWAPOJEBIE,COTOKURWAJESTAAAAAAAAAAAAAAAAAAAAAAAAA
 
 public class CourseToReveal
 {

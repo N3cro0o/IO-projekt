@@ -19,7 +19,7 @@ const UserPanel: React.FC = () => {
         const userId = localStorage.getItem('userId');
         console.log('User ID from localStorage:', userId);
 
-        fetch('https://localhost:59127/api/TestManager/CoursesList/' + userId)
+        fetch('https://localhost:59127/api/CoursesManager/ListCourse/' + userId)
             .then((response) => response.json())
             .then((data: Course[]) => {
                 setCourses(data);
@@ -45,7 +45,7 @@ const UserPanel: React.FC = () => {
             <ButtonAppBar />
             <div className="content-container">
                 <Typography color="white" variant="h4" gutterBottom>
-                    Your Courses:
+                    Select course to manage tests:
                 </Typography>
                 {courses.length === 0 ? (
                     <Typography variant="h6">Lack of courses added</Typography>

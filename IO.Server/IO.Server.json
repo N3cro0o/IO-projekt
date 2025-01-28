@@ -332,7 +332,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/CourseToReveal"
+                    "$ref": "#/components/schemas/Course"
                   }
                 }
               },
@@ -340,7 +340,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/CourseToReveal"
+                    "$ref": "#/components/schemas/Course"
                   }
                 }
               },
@@ -348,7 +348,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/CourseToReveal"
+                    "$ref": "#/components/schemas/Course"
                   }
                 }
               }
@@ -1074,25 +1074,6 @@
             }
           },
           "category": {
-            "type": "string"
-          }
-        }
-      },
-      "CourseToReveal": {
-        "type": "object",
-        "properties": {
-          "courseid": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "courseName": {
-            "type": "string"
-          },
-          "ownerid": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "ownerLogin": {
             "type": "string"
           }
         }

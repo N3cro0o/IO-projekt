@@ -1,6 +1,6 @@
 import Button from '@mui/material/Button';
 import { useEffect, useState } from 'react';
-import BasicModal from '../comps/ModalAddUsersToCourse.tsx';
+import ModalShowTestsStudent from '../comps/ModalShowTests.tsx';
 import ModalChangeUsers from '../comps/ModalKickUsersFromCourse.tsx';
 import ModalAddCourse from '../comps/ModalAddCourse.tsx';
 import { ButtonAppBar } from '../comps/AppBar.tsx';
@@ -9,18 +9,14 @@ import { jwtDecode } from "jwt-decode";
 export const CourseUser = () => {
     const [loading, setLoading] = useState<boolean>(true);
     const [courses, setCourses] = useState<Course[]>([]);
-    const [deletedCourse, setDeletedCourse] = useState<string | null>(null);
     const [selectedCourseId, setSelectedCourseId] = useState<number | null>(null);
     const [selectedCourseName, setSelectedCourseName] = useState<string | null>(null);
-    const [selectedCourseName2, setSelectedCourseName2] = useState<string | null>(null)
-    const [selectedCourseId2, setSelectedCourseId2] = useState<number | null>(null);
-    const [openModalAddCourse, setOpenModalAddCourse] = useState<boolean>(false); // Stan otwarcia modala
 
     interface Course {
         id: number;
         name: string;
         owner: string;
-        car: string;
+        cat: string;
     }
 
     const transformCourseData = (apiData: any[]): Course[] => {
@@ -40,7 +36,7 @@ export const CourseUser = () => {
                 const decoded = jwtDecode(token);
                 const userID = decoded.certserialnumber;
                 console.log('User ID from localStorage:', userID);
-                
+
                 const response = await fetch('https://localhost:7293/api/CoursesManager/Student/' + userID + '/courses');
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -81,6 +77,11 @@ export const CourseUser = () => {
     }, []);
     if (loading) return <div>Loading...</div>;
 
+    const handleShowTests = (courseId: number, coursename: string) => {
+        setSelectedCourseId(courseId);
+        setSelectedCourseName(coursename);
+    };
+
     return (
         <div>
             <ButtonAppBar />
@@ -112,30 +113,23 @@ export const CourseUser = () => {
                                     <td style={{ padding: '10px' }}>{course.owner}</td>
                                     <td style={{ padding: '10px' }}>{course.cat}</td>
                                     <td style={{ padding: '10px', display: 'flex', gap: '8px' }}>
-                                        
+                                        <Button onClick={() => handleShowTests(course.id, course.name)} variant="contained">
+                                            Show course tests
+                                        </Button>
                                     </td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
-                    
+
 
                     {/* Modal bêdzie siê otwiera³, gdy selectedCourseId nie bêdzie null */}
                     {selectedCourseId !== null && selectedCourseName !== null && (
-                        <BasicModal courseId={selectedCourseId} coursename={selectedCourseName} handleClose={() => {
+                        <ModalShowTestsStudent courseID={selectedCourseId} coursename={selectedCourseName} handleClose={() => {
                             setSelectedCourseId(null);
                             setSelectedCourseName(null);
                         }} />
                     )}
-
-                    {selectedCourseId2 !== null && selectedCourseName2 !== null && (
-                        <ModalChangeUsers courseId={selectedCourseId2} coursename={selectedCourseName2} handleClose={() => {
-                            setSelectedCourseId2(null);
-                            setSelectedCourseName2(null);
-                        }} />
-                    )}
-
-                    
                 </div>
             </div>
         </div>

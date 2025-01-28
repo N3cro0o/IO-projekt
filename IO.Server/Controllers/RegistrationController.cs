@@ -65,7 +65,7 @@ namespace IO.Server.Controllers
             //    ReceivedData = data
             //});
 
-            string role = "uczen";
+            string role = "student";
             string query = "INSERT INTO \"User\"(login, name, surname, email, password, role) VALUES ";
             query += string.Format("(\'{0}\', \'{1}\', \'{2}\', \'{3}\', \'{4}\', \'{5}\')", data.Login, data.FirstName, data.LastName, data.Email, hashedPassword, role);
             Debug.Print(query);
