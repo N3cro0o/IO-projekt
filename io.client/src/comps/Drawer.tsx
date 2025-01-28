@@ -43,6 +43,15 @@ const TemporaryDrawer = ({ open, toggleDrawer, token }) => {
                 </ListItem>
             </List>
             <List>
+                {/* Link do Course Management */}
+                <ListItem button component={Link} to="/CourseManagment">
+                    <ListItemIcon sx={{ color: '#007bff' }}> {/* Kolor ikon - niebieski */}
+                        <DashboardIcon /> {/* Ikona dashboard */}
+                    </ListItemIcon>
+                    <ListItemText primary="Your courses" sx={{ color: 'white' }} /> {/* Kolor tekstu - bia³y */}
+                </ListItem>
+            </List>
+            <List>
                 {/* Link do User Panel */}
                 <ListItem button component={Link} to="/UserPanel">
                     <ListItemIcon sx={{ color: '#007bff' }}> {/* Kolor ikon - niebieski */}

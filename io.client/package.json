@@ -19,7 +19,8 @@
     "react-bootstrap": "2.10.6",
     "react-dom": "^18.3.1",
     "react-router-dom": "^7.0.1",
-    "react-slick": "0.30.2"
+    "react-slick": "0.30.2",
+    "jwt-decode": "4.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.13.0",
@@ -35,6 +36,7 @@
     "globals": "^15.11.0",
     "typescript": "~5.6.2",
     "typescript-eslint": "^8.11.0",
-    "vite": "^5.4.10"
+    "vite": "^5.4.10",
+    "jwt-decode": "4.0.0"
   }
 }

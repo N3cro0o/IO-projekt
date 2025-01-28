@@ -50,15 +50,15 @@ namespace IO.Server.Controllers
                             // Brak użytkownika w bazie danych
                             return Unauthorized(new { Message = "Invalid Username or Password" });
                         }
-                        
-                        
+
+
 
                         // Pobranie hasła z bazy danych
                         var storedPassword = reader.GetString(1); // Druga kolumna zawiera hasło
 
                         //hasło hashowane podczas rejestracji, ponowne hasowanie hasła podczas logowania i porównanie 2 hashów
                         var hashedPassword = PasswordHasher.HashPasswordWithSHA256(data.Password);
-                        
+
                         if (storedPassword != hashedPassword)
                         {
                             // Hasło nie pasuje
@@ -67,11 +67,11 @@ namespace IO.Server.Controllers
 
                         // Pobranie roli użytkownika
                         var userRole = reader.GetString(2); // Trzecia kolumna zawiera rolę
-                        var userId = reader.GetInt32(3);
+                        var userID = reader.GetInt32(3);
 
                         // Wygenerowanie tokenu JWT
-                        var token = GenerateJwtToken(data.Login, userRole);
-                        return Ok(new { Message = "Login successful", Token = token, userId = userId});
+                        var token = GenerateJwtToken(userID, data.Login, userRole);
+                        return Ok(new { Message = "Login successful", Token = token, userId = userID });
 
 
                     }
@@ -88,13 +88,14 @@ namespace IO.Server.Controllers
             }
         }
 
-        private string GenerateJwtToken(string username, string role)
+        private string GenerateJwtToken(int id, string username, string role)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes("YourSuperSecretKey");
 
             var claims = new List<Claim>
             {
+                new Claim(ClaimTypes.SerialNumber, id.ToString()),
                 new Claim(ClaimTypes.Name, username),
                 new Claim(ClaimTypes.Role, role)
             };

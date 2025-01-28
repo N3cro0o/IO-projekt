@@ -4,6 +4,7 @@ import BasicModal from '../comps/ModalAddUsersToCourse.tsx';
 import ModalChangeUsers from '../comps/ModalKickUsersFromCourse.tsx';
 import ModalAddCourse from '../comps/ModalAddCourse.tsx';
 import { ButtonAppBar } from '../comps/AppBar.tsx';
+import { jwtDecode } from "jwt-decode";
 
 export const Course = () => {
     const [loading, setLoading] = useState<boolean>(true);
@@ -32,6 +33,11 @@ export const Course = () => {
     };
 
     useEffect(() => {
+        // Check token
+        const token = localStorage.getItem('authToken');
+        const decoded = jwtDecode(token);
+        console.log(decoded);
+
         const fetchCourses = async () => {
             try {
                 const userId = localStorage.getItem('userId');
