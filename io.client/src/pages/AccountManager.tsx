@@ -27,13 +27,14 @@ export const UserProfilePage: React.FC = () => {
         newPassword: '',
         confirmPassword: '',
     });
+    const [activeSection, setActiveSection] = useState<string>('login'); // Active section state
 
     const navigate = useNavigate();
     const userId = localStorage.getItem('userId');
 
     const fetchUserData = async () => {
         try {
-            setLoading(true); // Start the loading spinner
+            setLoading(true);
             const response = await fetch(`https://localhost:7293/api/Account/showData/${userId}`, {
                 method: 'GET',
                 headers: {
@@ -56,7 +57,7 @@ export const UserProfilePage: React.FC = () => {
         } catch (error) {
             setUpdateError('An error occurred while fetching user data.');
         } finally {
-            setLoading(false); // Stop the loading spinner
+            setLoading(false);
         }
     };
 
@@ -95,7 +96,7 @@ export const UserProfilePage: React.FC = () => {
 
             setUpdateSuccess(`${fieldName} updated successfully!`);
             setFieldToUpdate({ ...fieldToUpdate, [fieldName]: '' });
-            await fetchUserData(); // Refetch user data after success
+            await fetchUserData();
         } catch (error) {
             setUpdateError(`An error occurred while updating ${fieldName}.`);
         }
@@ -131,7 +132,7 @@ export const UserProfilePage: React.FC = () => {
                 newPassword: '',
                 confirmPassword: '',
             });
-            await fetchUserData(); // Refetch user data after success
+            await fetchUserData();
         } catch (error) {
             setUpdateError('An error occurred while updating the password.');
         }
@@ -150,6 +151,111 @@ export const UserProfilePage: React.FC = () => {
             </Box>
         );
     }
+
+    const renderActiveSection = () => {
+        if (activeSection === 'password') {
+            return (
+                <Box sx={{ marginBottom: '20px' }}>
+                    <Typography variant="subtitle1" color="white">Change Password:</Typography>
+                    <TextField
+                        label="Current Password"
+                        name="currentPassword"
+                        value={passwordData.currentPassword}
+                        onChange={handlePasswordChange}
+                        type="password"
+                        fullWidth
+                        sx={{
+                            marginBottom: '8px',
+                            '& .MuiInputLabel-root': { color: 'white' },
+                            '& .MuiInputBase-root': {
+                                backgroundColor: '#333',
+                                color: 'white',
+                            },
+                        }}
+                    />
+                    <TextField
+                        label="New Password"
+                        name="newPassword"
+                        value={passwordData.newPassword}
+                        onChange={handlePasswordChange}
+                        type="password"
+                        fullWidth
+                        sx={{
+                            marginBottom: '8px',
+                            '& .MuiInputLabel-root': { color: 'white' },
+                            '& .MuiInputBase-root': {
+                                backgroundColor: '#333',
+                                color: 'white',
+                            },
+                        }}
+                    />
+                    <TextField
+                        label="Confirm Password"
+                        name="confirmPassword"
+                        value={passwordData.confirmPassword}
+                        onChange={handlePasswordChange}
+                        type="password"
+                        fullWidth
+                        sx={{
+                            '& .MuiInputLabel-root': { color: 'white' },
+                            '& .MuiInputBase-root': {
+                                backgroundColor: '#333',
+                                color: 'white',
+                            },
+                        }}
+                    />
+                    <Button
+                        variant="contained"
+                        sx={{ marginTop: '8px', backgroundColor: '#007bff', color: '#fff' }}
+                        onClick={handlePasswordUpdate}
+                    >
+                        Update Password
+                    </Button>
+                </Box>
+            );
+        } else {
+            return (
+                <Box sx={{ marginBottom: '20px' }}>
+                    <Typography variant="subtitle1" color="white">
+                        {activeSection.charAt(0).toUpperCase() + activeSection.slice(1)}:
+                    </Typography>
+                    <TextField
+                        value={userData[activeSection]}
+                        InputProps={{ readOnly: true }}
+                        fullWidth
+                        sx={{
+                            marginBottom: '8px',
+                            '& .MuiInputBase-root': {
+                                backgroundColor: '#333',
+                                color: 'white',
+                            },
+                        }}
+                    />
+                    <TextField
+                        label={`Change ${activeSection}`}
+                        name={activeSection}
+                        value={fieldToUpdate[activeSection]}
+                        onChange={handleChange}
+                        fullWidth
+                        sx={{
+                            '& .MuiInputLabel-root': { color: 'white' },
+                            '& .MuiInputBase-root': {
+                                backgroundColor: '#333',
+                                color: 'white',
+                            },
+                        }}
+                    />
+                    <Button
+                        variant="contained"
+                        sx={{ marginTop: '8px', backgroundColor: '#007bff', color: '#fff' }}
+                        onClick={() => handleUpdate(activeSection)}
+                    >
+                        Update {activeSection.charAt(0).toUpperCase() + activeSection.slice(1)}
+                    </Button>
+                </Box>
+            );
+        }
+    };
 
     return (
         <div>
@@ -190,103 +296,22 @@ export const UserProfilePage: React.FC = () => {
 
                     {userData && (
                         <>
-                            {['login', 'email', 'name', 'surname'].map((field) => (
-                                <Box key={field} sx={{ marginBottom: '20px' }}>
-                                    <Typography variant="subtitle1" color="white">
-                                        {field.charAt(0).toUpperCase() + field.slice(1)}:
-                                    </Typography>
-                                    <TextField
-                                        value={userData[field]}
-                                        InputProps={{ readOnly: true }}
-                                        fullWidth
-                                        sx={{
-                                            marginBottom: '8px',
-                                            '& .MuiInputBase-root': {
-                                                backgroundColor: '#333',
-                                                color: 'white',
-                                            },
-                                        }}
-                                    />
-                                    <TextField
-                                        label={`Change ${field}`}
-                                        name={field}
-                                        value={fieldToUpdate[field]}
-                                        onChange={handleChange}
-                                        fullWidth
-                                        sx={{
-                                            '& .MuiInputLabel-root': { color: 'white' },
-                                            '& .MuiInputBase-root': {
-                                                backgroundColor: '#333',
-                                                color: 'white',
-                                            },
-                                        }}
-                                    />
+                            {renderActiveSection()}
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px' }}>
+                                {['login', 'email', 'name', 'surname', 'password'].map((section) => (
                                     <Button
-                                        variant="contained"
-                                        sx={{ marginTop: '8px', backgroundColor: '#007bff', color: '#fff' }}
-                                        onClick={() => handleUpdate(field)}
+                                        key={section}
+                                        variant="outlined"
+                                        sx={{
+                                            color: '#fff',
+                                            borderColor: '#007bff',
+                                            '&:hover': { borderColor: '#0056b3' },
+                                        }}
+                                        onClick={() => setActiveSection(section)}
                                     >
-                                        Update {field.charAt(0).toUpperCase() + field.slice(1)}
+                                        {section.charAt(0).toUpperCase() + section.slice(1)}
                                     </Button>
-                                </Box>
-                            ))}
-
-                            <Box sx={{ marginBottom: '20px' }}>
-                                <Typography variant="subtitle1" color="white">Change Password:</Typography>
-                                <TextField
-                                    label="Current Password"
-                                    name="currentPassword"
-                                    value={passwordData.currentPassword}
-                                    onChange={handlePasswordChange}
-                                    type="password"
-                                    fullWidth
-                                    sx={{
-                                        marginBottom: '8px',
-                                        '& .MuiInputLabel-root': { color: 'white' },
-                                        '& .MuiInputBase-root': {
-                                            backgroundColor: '#333',
-                                            color: 'white',
-                                        },
-                                    }}
-                                />
-                                <TextField
-                                    label="New Password"
-                                    name="newPassword"
-                                    value={passwordData.newPassword}
-                                    onChange={handlePasswordChange}
-                                    type="password"
-                                    fullWidth
-                                    sx={{
-                                        marginBottom: '8px',
-                                        '& .MuiInputLabel-root': { color: 'white' },
-                                        '& .MuiInputBase-root': {
-                                            backgroundColor: '#333',
-                                            color: 'white',
-                                        },
-                                    }}
-                                />
-                                <TextField
-                                    label="Confirm Password"
-                                    name="confirmPassword"
-                                    value={passwordData.confirmPassword}
-                                    onChange={handlePasswordChange}
-                                    type="password"
-                                    fullWidth
-                                    sx={{
-                                        '& .MuiInputLabel-root': { color: 'white' },
-                                        '& .MuiInputBase-root': {
-                                            backgroundColor: '#333',
-                                            color: 'white',
-                                        },
-                                    }}
-                                />
-                                <Button
-                                    variant="contained"
-                                    sx={{ marginTop: '8px', backgroundColor: '#007bff', color: '#fff' }}
-                                    onClick={handlePasswordUpdate}
-                                >
-                                    Update Password
-                                </Button>
+                                ))}
                             </Box>
                         </>
                     )}
