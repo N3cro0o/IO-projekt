@@ -16,3 +16,7 @@ GET {{IO.Server_HostAddress}}/api/main/getEnvCourses
 Accept: application/json
 
 ###
+GET {{IO.Server_HostAddress}}/api/CoursesManager/Student/44/courses
+Accept: application/json
+
+###

@@ -259,6 +259,55 @@
         }
       }
     },
+    "/api/CoursesManager/Student/{id}/courses": {
+      "get": {
+        "tags": [
+          "CoursesManager"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Course"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Course"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Course"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/CoursesManager/ListCourse/{userId}": {
       "get": {
         "tags": [
@@ -983,13 +1032,6 @@
         }
       },
       "Course": {
-        "required": [
-          "name",
-          "id",
-          "teachers",
-          "students",
-          "tests"
-        ],
         "type": "object",
         "properties": {
           "name": {
@@ -999,6 +1041,9 @@
           "id": {
             "type": "integer",
             "format": "int32"
+          },
+          "headTeacherName": {
+            "type": "string"
           },
           "teachers": {
             "type": "array",

@@ -17,6 +17,55 @@ namespace IO.Server.Controllers
             _connection = connection;
         }
 
+        [HttpGet("Student/{id}/courses")]
+        public ActionResult<IEnumerable<Course>> GetStudentCourses(int id) 
+        {
+            List<Course> courses = new List<Course>();
+
+            try
+            {
+                _connection.Open();
+
+                // Query to fetch courses
+                string query = "SELECT c.courseid, c.name, u.name, u.surname, c.category FROM \"UserToCourse\" uc " +
+                    $"JOIN \"Course\" c ON uc.userid = {id} JOIN \"User\" u ON c.ownerid = u.userid WHERE uc.courseid = c.courseid ORDER BY c.name ASC";
+
+                using (var command = new NpgsqlCommand(query, _connection))
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        // Safely retrieve data and handle nullability
+                        int courseID = reader.GetInt32(0);
+                        string courseName = reader.GetString(1);
+                        string userNameF = reader.GetString(2);
+                        string userNameL = reader.GetString(3);
+                        string cat = reader.GetString(4);
+                        userNameF += userNameL;
+
+                        courses.Add(new Course(courseID, courseName,cat, userNameF));
+                    }
+                }
+
+                return Ok(courses);
+            }
+            catch (Exception ex)
+            {
+                Debug.Print(ex.ToString());
+                return BadRequest(new { message = "An error occurred while fetching courses.", details = ex.Message });
+            }
+            finally
+            {
+                // Ensure the connection is closed
+                if (_connection.State == System.Data.ConnectionState.Open)
+                {
+                    _connection.Close();
+                }
+            }
+
+            return Ok(courses);
+        }
+
         [HttpGet("ListCourse/{userId}")]
         public ActionResult<IEnumerable<CourseToReveal>> GetCourse(int userId)
         {
@@ -341,6 +390,8 @@ namespace IO.Server.Controllers
         }
     }
 }
+
+    // MNIEKURWAPOJEBIE,COTOKURWAJESTAAAAAAAAAAAAAAAAAAAAAAAAA
 
 public class CourseToReveal
 {

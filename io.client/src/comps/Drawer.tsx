@@ -20,7 +20,7 @@ const TemporaryDrawer = ({ open, toggleDrawer, token }) => {
     if (token) {
         try {
             const decoded = jwtDecode(token);
-            console.log(decoded.role);
+            console.log(decoded.certserialnumber);
             if (decoded.role == 'student' || decoded.role == 'uczen') {
                 user_check = true;
             }
@@ -60,7 +60,7 @@ const TemporaryDrawer = ({ open, toggleDrawer, token }) => {
             {/* Your Courses link */}
             {user_check && (
                 <List>
-                    <ListItem button component={Link} to="/CourseManagment">
+                    <ListItem button component={Link} to="/student/courses">
                         <ListItemIcon sx={{ color: '#007bff' }}> {/* Kolor ikon - niebieski */}
                             <DashboardIcon /> {/* Ikona dashboard */}
                         </ListItemIcon>
