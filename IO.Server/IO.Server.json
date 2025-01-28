@@ -963,6 +963,55 @@
           }
         }
       }
+    },
+    "/api/TestViev/GetQuestion/{testId}": {
+      "get": {
+        "tags": [
+          "TestViev"
+        ],
+        "parameters": [
+          {
+            "name": "testId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/QuestionToReveal"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/QuestionToReveal"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/QuestionToReveal"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1152,6 +1201,49 @@
           },
           "shared": {
             "type": "boolean"
+          }
+        }
+      },
+      "QuestionToReveal": {
+        "type": "object",
+        "properties": {
+          "questionid": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "questionName": {
+            "type": "string"
+          },
+          "cattegory": {
+            "type": "string"
+          },
+          "questiontype": {
+            "type": "string"
+          },
+          "shared": {
+            "type": "boolean"
+          },
+          "answer": {
+            "type": "string"
+          },
+          "a": {
+            "type": "boolean"
+          },
+          "b": {
+            "type": "boolean"
+          },
+          "c": {
+            "type": "boolean"
+          },
+          "d": {
+            "type": "boolean"
+          },
+          "question": {
+            "type": "string"
+          },
+          "maxpoint": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },

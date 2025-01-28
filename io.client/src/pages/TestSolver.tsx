@@ -3,10 +3,12 @@ import { ButtonAppBar } from '../comps/AppBar.tsx';
 import Button from '@mui/material/Button';
 
 interface Question {
-    id: number;
-    questionText: string;
+    questionid: number;
+    questionName: string;
+    question: string;
     options: string[];
     correctAnswer: string;
+    maxpoint: number;
 }
 
 export const TestSolver = () => {
@@ -19,10 +21,12 @@ export const TestSolver = () => {
     // Funkcja do transformacji danych
     const transformQuestionData = (apiData: any[]): Question[] => {
         return apiData.map((question) => ({
-            id: question.questionId,
-            questionText: question.questionText,
-            options: [question.optionA, question.optionB, question.optionC, question.optionD],
-            correctAnswer: question.correctAnswer,
+            questionid: question.questionid,
+            questionName: question.questionName,
+            question: question.question,
+            options: [question.a ? 'A' : null, question.b ? 'B' : null, question.c ? 'C' : null, question.d ? 'D' : null].filter(option => option !== null),
+            correctAnswer: question.answer,
+            maxpoint: question.maxpoint,
         }));
     };
 
@@ -33,7 +37,7 @@ export const TestSolver = () => {
                 const testId = localStorage.getItem('selectedTestId');
                 console.log('Selected Test ID from localStorage:', testId);
 
-                const response = await fetch(`https://localhost:7293/api/TestsViev/GetQuestions/${testId}`);
+                const response = await fetch(`https://localhost:7293/api/TestViev/GetQuestion/${testId}`);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -49,16 +53,27 @@ export const TestSolver = () => {
         fetchQuestions();
     }, []);
 
-    
-
     const handleNextQuestion = () => {
         if (selectedAnswer) {
+            // Sprawdzamy, czy odpowiedŸ jest poprawna
+            if (selectedAnswer === questions[currentQuestionIndex].correctAnswer) {
+                setScore((prevScore) => prevScore + questions[currentQuestionIndex].maxpoint);
+            }
+
             // Przechodzimy do nastêpnego pytania
             setSelectedAnswer(null);
             setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
         } else {
             alert('Please select an answer before proceeding.');
         }
+    };
+
+    const handleAnswerSelect = (option: string) => {
+        setSelectedAnswer(option);
+    };
+
+    const handleSubmitTest = () => {
+        alert(`Test submitted! Your score: ${score}/${questions.length}`);
     };
 
     // Sprawdzamy, czy pytania s¹ ju¿ za³adowane
@@ -70,24 +85,6 @@ export const TestSolver = () => {
     // Pobieramy bie¿¹ce pytanie
     const currentQuestion = questions[currentQuestionIndex];
 
-    // Funkcja do obs³ugi wyboru odpowiedzi
-    const handleAnswerSelect = (option) => {
-        setSelectedAnswer(option);
-
-        // Sprawdzamy, czy odpowiedŸ jest poprawna
-        if (option === currentQuestion.answer) {
-            // Dodajemy punkty za poprawn¹ odpowiedŸ
-            setScore((prevScore) => prevScore + currentQuestion.maxpoint);
-        }
-    };
-
-    
-
-    // Funkcja do obs³ugi wys³ania testu
-    const handleSubmitTest = () => {
-        alert(`Test submitted! Your score: ${score}/${questions.length}`);
-    };
-
     return (
         <div>
             <ButtonAppBar />
@@ -95,7 +92,8 @@ export const TestSolver = () => {
                 <div style={{ width: '100%', maxWidth: '800px' }}>
                     <h1 style={{ color: 'white', textAlign: 'center' }}>Test Solver</h1>
                     <div style={{ backgroundColor: '#333', padding: '20px', borderRadius: '8px', color: '#fff' }}>
-                        <h2>{currentQuestion.questionText}</h2>
+                        <h2>{currentQuestion.questionName}</h2>
+                        <p>{currentQuestion.question}</p>
                         <div>
                             {currentQuestion.options.map((option, index) => (
                                 <div key={index} style={{ marginBottom: '10px' }}>
@@ -131,4 +129,3 @@ export const TestSolver = () => {
 };
 
 export default TestSolver;
-

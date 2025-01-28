@@ -86,81 +86,65 @@ namespace IO.Server.Controllers
             }
             
         }
-        
-    //public ActionResult<IEnumerable<QuestionToReveal>> GetQuestion(int testId)
-    //{
-    //    List<QuestionToReveal> question = new List<QuestionToReveal>();
 
-    //    try
-    //    {
-    //        _connection.Open();
+        [HttpGet("GetQuestion/{testId}")]
+        public ActionResult<IEnumerable<QuestionToReveal>> GetQuestion(int testId)
+        {
+            List<QuestionToReveal> question = new List<QuestionToReveal>();
 
-    //        // Query to fetch courses
-    //        string query = @"SELECT q.*, t.testid
-    //            FROM  ""Question"" q, ""QuestionToTest"" qtt, ""Test"" t
-    //            WHERE qtt.testid = t.testid AND qtt.questionid = q.questionid AND t.testid = @testId";
+            try
+            {
+                _connection.Open();
 
-    //        using (var command = new NpgsqlCommand(query, _connection))
-    //        using (var reader = command.ExecuteReader())
-    //        {
-    //            while (reader.Read())
-    //            {
-    //                int questionId = reader.GetFieldValue<int>(0);
-    //                string questionName = reader.GetFieldValue<string>(1);
-    //                string questionCattegory = reader.GetFieldValue<string>(2);
-    //                string questionType = reader.GetFieldValue<string>(3);
-    //                bool questionShared = reader.GetFieldValue<bool>(4);
-    //                string questionAnswer = reader.GetFieldValue<string>(5);
-    //                bool a = reader.GetFieldValue<bool>(6);
-    //                bool b = reader.GetFieldValue<bool>(7);
-    //                bool c = reader.GetFieldValue<bool>(8);
-    //                bool d = reader.GetFieldValue<bool>(9);
-    //                string questionQ = reader.GetFieldValue<string>(10);
-    //                int maxPoint = reader.GetFieldValue<int>(11);
+                // Query to fetch questions related to the test
+                string query = @"SELECT q.*, t.testid
+                         FROM  ""Question"" q
+                         JOIN ""QuestionToTest"" qtt ON qtt.questionid = q.questionid
+                         JOIN ""Test"" t ON qtt.testid = t.testid
+                         WHERE t.testid = @testId";
 
-    //                // Create the QuestionToReveal object
-    //                QuestionToReveal questionToReveal = new QuestionToReveal
-    //                {
-    //                    questionid = questionId,
-    //                    questionName = questionName,
-    //                    cattegory = questionCattegory,
-    //                    questiontype = questionType,
-    //                    shared = questionShared,
-    //                    answer = questionAnswer,
-    //                    a = a,
-    //                    b = b,
-    //                    c = c,
-    //                    d = d,
-    //                    question = questionQ,
-    //                    maxpoint = maxPoint
-    //                };
-    //                question.Add(questionToReveal);
-    //            }
-    //        }
-    //        return Ok(question);
-    //    }
-
-    //    catch (Exception ex)
-    //    {
-    //        Debug.Print(ex.ToString());
-    //        return BadRequest(new { message = "An error occurred while fetching courses.", details = ex.Message });
-    //    }
-    //    finally
-    //    {
-    //        // Ensure the connection is closed
-    //        if (_connection.State == System.Data.ConnectionState.Open)
-    //        {
-    //            _connection.Close();
-    //        }
-    //    }
-    //}
+                using (var command = new NpgsqlCommand(query, _connection))
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        var questionToReveal = new QuestionToReveal
+                        {
+                            questionid = reader.GetInt32(0),
+                            questionName = reader.GetString(1),
+                            question = reader.GetString(10),  // Assuming the question text is the 10th column
+                            a = reader.GetBoolean(6),
+                            b = reader.GetBoolean(7),
+                            c = reader.GetBoolean(8),
+                            d = reader.GetBoolean(9),
+                            answer = reader.GetString(5),  // Assuming the correct answer is stored in column 5
+                            maxpoint = reader.GetInt32(11)
+                        };
+                        question.Add(questionToReveal);
+                    }
+                }
+                return Ok(question);
+            }
+            catch (Exception ex)
+            {
+                Debug.Print(ex.ToString());
+                return BadRequest(new { message = "An error occurred while fetching questions.", details = ex.Message });
+            }
+            finally
+            {
+                if (_connection.State == System.Data.ConnectionState.Open)
+                {
+                    _connection.Close();
+                }
+            }
+        }
 
 
 
 
 
 
-    public class TestToReveal
+        public class TestToReveal
         {
             public int testid { get; set; }
             public string testName { get; set; }
