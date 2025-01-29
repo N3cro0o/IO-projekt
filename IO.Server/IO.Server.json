@@ -236,14 +236,16 @@
             "description": "OK"
           }
         }
-      },
+      }
+    },
+    "/api/Question/questions/from/{testID}": {
       "get": {
         "tags": [
           "Question"
         ],
         "parameters": [
           {
-            "name": "testId",
+            "name": "testID",
             "in": "path",
             "required": true,
             "schema": {

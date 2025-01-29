@@ -97,8 +97,7 @@ export const CourseUser = () => {
                             borderRadius: '8px',
                             overflow: 'hidden',
                             tableLayout: 'fixed',
-                        }}
-                    >
+                        }}>
                         <thead>
                             <tr style={{ borderBottom: '2px solid #555' }}>
                                 <th style={{ padding: '10px' }}>Course Name</th>

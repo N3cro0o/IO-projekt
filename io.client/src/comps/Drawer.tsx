@@ -21,7 +21,6 @@ const TemporaryDrawer = ({ open, toggleDrawer, token }) => {
     if (token) {
         try {
             const decoded = jwtDecode(token);
-            console.log(decoded.role.toLowerCase());
             if (decoded.role == 'student' || decoded.role == 'uczen') {
                 user_check = true;
             }
