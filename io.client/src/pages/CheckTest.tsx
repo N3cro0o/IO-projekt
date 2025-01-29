@@ -85,7 +85,7 @@ const ReviewQuestions: React.FC = () => {
                     { currentQuestion.text }
                     </Typography>
                     < Paper sx = {{ p: 2, backgroundColor: '#444', borderRadius: 1 }}>
-                        <Typography variant="body1" > { currentQuestion.userAnswer } </Typography>
+                        <Typography variant="body1" > { currentQuestion.text } </Typography>
                             </Paper>
                             < TextField
 label = "Assign Points"
