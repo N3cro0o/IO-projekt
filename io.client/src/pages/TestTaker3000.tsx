@@ -11,6 +11,7 @@ import {
     Container
 } from '@mui/material';
 import { ButtonAppBar } from '../comps/AppBar.tsx';
+import { Link, useNavigate } from 'react-router-dom';
 
 interface Question {
     answersClosed: string;
@@ -34,6 +35,7 @@ const StartTest: React.FC = () => {
     const { testID } = useParams<{ testID: string }>();
     const [loading, setLoading] = useState<boolean>(true);
     const [questions, setQuestions] = useState<Question[]>([]);
+    const navigate = useNavigate();
 
     const [index, setIndex] = useState<number>(0);
     const [question, setQuestion] = useState<Question>();
@@ -93,6 +95,7 @@ const StartTest: React.FC = () => {
         setIndex(index + 1);
         console.log('Curr index:' + index);
         if (index >= questions.length) {
+            navigate("/student/courses");
             return;
         }
         const quest = questions[index];
