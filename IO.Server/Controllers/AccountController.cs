@@ -104,9 +104,9 @@ namespace IO.Server.Controllers
         {
             try
             {
-                if (string.IsNullOrEmpty(request.FieldName) || string.IsNullOrEmpty(request.Value))
+                if (string.IsNullOrEmpty(request.FieldName) || string.IsNullOrEmpty(request.Value) || string.IsNullOrEmpty(request.Password))
                 {
-                    return BadRequest(new { message = "Invalid request data." });
+                    return BadRequest(new { message = "Invalid request data. Password is required." });
                 }
 
                 // Lista dozwolonych pól
@@ -137,17 +137,32 @@ namespace IO.Server.Controllers
                     }
                 }
 
-
-
-                string query = $"UPDATE \"User\" SET \"{request.FieldName}\" = @Value WHERE userid = @UserId";
-
+                // Pobranie aktualnego hasła użytkownika
+                string query = "SELECT password FROM \"User\" WHERE userid = @UserId";
                 _connection.Open();
                 using (var command = new NpgsqlCommand(query, _connection))
                 {
-                    command.Parameters.AddWithValue("@Value", request.Value);
                     command.Parameters.AddWithValue("@UserId", userId);
+                    var storedPassword = command.ExecuteScalar()?.ToString();
 
-                    int rowsAffected = command.ExecuteNonQuery();
+                    if (storedPassword == null || !VerifyPassword(request.Password, storedPassword))
+                    {
+                        _connection.Close();
+                        return Unauthorized(new { message = "Incorrect password." });
+                    }
+                }
+
+                
+
+                // Aktualizacja pola użytkownika
+                string updateQuery = $"UPDATE \"User\" SET \"{request.FieldName}\" = @Value WHERE userid = @UserId";
+                using (var updateCommand = new NpgsqlCommand(updateQuery, _connection))
+                {
+                    updateCommand.Parameters.AddWithValue("@Value", request.Value);
+                    updateCommand.Parameters.AddWithValue("@UserId", userId);
+
+                    int rowsAffected = updateCommand.ExecuteNonQuery();
+                    _connection.Close();
 
                     if (rowsAffected > 0)
                     {
@@ -172,6 +187,7 @@ namespace IO.Server.Controllers
             }
         }
 
+       
         [HttpPut("changePassword/{userId}")]
         public IActionResult ChangePassword(int userId, [FromBody] ChangePasswordRequest request)
         {
@@ -260,11 +276,15 @@ namespace IO.Server.Controllers
             public string OldPassword { get; set; }
             public string NewPassword { get; set; }
         }
+
+     
         public class UpdateFieldRequest
         {
             public string FieldName { get; set; }
             public string Value { get; set; }
+            public string Password { get; set; } // Nowe pole - wymagane hasło użytkownika
         }
+
 
         public class UserData
         {

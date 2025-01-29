@@ -21,6 +21,7 @@ export const UserProfilePage: React.FC = () => {
         email: '',
         name: '',
         surname: '',
+        Password: '',
     });
     const [passwordData, setPasswordData] = useState({
         currentPassword: '',
@@ -53,6 +54,7 @@ export const UserProfilePage: React.FC = () => {
                 email: '',
                 name: '',
                 surname: '',
+                Password: '',
             });
         } catch (error) {
             setUpdateError('An error occurred while fetching user data.');
@@ -87,6 +89,7 @@ export const UserProfilePage: React.FC = () => {
                 body: JSON.stringify({
                     fieldName,
                     value: fieldToUpdate[fieldName],
+                    Password: fieldToUpdate.Password
                 }),
             });
 
@@ -238,6 +241,23 @@ export const UserProfilePage: React.FC = () => {
                         onChange={handleChange}
                         fullWidth
                         sx={{
+                            marginBottom: '8px',
+                            '& .MuiInputLabel-root': { color: 'white' },
+                            '& .MuiInputBase-root': {
+                                backgroundColor: '#333',
+                                color: 'white',
+                            },
+                        }}
+                    />
+                    <TextField
+                        label="Password"
+                        name="Password"
+                        value={fieldToUpdate.Password}
+                        onChange={handleChange}
+                        type="password"
+                        fullWidth
+                        sx={{
+                            marginBottom: '8px',
                             '& .MuiInputLabel-root': { color: 'white' },
                             '& .MuiInputBase-root': {
                                 backgroundColor: '#333',

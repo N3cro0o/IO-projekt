@@ -1278,6 +1278,9 @@
           },
           "value": {
             "type": "string"
+          },
+          "password": {
+            "type": "string"
           }
         }
       },
