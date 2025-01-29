@@ -1,7 +1,8 @@
-﻿using IO.Server.Elements;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Npgsql;
 using System;
+using IO.Server.Elements;
+using System.Diagnostics;
 
 namespace IO.Server.Controllers
 {
@@ -36,12 +37,12 @@ namespace IO.Server.Controllers
                     command.Parameters.AddWithValue("@category", newQuestion.Category);
                     command.Parameters.AddWithValue("@questionType", newQuestion.QuestionType);
                     command.Parameters.AddWithValue("@shared", newQuestion.Shared);
-                    command.Parameters.AddWithValue("@answer", (object)newQuestion.Answer ?? DBNull.Value);
-                    command.Parameters.AddWithValue("@a", (object)newQuestion.A ?? DBNull.Value);
-                    command.Parameters.AddWithValue("@b", (object)newQuestion.B ?? DBNull.Value);
-                    command.Parameters.AddWithValue("@c", (object)newQuestion.C ?? DBNull.Value);
-                    command.Parameters.AddWithValue("@d", (object)newQuestion.D ?? DBNull.Value);
-                    command.Parameters.AddWithValue("@maxpoints", (object)newQuestion.MaxPoints ?? DBNull.Value);
+                    command.Parameters.AddWithValue("@answer", (object)newQuestion.Answers ?? DBNull.Value);
+                    command.Parameters.AddWithValue("@a", (object)newQuestion.ReturnCorrectAnswerSingle(Question.QUESTION_ANSWER.A) ?? DBNull.Value);
+                    command.Parameters.AddWithValue("@b", (object)newQuestion.ReturnCorrectAnswerSingle(Question.QUESTION_ANSWER.B) ?? DBNull.Value);
+                    command.Parameters.AddWithValue("@c", (object)newQuestion.ReturnCorrectAnswerSingle(Question.QUESTION_ANSWER.C) ?? DBNull.Value);
+                    command.Parameters.AddWithValue("@d", (object)newQuestion.ReturnCorrectAnswerSingle(Question.QUESTION_ANSWER.D) ?? DBNull.Value);
+                    command.Parameters.AddWithValue("@maxpoints", (object)newQuestion.Points ?? DBNull.Value);
 
                     newQuestionId = Convert.ToInt32(command.ExecuteScalar());
                 }
@@ -62,6 +63,7 @@ namespace IO.Server.Controllers
             }
             catch (Exception ex)
             {
+                Debug.Print(ex.ToString());
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
             finally
@@ -70,17 +72,15 @@ namespace IO.Server.Controllers
             }
         }
 
-        [HttpGet("{testId}")]
-        public IActionResult GetQuestionsForTest(int testId)
+        [HttpGet("questions/from/{testID}")]
+        public IActionResult GetQuestionsForTest(int testID)
         {
             try
             {
                 _connection.Open();
 
                 string query = @"
-            SELECT q.questionid, q.name, q.category, q.questiontype, q.shared, 
-                   q.answer, q.a, q.b, q.c, q.d, q.maxpoints
-            FROM ""Question"" q
+            SELECT q.* FROM ""Question"" q
             INNER JOIN ""QuestionToTest"" qt ON q.questionid = qt.questionid
             WHERE qt.testid = @testId;";
 
@@ -88,24 +88,25 @@ namespace IO.Server.Controllers
 
                 using (var command = new NpgsqlCommand(query, _connection))
                 {
-                    command.Parameters.AddWithValue("@testId", testId);
+                    command.Parameters.AddWithValue("@testId", testID);
                     using (var reader = command.ExecuteReader())
                     {
                         while (reader.Read())
                         {
-                            questions.Add(new Question
-                            {
-                                Name = reader["name"].ToString(),
-                                Category = reader["category"].ToString(),
-                                QuestionType = reader["questiontype"].ToString(),
-                                Shared = (bool)reader["shared"],
-                                Answer = reader["answer"] as string,
-                                A = reader["a"] as bool?,
-                                B = reader["b"] as bool?,
-                                C = reader["c"] as bool?,
-                                D = reader["d"] as bool?,
-                                MaxPoints = reader["maxpoints"] as int?
-                            });
+                            int id = reader.GetInt32(0);
+                            string name = reader.GetString(1);
+                            string cat = reader.GetString(2);
+                            string questionType = reader.GetString(3);
+                            bool shared = reader.GetBoolean(4);
+                            double points = reader.GetDouble(10);
+                            string text = reader.GetString(11);
+                            bool a = reader.GetBoolean(6);
+                            bool b = reader.GetBoolean(7);
+                            bool c = reader.GetBoolean(8);
+                            bool d = reader.GetBoolean(9);
+                            int key = (d ? 1 : 0) + (c ? 2 : 0) + (b ? 4 : 0) + (a ? 8 : 0);
+                            var q = new Question(name, text, questionType, reader.GetString(5), points, key, cat, shared, id);
+                            questions.Add(q);
                         }
                     }
                 }
@@ -114,27 +115,13 @@ namespace IO.Server.Controllers
             }
             catch (Exception ex)
             {
+                Debug.Print(ex.ToString());
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
             finally
             {
                 _connection.Close();
             }
-        }
-
-
-        public class Question
-        {
-            public string Name { get; set; }
-            public string Category { get; set; }
-            public string QuestionType { get; set; }
-            public bool Shared { get; set; }
-            public string Answer { get; set; }
-            public bool? A { get; set; }
-            public bool? B { get; set; }
-            public bool? C { get; set; }
-            public bool? D { get; set; }
-            public int? MaxPoints { get; set; }
         }
     }
 }

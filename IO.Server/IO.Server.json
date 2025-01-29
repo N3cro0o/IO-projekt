@@ -236,14 +236,16 @@
             "description": "OK"
           }
         }
-      },
+      }
+    },
+    "/api/Question/questions/from/{testID}": {
       "get": {
         "tags": [
           "Question"
         ],
         "parameters": [
           {
-            "name": "testId",
+            "name": "testID",
             "in": "path",
             "required": true,
             "schema": {
@@ -255,6 +257,55 @@
         "responses": {
           "200": {
             "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/CoursesManager/Student/{id}/courses": {
+      "get": {
+        "tags": [
+          "CoursesManager"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Course"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Course"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Course"
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -283,7 +334,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/CourseToReveal"
+                    "$ref": "#/components/schemas/Course"
                   }
                 }
               },
@@ -291,7 +342,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/CourseToReveal"
+                    "$ref": "#/components/schemas/Course"
                   }
                 }
               },
@@ -299,7 +350,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/CourseToReveal"
+                    "$ref": "#/components/schemas/Course"
                   }
                 }
               }
@@ -715,51 +766,34 @@
         }
       }
     },
-    "/api/TestManager/CoursesList/{userId}": {
-      "get": {
+    "/api/TestManager/answer/add/test": {
+      "post": {
         "tags": [
           "TestManager"
         ],
-        "parameters": [
-          {
-            "name": "userId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Course"
-                  }
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Course"
-                  }
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Course"
-                  }
-                }
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Answer"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Answer"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Answer"
               }
             }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
           }
         }
       }
@@ -971,6 +1005,30 @@
           }
         }
       },
+      "Answer": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "test": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "question": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "points": {
+            "type": "number",
+            "format": "double"
+          },
+          "key": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
       "ChangePasswordRequest": {
         "type": "object",
         "properties": {
@@ -983,13 +1041,6 @@
         }
       },
       "Course": {
-        "required": [
-          "name",
-          "id",
-          "teachers",
-          "students",
-          "tests"
-        ],
         "type": "object",
         "properties": {
           "name": {
@@ -999,6 +1050,9 @@
           "id": {
             "type": "integer",
             "format": "int32"
+          },
+          "headTeacherName": {
+            "type": "string"
           },
           "teachers": {
             "type": "array",
@@ -1029,25 +1083,6 @@
             }
           },
           "category": {
-            "type": "string"
-          }
-        }
-      },
-      "CourseToReveal": {
-        "type": "object",
-        "properties": {
-          "courseid": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "courseName": {
-            "type": "string"
-          },
-          "ownerid": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "ownerLogin": {
             "type": "string"
           }
         }
@@ -1114,38 +1149,36 @@
           "name": {
             "type": "string"
           },
-          "category": {
+          "text": {
             "type": "string"
           },
           "questionType": {
             "type": "string"
           },
+          "answers": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string"
+          },
           "shared": {
             "type": "boolean"
           },
-          "answer": {
-            "type": "string"
+          "points": {
+            "type": "number",
+            "format": "double"
           },
-          "a": {
-            "type": "boolean",
-            "nullable": true
-          },
-          "b": {
-            "type": "boolean",
-            "nullable": true
-          },
-          "c": {
-            "type": "boolean",
-            "nullable": true
-          },
-          "d": {
-            "type": "boolean",
-            "nullable": true
-          },
-          "maxPoints": {
+          "correctAnswers": {
             "type": "integer",
-            "format": "int32",
+            "format": "int32"
+          },
+          "correctAnswersBinary": {
+            "type": "string",
             "nullable": true
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },

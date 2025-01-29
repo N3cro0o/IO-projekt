@@ -64,13 +64,8 @@ namespace IO.Server.Elements
 
         public int MaxPoints()
         {
-            int p = 0;
-            foreach (int i in Questions)
-            {
-                Question q = Environment.QuestionPool[i];
-                p += q.ReturnPoints();
-            }
-            return p;
+            
+            return 2137;
         }
 
         public void ChangeCategory(int cat)
@@ -83,19 +78,5 @@ namespace IO.Server.Elements
             return ID;
         }
 
-        public Answer AddAnswer(Question.QUESTION_TYPE type, string answ, int userID)
-        {
-            var answer = new Answer()
-            {
-                Course = this.Course,
-                User = userID,
-                UserAnswer = answ,
-                Test = ID,
-                Type = type
-            };
-
-            Answers.Add(answer);
-            return answer;
-        }
     }
 }

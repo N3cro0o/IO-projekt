@@ -1,5 +1,7 @@
-﻿using IO.Server.Elements;
+﻿using System.Diagnostics;
+using IO.Server.Elements;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Formatters;
 using Npgsql;
 
 namespace IO.Server.Controllers
@@ -15,51 +17,29 @@ namespace IO.Server.Controllers
             _connection = connection;
         }
 
-        // Wyświetlanie kursów
-        [HttpGet("CoursesList/{userId}")]
-        public ActionResult<IEnumerable<Course>> GetCourses(int userId)
-        {
-            List<Course> courses = new List<Course>();
 
+        [HttpPost("answer/add/test")]
+        public ActionResult AddAnswerToDB([FromBody] Answer answ)
+        {
             try
             {
+                int a = (answ.Key & 1 << 3) >> 3;
+                int b = (answ.Key & 1 << 2) >> 2;
+                int c = (answ.Key & 1 << 1) >> 1;
+                int d = (answ.Key & 1 << 0) >> 0;
                 _connection.Open();
-                Console.WriteLine("Połączenie z bazą danych otwarte.");
-
-                string query = $"SELECT courseid, name, category, description, ownerid FROM \"Course\" WHERE ownerid = {userId} ORDER BY courseid ASC";
-
-                using (var command = new NpgsqlCommand(query, _connection))
-                using (var reader = command.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        Console.WriteLine($"Wczytywanie kursu: ID={reader.GetInt32(0)}, Name={reader.GetString(1)}");
-
-                        var course = new Course(
-                            id: reader.GetInt32(0),          // courseid
-                            name: reader.GetString(1),       // name
-                            cat: reader.GetString(2),        // category
-                            teachers: new List<int>(),       // Wypełnij nauczycielami, jeśli wymagane
-                            students: new List<int>(),       // Wypełnij studentami, jeśli wymagane
-                            tests: new List<int>()           // Wypełnij testami, jeśli wymagane
-                        );
-                        courses.Add(course);
-                    }
-                }
-
-                Console.WriteLine($"Łączna liczba kursów: {courses.Count}");
-                return Ok(courses);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Błąd: {ex.Message}");
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
-            finally
-            {
+                string query = "INSERT INTO \"Answer\" (points, answer, a, b, c, d, questionid, testid) VALUES " +
+                    $"('{answ.Points.ToString(System.Globalization.CultureInfo.InvariantCulture)}','{answ.Text}','{a}','{b}','{c}','{d}','{answ.Question}','{answ.Test}')";
+                var com = new NpgsqlCommand(query, _connection);
+                com.ExecuteNonQuery();
                 _connection.Close();
-                Console.WriteLine("Połączenie z bazą danych zamknięte.");
             }
+            catch (Exception ex) 
+            {
+                Debug.Print(ex.ToString());
+                return BadRequest(ex.Message);
+            }
+            return Ok();
         }
 
         // Wyświetlanie Testów

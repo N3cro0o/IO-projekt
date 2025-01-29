@@ -2,11 +2,10 @@
 {
     public class Answer
     {
-        public Question.QUESTION_TYPE Type;
-        public string? UserAnswer;
-        public int Test;
-        public int Course;
-        public int User;
-        public int Points;
+        public string Text { get; set; }
+        public int Test { get; set; }
+        public int Question { get; set; }
+        public double Points { get; set; }
+        public int Key { get; set; }
     }
 }

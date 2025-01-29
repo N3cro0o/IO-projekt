@@ -4,6 +4,7 @@ import BasicModal from '../comps/ModalAddUsersToCourse.tsx';
 import ModalChangeUsers from '../comps/ModalKickUsersFromCourse.tsx';
 import ModalAddCourse from '../comps/ModalAddCourse.tsx';
 import { ButtonAppBar } from '../comps/AppBar.tsx';
+import { jwtDecode } from "jwt-decode";
 
 export const Course = () => {
     const [loading, setLoading] = useState<boolean>(true);
@@ -24,14 +25,15 @@ export const Course = () => {
 
     const transformCourseData = (apiData: any[]): Course[] => {
         return apiData.map((course) => ({
-            id: course.courseid,
-            name: course.courseName,
-            owner: course.ownerid,
-            ownerLogin: course.ownerLogin
+            id: course.id,
+            name: course.name,
+            owner: course.teachers[0],
+            ownerLogin: course.headTeacherName
         }));
     };
 
     useEffect(() => {
+
         const fetchCourses = async () => {
             try {
                 const userId = localStorage.getItem('userId');

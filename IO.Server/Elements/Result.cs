@@ -20,12 +20,6 @@ namespace IO.Server.Elements
             Answers = answs;
         }
 
-        public User ReturnUser()
-        {
-            int id = Answers[0].User;
-            return Environment.Users[id];
-        }
-
         public int ReturnTestID()
         {
             return TestID;

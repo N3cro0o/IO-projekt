@@ -7,6 +7,8 @@ namespace IO.Server.Elements
         public string? Name { get; set; }
 
         public int ID { get; set; }
+        [JsonInclude]
+        public string HeadTeacherName { get; set; } = "Lorem Ipsum nie keko";
 
         [JsonInclude]
         public List<int> Teachers { get; set; } = new List<int>();
@@ -31,6 +33,14 @@ namespace IO.Server.Elements
             Category = cat;
             Students = students;
             Tests = tests;
+        }
+
+        public Course(int id, string name, string cat, string teacherName)
+        {
+            ID = id;
+            Name = name;
+            Category = cat;
+            HeadTeacherName = teacherName;
         }
 
         public List<User> ShowTeachers()

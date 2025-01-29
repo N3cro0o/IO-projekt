@@ -11,9 +11,27 @@ import AssignmentIcon from '@mui/icons-material/Assignment';
 import HomeIcon from '@mui/icons-material/Home'; // Ikona dla ekranu g堯wnego
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
+import { jwtDecode } from "jwt-decode";
 
 
 const TemporaryDrawer = ({ open, toggleDrawer, token }) => {
+    let user_check = false;
+    let admin_check = false;
+
+    if (token) {
+        try {
+            const decoded = jwtDecode(token);
+            if (decoded.role == 'student' || decoded.role == 'uczen') {
+                user_check = true;
+            }
+            else if (decoded.role.toLowerCase() == 'admin') {
+                admin_check = true;
+            }
+        } catch (error) {
+            console.error('Piedolony lag muzgu:', error);
+        }
+    }
+
     const DrawerList = (
         <Box
             sx={{
@@ -33,15 +51,30 @@ const TemporaryDrawer = ({ open, toggleDrawer, token }) => {
                 </ListItemIcon>
                 <ListItemText primary="Home" sx={{ color: 'white' }} /> {/* Kolor tekstu - bia造 */}
             </ListItem>
-            <List>
-                {/* Link do Course Management */}
-                <ListItem button component={Link} to="/CourseManagment">
-                    <ListItemIcon sx={{ color: '#007bff' }}> {/* Kolor ikon - niebieski */}
-                        <DashboardIcon /> {/* Ikona dashboard */}
-                    </ListItemIcon>
-                    <ListItemText primary="Courses Management" sx={{ color: 'white' }} /> {/* Kolor tekstu - bia造 */}
-                </ListItem>
-            </List>
+            
+            {/* Your Courses link */}
+            {(user_check || admin_check) && (
+                <List>
+                    <ListItem button component={Link} to="/student/courses">
+                        <ListItemIcon sx={{ color: '#007bff' }}> {/* Kolor ikon - niebieski */}
+                            <DashboardIcon /> {/* Ikona dashboard */}
+                        </ListItemIcon>
+                        <ListItemText primary="Your courses" sx={{ color: 'white' }} /> {/* Kolor tekstu - bia造 */}
+                    </ListItem>
+                </List>
+            )}
+
+            {!user_check && (
+                <List>
+                    {/* Link do Course Management */}
+                    <ListItem button component={Link} to="/CourseManagment">
+                        <ListItemIcon sx={{ color: '#007bff' }}> {/* Kolor ikon - niebieski */}
+                            <DashboardIcon /> {/* Ikona dashboard */}
+                        </ListItemIcon>
+                        <ListItemText primary="Courses Management" sx={{ color: 'white' }} /> {/* Kolor tekstu - bia造 */}
+                    </ListItem>
+                </List>
+            )}
             <List>
                 {/* Link do User Panel */}
                 <ListItem button component={Link} to="/UserPanel">

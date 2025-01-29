@@ -13,6 +13,8 @@ import { Registration } from './pages/RegistrationPage';
 import SetTestTimePage from './pages/SetTestTimePage';
 import { UserProfilePage } from './pages/AccountManager';
 import EditTestPage from './pages/EditTestPage';
+import CourseUser from './pages/StudentCourses';
+import StartTest from './pages/TestTaker3000';
 
 function App() {
     const [token, setToken] = useState(-1);
@@ -30,6 +32,8 @@ function App() {
                     <Route path="/course/:courseId/test/:testId/set-time" element={<SetTestTimePage />} />
                     <Route path="/AccountManager" element={<UserProfilePage />} />
                     <Route path="/course/:courseId/test/:testId/edit" element={<EditTestPage />} />
+                    <Route path="/student/courses" element={<CourseUser />} />
+                    <Route path="/student/:testID/start" element={<StartTest />} />
 
                 </Routes>
             </HRouter>
