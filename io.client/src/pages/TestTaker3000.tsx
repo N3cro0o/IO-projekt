@@ -25,10 +25,9 @@ interface Question {
 
 interface Answer {
     key: number;
-    text: string;
+    userAnswer: string;
     question: number;
     points: number;
-    test: number;
 }
 
 const StartTest: React.FC = () => {
@@ -56,13 +55,41 @@ const StartTest: React.FC = () => {
 
     const createAnswer = async () => {
         const value = question?.type == "closed" ? (selectedValues[0] ? 8 : 0) + (selectedValues[1] ? 4 : 0) + (selectedValues[2] ? 2 : 0) + (selectedValues[3] ? 1 : 0) : 0;
-        console.log('Selected value sum: ', value);
-        console.log('Input answer: ', answerText);
+        const points = question?.type == "closed" ? value == question.key ? question.points : 0 : 0;
+        const answ: Answer = {
+            key: value,
+            userAnswer: answerText,
+            question: question.id,
+            points: points,
+        }
 
+        try {
+            const response = await fetch('https://localhost:7293/api/TestManager/answer/add/test', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    Text: answ.userAnswer,
+                    Test: parseInt(testID),
+                    Question: answ.question,
+                    Points: answ.points,
+                    Key: answ.key,
+                }),
+            });
+            if (response.ok) {
+                console.log('Answer git!');
+            }
+        }
+        catch (err) {
+            console.log(err);
+        }
     }
 
     const advanceQuestion = () => {
-        createAnswer();
+        if (question != undefined) {
+            createAnswer();
+        }
         setIndex(index + 1);
         console.log('Curr index:' + index);
         if (index >= questions.length) {

@@ -766,6 +766,38 @@
         }
       }
     },
+    "/api/TestManager/answer/add/test": {
+      "post": {
+        "tags": [
+          "TestManager"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Answer"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Answer"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Answer"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/TestManager/TestsList/{courseId}/tests": {
       "get": {
         "tags": [
@@ -970,6 +1002,30 @@
               "type": "integer",
               "format": "int32"
             }
+          }
+        }
+      },
+      "Answer": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "test": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "question": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "points": {
+            "type": "number",
+            "format": "double"
+          },
+          "key": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },

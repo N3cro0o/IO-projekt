@@ -78,19 +78,5 @@ namespace IO.Server.Elements
             return ID;
         }
 
-        public Answer AddAnswer(Question.QUESTION_TYPE type, string answ, int userID)
-        {
-            var answer = new Answer()
-            {
-                Course = this.Course,
-                User = userID,
-                UserAnswer = answ,
-                Test = ID,
-                Type = type
-            };
-
-            Answers.Add(answer);
-            return answer;
-        }
     }
 }

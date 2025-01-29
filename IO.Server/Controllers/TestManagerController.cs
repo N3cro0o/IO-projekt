@@ -1,5 +1,7 @@
-﻿using IO.Server.Elements;
+﻿using System.Diagnostics;
+using IO.Server.Elements;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Formatters;
 using Npgsql;
 
 namespace IO.Server.Controllers
@@ -13,6 +15,31 @@ namespace IO.Server.Controllers
         public TestManagerController(NpgsqlConnection connection)
         {
             _connection = connection;
+        }
+
+
+        [HttpPost("answer/add/test")]
+        public ActionResult AddAnswerToDB([FromBody] Answer answ)
+        {
+            try
+            {
+                int a = (answ.Key & 1 << 3) >> 3;
+                int b = (answ.Key & 1 << 2) >> 2;
+                int c = (answ.Key & 1 << 1) >> 1;
+                int d = (answ.Key & 1 << 0) >> 0;
+                _connection.Open();
+                string query = "INSERT INTO \"Answer\" (points, answer, a, b, c, d, questionid, testid) VALUES " +
+                    $"('{answ.Points.ToString(System.Globalization.CultureInfo.InvariantCulture)}','{answ.Text}','{a}','{b}','{c}','{d}','{answ.Question}','{answ.Test}')";
+                var com = new NpgsqlCommand(query, _connection);
+                com.ExecuteNonQuery();
+                _connection.Close();
+            }
+            catch (Exception ex) 
+            {
+                Debug.Print(ex.ToString());
+                return BadRequest(ex.Message);
+            }
+            return Ok();
         }
 
         // Wyświetlanie Testów

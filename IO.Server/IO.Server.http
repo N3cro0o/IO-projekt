@@ -5,11 +5,14 @@ Accept: application/json
 
 ###
 
-POST {{IO.Server_HostAddress}}/api/login/loginRequest
+POST {{IO.Server_HostAddress}}/api/TestManager/answer/add/test
 Content-Type: application/json
 {
-    "Username": "Admin",
-    "Password": "*******"
+    "text": "Admin",
+    "test": "1",
+    "question": "2",
+    "points": "2.3",
+    "key": "4"
 }
 ###
 GET {{IO.Server_HostAddress}}/api/main/getEnvCourses
