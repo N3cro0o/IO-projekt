@@ -175,6 +175,50 @@ namespace IO.Server.Controllers
                 _connection.Close();
             }
         }
+        //Pobieranie dat testu
+        [HttpGet("GetTestTime/{testId}")]
+        public ActionResult<TestTimeUpdateRequest> GetTestTime(int testId)
+        {
+            try
+            {
+                _connection.Open();
+
+                const string query = @"
+        SELECT starttime, endtime
+        FROM ""Test""
+        WHERE testid = @TestId";
+
+                using (var command = new NpgsqlCommand(query, _connection))
+                {
+                    command.Parameters.AddWithValue("@TestId", testId);
+
+                    using (var reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            var testTime = new TestTimeUpdateRequest
+                            {
+                                StartTime = reader.GetDateTime(0),
+                                EndTime = reader.GetDateTime(1)
+                            };
+                            return Ok(testTime);
+                        }
+                    }
+                }
+
+                return NotFound($"No test found with ID {testId}.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error while fetching test time: {ex.Message}");
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+            finally
+            {
+                _connection.Close();
+            }
+        }
+
 
         // Usuwanie Testów
         [HttpDelete("DeleteTest/{testId}")]

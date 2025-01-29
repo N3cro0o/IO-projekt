@@ -5,6 +5,70 @@
     "version": "1.0.0"
   },
   "paths": {
+    "/api/DeleteQuestion/DeleteQuestionByName/{questionName}": {
+      "delete": {
+        "tags": [
+          "DeleteQuestion"
+        ],
+        "parameters": [
+          {
+            "name": "questionName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/EditQuestion/EditQuestionByName/{name}": {
+      "put": {
+        "tags": [
+          "EditQuestion"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuestionUpdateRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuestionUpdateRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuestionUpdateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/Account/showData/{userId}": {
       "get": {
         "tags": [
@@ -131,10 +195,10 @@
         }
       }
     },
-    "/api/AddQuestion/{testId}": {
+    "/api/Question/{testId}": {
       "post": {
         "tags": [
-          "AddQuestion"
+          "Question"
         ],
         "parameters": [
           {
@@ -167,6 +231,27 @@
           },
           "required": true
         },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Question"
+        ],
+        "parameters": [
+          {
+            "name": "testId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK"
@@ -449,81 +534,6 @@
         }
       }
     },
-    "/api/DeleteQuestion/{testId}/{questionId}": {
-      "delete": {
-        "tags": [
-          "DeleteQuestion"
-        ],
-        "parameters": [
-          {
-            "name": "testId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          },
-          {
-            "name": "questionId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/EditQuestion/{questionId}": {
-      "put": {
-        "tags": [
-          "EditQuestion"
-        ],
-        "parameters": [
-          {
-            "name": "questionId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Question"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Question"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/Question"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
     "/api/Login/login": {
       "post": {
         "tags": [
@@ -664,6 +674,47 @@
         }
       }
     },
+    "/api/ShareQuestion/UpdateSharedStatus": {
+      "put": {
+        "tags": [
+          "ShareQuestion"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/SharedUpdateRequest"
+                }
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/SharedUpdateRequest"
+                }
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/SharedUpdateRequest"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/TestManager/CoursesList/{userId}": {
       "get": {
         "tags": [
@@ -790,6 +841,46 @@
         "responses": {
           "200": {
             "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/TestManager/GetTestTime/{testId}": {
+      "get": {
+        "tags": [
+          "TestManager"
+        ],
+        "parameters": [
+          {
+            "name": "testId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestTimeUpdateRequest"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestTimeUpdateRequest"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestTimeUpdateRequest"
+                }
+              }
+            }
           }
         }
       }
@@ -1071,6 +1162,86 @@
           },
           "shared": {
             "type": "boolean"
+          },
+          "answer": {
+            "type": "string"
+          },
+          "a": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "b": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "c": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "d": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "maxPoints": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        }
+      },
+      "QuestionUpdateRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string"
+          },
+          "questionType": {
+            "type": "string"
+          },
+          "shared": {
+            "type": "boolean"
+          },
+          "maxPoints": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "answer": {
+            "type": "string",
+            "nullable": true
+          },
+          "a": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "b": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "c": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "d": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "question": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "SharedUpdateRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "shared": {
+            "type": "boolean"
           }
         }
       },
@@ -1213,19 +1384,19 @@
   },
   "tags": [
     {
-      "name": "Account"
-    },
-    {
-      "name": "AddQuestion"
-    },
-    {
-      "name": "CoursesManager"
-    },
-    {
       "name": "DeleteQuestion"
     },
     {
       "name": "EditQuestion"
+    },
+    {
+      "name": "Account"
+    },
+    {
+      "name": "Question"
+    },
+    {
+      "name": "CoursesManager"
     },
     {
       "name": "Login"
@@ -1235,6 +1406,9 @@
     },
     {
       "name": "Registration"
+    },
+    {
+      "name": "ShareQuestion"
     },
     {
       "name": "TestManager"

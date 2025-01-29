@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using IO.Server.Elements;
+using Microsoft.AspNetCore.Mvc;
 using Npgsql;
 using System;
 using System.Collections.Generic;
@@ -16,29 +17,40 @@ namespace IO.Server.Controllers
             _connection = connection;
         }
 
-        [HttpPost]
-        public IActionResult ShareQuestions([FromBody] ShareRequest request)
+        [HttpPut("UpdateSharedStatus")]
+        public IActionResult UpdateSharedStatus([FromBody] List<SharedUpdateRequest> updates)
         {
-            if (request == null || request.QuestionIds == null || request.QuestionIds.Count == 0)
+            if (updates == null || updates.Count == 0)
             {
-                return BadRequest("Invalid request data.");
+                return BadRequest("No updates provided.");
             }
 
             try
             {
                 _connection.Open();
 
-                foreach (var questionId in request.QuestionIds)
+                foreach (var update in updates)
                 {
-                    string updateQuery = "UPDATE \"Question\" SET shared = TRUE WHERE questionid = @questionId";
+                    string updateQuery = @"
+                        UPDATE ""Question""
+                        SET shared = @shared
+                        WHERE name = @name;
+                    ";
+
                     using (var command = new NpgsqlCommand(updateQuery, _connection))
                     {
-                        command.Parameters.AddWithValue("questionId", questionId);
-                        command.ExecuteNonQuery();
+                        command.Parameters.AddWithValue("@shared", update.Shared);
+                        command.Parameters.AddWithValue("@name", update.Name);
+
+                        int rowsAffected = command.ExecuteNonQuery();
+                        if (rowsAffected == 0)
+                        {
+                            return NotFound($"No question found with name '{update.Name}'.");
+                        }
                     }
                 }
 
-                return Ok(new { Message = "Questions shared successfully." });
+                return Ok(new { Message = "Shared status updated successfully for selected questions." });
             }
             catch (Exception ex)
             {
@@ -50,9 +62,10 @@ namespace IO.Server.Controllers
             }
         }
 
-        public class ShareRequest
+        public class SharedUpdateRequest
         {
-            public List<int> QuestionIds { get; set; }
+            public string Name { get; set; }
+            public bool Shared { get; set; }
         }
     }
 }

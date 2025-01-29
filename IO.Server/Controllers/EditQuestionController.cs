@@ -1,84 +1,101 @@
-﻿using IO.Server.Elements;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Npgsql;
 using System;
+using System.Threading.Tasks;
 
-namespace IO.Server.Controllers
+[Route("api/EditQuestion")]
+[ApiController]
+public class EditQuestionController : ControllerBase
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class EditQuestionController : ControllerBase
+    private readonly NpgsqlConnection _connection;
+
+    public EditQuestionController(NpgsqlConnection connection)
     {
-        private readonly NpgsqlConnection _connection;
+        _connection = connection;
+    }
 
-        public EditQuestionController(NpgsqlConnection connection)
+    [HttpPut("EditQuestionByName/{name}")]
+    public async Task<IActionResult> EditQuestionByName(string name, [FromBody] QuestionUpdateRequest request)
+    {
+        if (request == null || string.IsNullOrWhiteSpace(name))
         {
-            _connection = connection;
+            return BadRequest(new { message = "Invalid data provided." });
         }
 
-        [HttpPut("{questionId}")]
-        public IActionResult EditQuestion(int questionId, [FromBody] Question updatedQuestion)
+        // Valid question types
+        var validQuestionTypes = new[] { "open", "closed", "multiple" };
+
+        if (!validQuestionTypes.Contains(request.QuestionType))
         {
-            try
-            {
-                _connection.Open();
-
-                // Sprawdzamy, czy pytanie istnieje
-                string checkQuery = @"SELECT COUNT(*) FROM ""Question"" WHERE questionid = @questionId";
-                using (var checkCommand = new NpgsqlCommand(checkQuery, _connection))
-                {
-                    checkCommand.Parameters.AddWithValue("@questionId", questionId);
-                    int count = Convert.ToInt32(checkCommand.ExecuteScalar());
-
-                    if (count == 0)
-                    {
-                        return NotFound("Question not found.");
-                    }
-                }
-
-                // Aktualizacja danych pytania
-                string updateQuery = @"
-                    UPDATE ""Question"" 
-                    SET name = @name, 
-                        category = @category, 
-                        questiontype = @questionType::qtype, 
-                        shared = @shared 
-                    WHERE questionid = @questionId";
-
-                using (var updateCommand = new NpgsqlCommand(updateQuery, _connection))
-                {
-                    updateCommand.Parameters.AddWithValue("@name", updatedQuestion.Name);
-                    updateCommand.Parameters.AddWithValue("@category", updatedQuestion.Category);
-                    updateCommand.Parameters.AddWithValue("@questionType", updatedQuestion.QuestionType);
-                    updateCommand.Parameters.AddWithValue("@shared", updatedQuestion.Shared);
-                    updateCommand.Parameters.AddWithValue("@questionId", questionId);
-
-                    int rowsAffected = updateCommand.ExecuteNonQuery();
-                    if (rowsAffected == 0)
-                    {
-                        return NotFound("Failed to update question.");
-                    }
-                }
-
-                return Ok(new { QuestionId = questionId, Message = "Question updated successfully." });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
-            finally
-            {
-                _connection.Close();
-            }
+            return BadRequest(new { message = $"Invalid question type. Allowed types: {string.Join(", ", validQuestionTypes)}" });
         }
 
-        // Klasa modelu pytania
-        public class Question
+        try
         {
-            public string Name { get; set; }
-            public string Category { get; set; }
-            public string QuestionType { get; set; }
-            public bool Shared { get; set; }
+            await _connection.OpenAsync();
+
+            const string query = @"
+            UPDATE ""Question""
+            SET
+                category = @Category,
+                questiontype = @QuestionType::qtype,
+                shared = @Shared,
+                maxpoints = @MaxPoints,
+                answer = @Answer,
+                a = @A,
+                b = @B,
+                c = @C,
+                d = @D,
+                question = @Question
+            WHERE name = @Name";
+
+            using (var command = new NpgsqlCommand(query, _connection))
+            {
+                command.Parameters.AddWithValue("@Name", name);
+                command.Parameters.AddWithValue("@Category", request.Category);
+                command.Parameters.AddWithValue("@QuestionType", request.QuestionType);
+                command.Parameters.AddWithValue("@Shared", request.Shared);
+                command.Parameters.AddWithValue("@MaxPoints", request.MaxPoints);
+                command.Parameters.AddWithValue("@Answer", (object?)request.Answer ?? DBNull.Value);
+                command.Parameters.AddWithValue("@A", (object?)request.A ?? DBNull.Value);
+                command.Parameters.AddWithValue("@B", (object?)request.B ?? DBNull.Value);
+                command.Parameters.AddWithValue("@C", (object?)request.C ?? DBNull.Value);
+                command.Parameters.AddWithValue("@D", (object?)request.D ?? DBNull.Value);
+                command.Parameters.AddWithValue("@Question", (object?)request.Question ?? DBNull.Value);
+
+                int rowsAffected = await command.ExecuteNonQueryAsync();
+
+                if (rowsAffected == 0)
+                {
+                    return NotFound(new { message = "Question not found." });
+                }
+            }
+
+            return Ok(new { message = "Question updated successfully." });
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error updating question: {ex.Message}");
+            return StatusCode(500, new { message = "An error occurred while updating the question.", details = ex.Message });
+        }
+        finally
+        {
+            await _connection.CloseAsync();
         }
     }
+}
+
+public class QuestionUpdateRequest
+{
+    public string Name { get; set; }
+    public string Category { get; set; }
+    public string QuestionType { get; set; }
+    public bool Shared { get; set; }
+    public int MaxPoints { get; set; }
+    public string? Answer { get; set; }
+    public bool? A { get; set; }
+    public bool? B { get; set; }
+    public bool? C { get; set; }
+    public bool? D { get; set; }
+    public string? Question { get; set; }
 }

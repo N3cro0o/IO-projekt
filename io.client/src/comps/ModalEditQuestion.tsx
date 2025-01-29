@@ -1,127 +1,137 @@
-import React, { useState, useEffect } from 'react';
-import { Box, Typography, Modal, TextField, Button } from '@mui/material';
+import React, { useState } from 'react';
+import {
+    Modal,
+    Box,
+    Typography,
+    TextField,
+    Button,
+    FormControlLabel,
+    Checkbox,
+    Grid
+} from '@mui/material';
 
-const modalStyle = {
-    position: 'absolute' as 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: 400,
-    bgcolor: '#333',
-    color: 'white',
-    borderRadius: '16px',
-    boxShadow: 24,
-    p: 4,
-};
+interface Question {
+    id: number;
+    name: string;
+    category: string;
+    questionType: string;
+    shared: boolean;
+    maxPoints: number;
+    answerId: number | null;
+    answerA?: string;
+    answerB?: string;
+    answerC?: string;
+    answerD?: string;
+    correctAnswer?: string;
+}
 
 interface EditQuestionModalProps {
     open: boolean;
-    handleClose: () => void;
-    question: {
-        id: number;
-        name: string;
-        category: string;
-        questionType: string;
-        shared: boolean;
-    };
-    onSave: (updatedQuestion: any) => void;
+    question: Question;
+    onClose: () => void;
+    onQuestionUpdated: () => void;
 }
 
 const EditQuestionModal: React.FC<EditQuestionModalProps> = ({
     open,
-    handleClose,
     question,
-    onSave,
+    onClose,
+    onQuestionUpdated,
 }) => {
-    const [editedQuestion, setEditedQuestion] = useState(question);
-    const [saving, setSaving] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+    const [name, setName] = useState(question.name);
+    const [category, setCategory] = useState(question.category);
+    const [questionType, setQuestionType] = useState(question.questionType);
+    const [shared, setShared] = useState(question.shared);
+    const [maxPoints, setMaxPoints] = useState(question.maxPoints);
 
-    useEffect(() => {
-        setEditedQuestion(question);
-    }, [question]);
+    // Jeœli pytanie zamkniête, edytujemy odpowiedzi
+    const [answerA, setAnswerA] = useState(question.answerA || "");
+    const [answerB, setAnswerB] = useState(question.answerB || "");
+    const [answerC, setAnswerC] = useState(question.answerC || "");
+    const [answerD, setAnswerD] = useState(question.answerD || "");
+    const [correctAnswer, setCorrectAnswer] = useState(question.correctAnswer || "");
 
-    const handleSave = async () => {
-        setSaving(true);
-        setError(null);
+    const handleSubmit = async () => {
+        const validQuestionTypes = ['open', 'closed', 'multiple']; // Dopasuj do wartoœci w bazie
+        if (!validQuestionTypes.includes(questionType)) {
+            alert(`Invalid question type: ${questionType}`);
+            return;
+        }
+
+        const updatedQuestion = {
+            name,
+            category,
+            questionType,
+            shared,
+            maxPoints,
+            ...(questionType === 'closed' && { answerA, answerB, answerC, answerD, correctAnswer }),
+        };
 
         try {
-            const response = await fetch(`/api/EditQuestion/${question.id}`, {
+            const response = await fetch(`/api/EditQuestion/EditQuestionByName/${encodeURIComponent(name)}`, {
                 method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(editedQuestion),
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updatedQuestion),
             });
 
             if (!response.ok) {
-                throw new Error(`Failed to update question: ${response.statusText}`);
+                const errorMessage = await response.text();
+                throw new Error(errorMessage);
             }
 
-            const updatedData = await response.json();
-            onSave(updatedData); // Aktualizujemy dane w stanie g³ównej strony
-            handleClose();
+            onQuestionUpdated();
+            onClose();
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Unknown error');
-        } finally {
-            setSaving(false);
+            console.error('Error updating question:', err);
+            alert(`Error updating question: ${err.message}`);
         }
     };
 
+
+
+
+
     return (
-        <Modal
-            open={open}
-            onClose={handleClose}
-            aria-labelledby="modal-edit-question"
-            aria-describedby="modal-edit-question-description"
-        >
-            <Box sx={modalStyle}>
+        <Modal open={open} onClose={onClose}>
+            <Box
+                sx={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    width: 400,
+                    bgcolor: 'background.paper',
+                    borderRadius: 2,
+                    boxShadow: 24,
+                    p: 4,
+                }}
+            >
                 <Typography variant="h6" mb={2}>
-                    Edit Question {question.id}
+                    Edit Question
                 </Typography>
-                {error && <Typography color="error">{error}</Typography>}
-                <TextField
-                    fullWidth
-                    label="Question Content"
-                    variant="outlined"
-                    value={editedQuestion.name}
-                    onChange={(e) =>
-                        setEditedQuestion({ ...editedQuestion, name: e.target.value })
-                    }
-                    sx={{ mb: 2 }}
-                />
-                <TextField
-                    fullWidth
-                    label="Category"
-                    variant="outlined"
-                    value={editedQuestion.category}
-                    onChange={(e) =>
-                        setEditedQuestion({ ...editedQuestion, category: e.target.value })
-                    }
-                    sx={{ mb: 2 }}
-                />
-                <TextField
-                    fullWidth
-                    label="Question Type"
-                    variant="outlined"
-                    value={editedQuestion.questionType}
-                    onChange={(e) =>
-                        setEditedQuestion({ ...editedQuestion, questionType: e.target.value })
-                    }
-                    sx={{ mb: 2 }}
-                />
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-                    <Button variant="outlined" color="error" onClick={handleClose}>
-                        Cancel
-                    </Button>
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={handleSave}
-                        disabled={saving}
-                    >
-                        {saving ? 'Saving...' : 'Save Changes'}
-                    </Button>
+                <TextField label="Name" value={name} onChange={(e) => setName(e.target.value)} fullWidth margin="normal" />
+                <TextField label="Category" value={category} onChange={(e) => setCategory(e.target.value)} fullWidth margin="normal" />
+                <TextField label="Question Type" value={questionType} onChange={(e) => setQuestionType(e.target.value)} fullWidth margin="normal" />
+                <TextField label="Max Points" type="number" value={maxPoints} onChange={(e) => setMaxPoints(Number(e.target.value))} fullWidth margin="normal" />
+                <FormControlLabel control={<Checkbox checked={shared} onChange={(e) => setShared(e.target.checked)} />} label="Shared" />
+
+                {/* Sekcja odpowiedzi tylko dla pytañ zamkniêtych */}
+                {questionType === "closed" && (
+                    <Box mt={2}>
+                        <Typography variant="subtitle1">Answers</Typography>
+                        <Grid container spacing={1}>
+                            <Grid item xs={6}><TextField label="Answer A" value={answerA} onChange={(e) => setAnswerA(e.target.value)} fullWidth /></Grid>
+                            <Grid item xs={6}><TextField label="Answer B" value={answerB} onChange={(e) => setAnswerB(e.target.value)} fullWidth /></Grid>
+                            <Grid item xs={6}><TextField label="Answer C" value={answerC} onChange={(e) => setAnswerC(e.target.value)} fullWidth /></Grid>
+                            <Grid item xs={6}><TextField label="Answer D" value={answerD} onChange={(e) => setAnswerD(e.target.value)} fullWidth /></Grid>
+                        </Grid>
+                        <TextField label="Correct Answer (A, B, C, D)" value={correctAnswer} onChange={(e) => setCorrectAnswer(e.target.value.toUpperCase())} fullWidth margin="normal" />
+                    </Box>
+                )}
+
+                <Box mt={2} display="flex" justifyContent="flex-end" gap={2}>
+                    <Button variant="outlined" onClick={onClose}>Cancel</Button>
+                    <Button variant="contained" color="primary" onClick={handleSubmit}>Save</Button>
                 </Box>
             </Box>
         </Modal>

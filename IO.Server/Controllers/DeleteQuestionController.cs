@@ -1,60 +1,58 @@
-﻿using IO.Server.Elements;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Npgsql;
+using System;
 
-namespace IO.Server.Controllers
+[Route("api/DeleteQuestion")]
+[ApiController]
+public class DeleteQuestionController : ControllerBase
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class DeleteQuestionController : ControllerBase
+    private readonly NpgsqlConnection _connection;
+
+    // Konstruktor przyjmujący połączenie do bazy danych
+    public DeleteQuestionController(NpgsqlConnection connection)
     {
-        private readonly NpgsqlConnection _connection;
+        _connection = connection;
+    }
 
-        public DeleteQuestionController(NpgsqlConnection connection)
+    // Metoda do usuwania pytania po jego nazwie
+    [HttpDelete("DeleteQuestionByName/{questionName}")]
+    public ActionResult DeleteQuestionByName(string questionName)
+    {
+        try
         {
-            _connection = connection;
+            // Otwieranie połączenia z bazą danych
+            _connection.Open();
+
+            const string query = @"DELETE FROM ""Question"" WHERE name = @QuestionName";
+
+            // Przygotowanie i wykonanie zapytania SQL
+            using (var command = new NpgsqlCommand(query, _connection))
+            {
+                command.Parameters.AddWithValue("@QuestionName", questionName);
+
+                int rowsAffected = command.ExecuteNonQuery();
+
+                // Jeśli brak wierszy do usunięcia, zwróć 404
+                if (rowsAffected == 0)
+                {
+                    return NotFound(new { message = $"No question found with name '{questionName}'." });
+                }
+            }
+
+            // Logowanie i zwrócenie odpowiedzi sukcesu
+            Console.WriteLine($"Question with name '{questionName}' was successfully deleted.");
+            return Ok(new { message = $"Question with name '{questionName}' has been deleted." });
         }
-
-        [HttpDelete("{testId}/{questionId}")]
-        public IActionResult DeleteQuestionFromTest(int testId, int questionId)
+        catch (Exception ex)
         {
-            try
-            {
-                _connection.Open();
-
-                // 1. Usunięcie powiązania pytania z testem w tabeli QuestionToTest
-                string deleteQuestionFromTestQuery = @"
-                DELETE FROM ""QuestionToTest"" 
-                WHERE testid = @testId AND questionid = @questionId";
-
-                using (var command = new NpgsqlCommand(deleteQuestionFromTestQuery, _connection))
-                {
-                    command.Parameters.AddWithValue("@testId", testId);
-                    command.Parameters.AddWithValue("@questionId", questionId);
-                    command.ExecuteNonQuery();
-                }
-
-                // 2. Usunięcie pytania z tabeli Question
-                string deleteQuestionQuery = @"
-                DELETE FROM ""Question"" 
-                WHERE questionid = @questionId";
-
-                using (var command = new NpgsqlCommand(deleteQuestionQuery, _connection))
-                {
-                    command.Parameters.AddWithValue("@questionId", questionId);
-                    command.ExecuteNonQuery();
-                }
-
-                return Ok(new { Message = "Question deleted successfully." });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
-            finally
-            {
-                _connection.Close();
-            }
+            // Obsługa błędów
+            Console.WriteLine($"Error while deleting question: {ex.Message}");
+            return StatusCode(500, new { message = "Internal server error.", details = ex.Message });
+        }
+        finally
+        {
+            // Zamknięcie połączenia
+            _connection.Close();
         }
     }
 }

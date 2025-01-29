@@ -14,30 +14,27 @@ import {
 } from '@mui/material';
 
 interface NewQuestion {
-    questionId: number;
     name: string;
     category: string;
-    question: string;
-    questionType: string; // "open" or "close"
-    a: { text: string, correct: boolean };
-    b: { text: string, correct: boolean };
-    c: { text: string, correct: boolean };
-    d: { text: string, correct: boolean };
+    questionType: string; // "open" or "closed"
+    answer?: string; // Dla pytania otwartego
+    options: { [key: string]: string }; // Treœæ odpowiedzi A, B, C, D
+    correctAnswers: { [key: string]: boolean }; // Odpowiedzi poprawne
     shared: boolean;
+    maxPoints?: number;
 }
 
 const AddQuestionModal: React.FC<{ testId: string; onClose: () => void; onQuestionAdded: () => void; }> = ({ testId, onClose, onQuestionAdded }) => {
     const [formData, setFormData] = useState<NewQuestion>({
-        questionId: 0,
         name: '',
         category: '',
-        question: '',
         questionType: 'open',
-        a: { text: '', correct: false },
-        b: { text: '', correct: false },
-        c: { text: '', correct: false },
-        d: { text: '', correct: false },
+        question: '',
+        answer: '',
+        options: { a: '', b: '', c: '', d: '' },
+        correctAnswers: { a: false, b: false, c: false, d: false },
         shared: false,
+        maxPoints: undefined,
     });
 
     const [loading, setLoading] = useState(false);
@@ -47,27 +44,43 @@ const AddQuestionModal: React.FC<{ testId: string; onClose: () => void; onQuesti
         setFormData({ ...formData, [field]: value });
     };
 
-    const handleAnswerChange = (option: 'a' | 'b' | 'c' | 'd', key: 'text' | 'correct', value: any) => {
-        setFormData({
-            ...formData,
-            [option]: { ...formData[option], [key]: value }
-        });
+    const handleOptionChange = (option: 'a' | 'b' | 'c' | 'd', value: string) => {
+        setFormData((prev) => ({
+            ...prev,
+            options: { ...prev.options, [option]: value }
+        }));
+    };
+
+    const handleCorrectAnswerChange = (option: 'a' | 'b' | 'c' | 'd', checked: boolean) => {
+        setFormData((prev) => ({
+            ...prev,
+            correctAnswers: { ...prev.correctAnswers, [option]: checked }
+        }));
     };
 
     const handleSubmit = async () => {
-        if (!formData.name || !formData.category || !formData.question || !formData.questionType) {
-            setError("Please fill in all fields correctly.");
+        if (!formData.name || !formData.category || !formData.questionType) {
+            setError("Please fill in all required fields.");
             return;
         }
+
+        const payload = {
+            ...formData,
+            question: formData.question,
+            a: formData.correctAnswers.a,
+            b: formData.correctAnswers.b,
+            c: formData.correctAnswers.c,
+            d: formData.correctAnswers.d,
+        };
 
         setLoading(true);
         setError('');
 
         try {
-            const response = await fetch(`/api/addquestion/${testId}`, {
+            const response = await fetch(`/api/question/${testId}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData),
+                body: JSON.stringify(payload),
             });
 
             if (!response.ok) {
@@ -85,6 +98,7 @@ const AddQuestionModal: React.FC<{ testId: string; onClose: () => void; onQuesti
         }
     };
 
+
     return (
         <Modal open onClose={onClose}>
             <Box
@@ -92,7 +106,7 @@ const AddQuestionModal: React.FC<{ testId: string; onClose: () => void; onQuesti
                     backgroundColor: '#2c2c2c',
                     padding: '32px',
                     margin: 'auto',
-                    width: '450px',
+                    width: '500px',
                     borderRadius: '16px',
                     maxHeight: '90vh',
                     overflowY: 'auto',
@@ -108,8 +122,6 @@ const AddQuestionModal: React.FC<{ testId: string; onClose: () => void; onQuesti
                     fullWidth
                     margin="normal"
                     variant="filled"
-                    InputLabelProps={{ style: { color: '#bbb' } }}
-                    InputProps={{ style: { color: '#fff', backgroundColor: '#3c3c3c', borderRadius: '8px' } }}
                     onChange={(e) => handleChange('name', e.target.value)}
                     value={formData.name}
                     sx={{ mb: 2 }}
@@ -119,23 +131,8 @@ const AddQuestionModal: React.FC<{ testId: string; onClose: () => void; onQuesti
                     fullWidth
                     margin="normal"
                     variant="filled"
-                    InputLabelProps={{ style: { color: '#bbb' } }}
-                    InputProps={{ style: { color: '#fff', backgroundColor: '#3c3c3c', borderRadius: '8px' } }}
                     onChange={(e) => handleChange('category', e.target.value)}
                     value={formData.category}
-                    sx={{ mb: 2 }}
-                />
-                <TextField
-                    label="Question Content"
-                    fullWidth
-                    margin="normal"
-                    variant="filled"
-                    multiline
-                    rows={3}
-                    InputLabelProps={{ style: { color: '#bbb' } }}
-                    InputProps={{ style: { color: '#fff', backgroundColor: '#3c3c3c', borderRadius: '8px' } }}
-                    onChange={(e) => handleChange('question', e.target.value)}
-                    value={formData.question}
                     sx={{ mb: 2 }}
                 />
                 <TextField
@@ -144,80 +141,82 @@ const AddQuestionModal: React.FC<{ testId: string; onClose: () => void; onQuesti
                     label="Question Type"
                     variant="outlined"
                     value={formData.questionType}
-                    InputLabelProps={{ style: { color: '#bbb' } }}
-                    InputProps={{ style: { color: '#fff', backgroundColor: '#3c3c3c', borderRadius: '8px' } }}
                     onChange={(e) => handleChange('questionType', e.target.value)}
-                    sx={{
-                        '& .MuiSelect-select': { backgroundColor: '#333' }, // Styl samego pola rozwijanego
-                    }}
-                    SelectProps={{
-                        MenuProps: {
-                            PaperProps: {
-                                sx: {
-                                    bgcolor: '#333', // T³o menu
-                                    color: 'white',  // Kolor tekstu w menu
-                                    '& .MuiMenuItem-root': {
-                                        '&:hover': {
-                                            bgcolor: '#555', // Kolor t³a przy najechaniu
-                                        },
-                                    },
-                                },
-                            },
-                        },
-                    }}
+                    sx={{ mb: 2 }}
                 >
                     <MenuItem value="open">Open</MenuItem>
-                    <MenuItem value="close">Close</MenuItem>
+                    <MenuItem value="closed">Closed</MenuItem>
                 </TextField>
 
-                {formData.questionType === 'close' && (
+                {formData.questionType === 'open' ? (
+                    <TextField
+                        label="Answer"
+                        fullWidth
+                        margin="normal"
+                        variant="filled"
+                        onChange={(e) => handleChange('answer', e.target.value)}
+                        value={formData.answer || ''}
+                        sx={{ mb: 2 }}
+                    />
+                ) : (
                     <FormGroup sx={{ mb: 2 }}>
                         <Typography variant="subtitle1" mb={1}>Possible Answers</Typography>
                         {(['a', 'b', 'c', 'd'] as const).map(option => (
-                            <Box key={option} display="flex" alignItems="center" sx={{ mb: 1 }}>
-                                <TextField
-                                    label={`Answer ${option.toUpperCase()}`}
-                                    fullWidth
-                                    margin="normal"
-                                    variant="filled"
-                                    InputLabelProps={{ style: { color: '#bbb' } }}
-                                    InputProps={{ style: { color: '#fff', backgroundColor: '#3c3c3c', borderRadius: '8px' } }}
-                                    value={formData[option].text}
-                                    onChange={(e) => handleAnswerChange(option, 'text', e.target.value)}
-                                    sx={{ mr: 2 }}
-                                />
+                            <Box key={option} display="flex" alignItems="center">
                                 <Checkbox
-                                    checked={formData[option].correct}
-                                    onChange={(e) => handleAnswerChange(option, 'correct', e.target.checked)}
-                                    sx={{
-                                        color: '#00bcd4',
-                                        '&.Mui-checked': { color: '#00bcd4' },
-                                    }}
+                                    checked={formData.correctAnswers[option]}
+                                    onChange={(e) => handleCorrectAnswerChange(option, e.target.checked)}
+                                />
+                                <TextField
+                                    label={`Option ${option.toUpperCase()}`}
+                                    fullWidth
+                                    variant="filled"
+                                    onChange={(e) => handleOptionChange(option, e.target.value)}
+                                    value={formData.options[option]}
+                                    sx={{ mb: 2 }}
                                 />
                             </Box>
                         ))}
                     </FormGroup>
                 )}
 
+                <TextField
+                    label="Max Points"
+                    type="number"
+                    fullWidth
+                    margin="normal"
+                    variant="filled"
+                    onChange={(e) => handleChange('maxPoints', Number(e.target.value))}
+                    value={formData.maxPoints || ''}
+                    sx={{ mb: 2 }}
+                />
+
                 <FormControlLabel
                     control={
                         <Switch
                             checked={formData.shared}
                             onChange={(e) => handleChange('shared', e.target.checked)}
-                            sx={{
-                                '.MuiSwitch-track': { backgroundColor: '#555' },
-                                '.MuiSwitch-thumb': { backgroundColor: '#00bcd4' },
-                            }}
                         />
                     }
                     label="Shared"
-                    sx={{ mb: 2, color: '#fff' }}
+                    sx={{ mb: 2 }}
                 />
 
                 {error && <Typography color="error" sx={{ mb: 2 }}>{error}</Typography>}
 
+                <TextField
+                    label="Question Text"
+                    fullWidth
+                    margin="normal"
+                    variant="filled"
+                    onChange={(e) => handleChange('question', e.target.value)}
+                    value={formData.question}
+                    sx={{ mb: 2 }}
+                />
+
+
                 <Box display="flex" justifyContent="space-between">
-                    <Button  variant="contained" color="error" onClick={onClose} sx={{ textTransform: 'none' }}>
+                    <Button variant="contained" color="error" onClick={onClose}>
                         Cancel
                     </Button>
                     <Button
@@ -225,9 +224,8 @@ const AddQuestionModal: React.FC<{ testId: string; onClose: () => void; onQuesti
                         color="primary"
                         onClick={handleSubmit}
                         disabled={loading}
-                        sx={{ backgroundColor: '#1976d2', textTransform: 'none', minWidth: '120px' }}
                     >
-                        {loading ? <CircularProgress size={24} sx={{ color: '#fff' }} /> : 'Add'}
+                        {loading ? <CircularProgress size={24} /> : 'Add'}
                     </Button>
                 </Box>
             </Box>
