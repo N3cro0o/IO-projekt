@@ -28,6 +28,7 @@ interface Answer {
     text: string;
     question: number;
     points: number;
+    test: number;
 }
 
 const StartTest: React.FC = () => {
