@@ -1,7 +1,5 @@
-﻿using System.Diagnostics;
-using IO.Server.Elements;
+﻿using IO.Server.Elements;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Formatters;
 using Npgsql;
 
 namespace IO.Server.Controllers
@@ -17,29 +15,51 @@ namespace IO.Server.Controllers
             _connection = connection;
         }
 
-
-        [HttpPost("answer/add/test")]
-        public ActionResult AddAnswerToDB([FromBody] Answer answ)
+        // Wyświetlanie kursów
+        [HttpGet("CoursesList/{userId}")]
+        public ActionResult<IEnumerable<Course>> GetCourses(int userId)
         {
+            List<Course> courses = new List<Course>();
+
             try
             {
-                int a = (answ.Key & 1 << 3) >> 3;
-                int b = (answ.Key & 1 << 2) >> 2;
-                int c = (answ.Key & 1 << 1) >> 1;
-                int d = (answ.Key & 1 << 0) >> 0;
                 _connection.Open();
-                string query = "INSERT INTO \"Answer\" (points, answer, a, b, c, d, questionid, testid) VALUES " +
-                    $"('{answ.Points.ToString(System.Globalization.CultureInfo.InvariantCulture)}','{answ.Text}','{a}','{b}','{c}','{d}','{answ.Question}','{answ.Test}')";
-                var com = new NpgsqlCommand(query, _connection);
-                com.ExecuteNonQuery();
-                _connection.Close();
+                Console.WriteLine("Połączenie z bazą danych otwarte.");
+
+                string query = $"SELECT courseid, name, category, description, ownerid FROM \"Course\" WHERE ownerid = {userId} ORDER BY courseid ASC";
+
+                using (var command = new NpgsqlCommand(query, _connection))
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        Console.WriteLine($"Wczytywanie kursu: ID={reader.GetInt32(0)}, Name={reader.GetString(1)}");
+
+                        var course = new Course(
+                            id: reader.GetInt32(0),          // courseid
+                            name: reader.GetString(1),       // name
+                            cat: reader.GetString(2),        // category
+                            teachers: new List<int>(),       // Wypełnij nauczycielami, jeśli wymagane
+                            students: new List<int>(),       // Wypełnij studentami, jeśli wymagane
+                            tests: new List<int>()           // Wypełnij testami, jeśli wymagane
+                        );
+                        courses.Add(course);
+                    }
+                }
+
+                Console.WriteLine($"Łączna liczba kursów: {courses.Count}");
+                return Ok(courses);
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
-                Debug.Print(ex.ToString());
-                return BadRequest(ex.Message);
+                Console.WriteLine($"Błąd: {ex.Message}");
+                return StatusCode(500, $"Internal server error: {ex.Message}");
             }
-            return Ok();
+            finally
+            {
+                _connection.Close();
+                Console.WriteLine("Połączenie z bazą danych zamknięte.");
+            }
         }
 
         // Wyświetlanie Testów
@@ -155,6 +175,50 @@ namespace IO.Server.Controllers
                 _connection.Close();
             }
         }
+        //Pobieranie dat testu
+        [HttpGet("GetTestTime/{testId}")]
+        public ActionResult<TestTimeUpdateRequest> GetTestTime(int testId)
+        {
+            try
+            {
+                _connection.Open();
+
+                const string query = @"
+        SELECT starttime, endtime
+        FROM ""Test""
+        WHERE testid = @TestId";
+
+                using (var command = new NpgsqlCommand(query, _connection))
+                {
+                    command.Parameters.AddWithValue("@TestId", testId);
+
+                    using (var reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            var testTime = new TestTimeUpdateRequest
+                            {
+                                StartTime = reader.GetDateTime(0),
+                                EndTime = reader.GetDateTime(1)
+                            };
+                            return Ok(testTime);
+                        }
+                    }
+                }
+
+                return NotFound($"No test found with ID {testId}.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error while fetching test time: {ex.Message}");
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+            finally
+            {
+                _connection.Close();
+            }
+        }
+
 
         // Usuwanie Testów
         [HttpDelete("DeleteTest/{testId}")]

@@ -4,7 +4,6 @@ import {
     Typography,
     Modal,
     TextField,
-    MenuItem,
     Button,
 } from '@mui/material';
 
@@ -80,6 +79,18 @@ const ModalAddTest: React.FC<ModalAddTestProps> = ({ open, handleClose, courseId
         }
     };
 
+    const getCurrentDateTime = (): string => {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const date = String(now.getDate()).padStart(2, '0');
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        return `${year}-${month}-${date}T${hours}:${minutes}`;
+    };
+
+    const minDateTime = getCurrentDateTime();
+
     return (
         <Modal
             open={open}
@@ -107,6 +118,7 @@ const ModalAddTest: React.FC<ModalAddTestProps> = ({ open, handleClose, courseId
                     value={newTest.startTime}
                     onChange={(e) => setNewTest({ ...newTest, startTime: e.target.value })}
                     sx={inputStyle}
+                    inputProps={{ min: minDateTime }}
                 />
                 <TextField
                     fullWidth
@@ -116,6 +128,7 @@ const ModalAddTest: React.FC<ModalAddTestProps> = ({ open, handleClose, courseId
                     value={newTest.endTime}
                     onChange={(e) => setNewTest({ ...newTest, endTime: e.target.value })}
                     sx={inputStyle}
+                    inputProps={{ min: minDateTime }}
                 />
                 <TextField
                     fullWidth
@@ -125,18 +138,7 @@ const ModalAddTest: React.FC<ModalAddTestProps> = ({ open, handleClose, courseId
                     onChange={(e) => setNewTest({ ...newTest, category: e.target.value })}
                     sx={inputStyle}
                 />
-                <TextField
-                    select
-                    fullWidth
-                    label="Question Type"
-                    value={newTest.questionType}
-                    onChange={(e) => setNewTest({ ...newTest, questionType: e.target.value })}
-                    sx={inputStyle}
-                >
-                    <MenuItem value="open">Open</MenuItem>
-                    <MenuItem value="closed">Closed</MenuItem>
-                    <MenuItem value="mixed">Open & Closed</MenuItem>
-                </TextField>
+
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
                     <Button
                         variant="contained"

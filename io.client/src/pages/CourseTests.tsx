@@ -11,7 +11,7 @@ import {
 } from '@mui/material';
 import { ButtonAppBar } from '../comps/AppBar.tsx';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
-import ModalAddTest from '../comps/ModalAddTests'; // Importujemy modal do dodawania testów
+import ModalAddTest from '../comps/modalAddTests'; // Importujemy modal do dodawania testów
 
 interface Test {
     testId: number;
@@ -127,6 +127,12 @@ const CourseTests: React.FC = () => {
     const handleEditTest = (testId: number) => {
         navigate(`/course/${courseId}/test/${testId}/edit`);
     };
+   
+
+    const handleArchiveTest = (testId: number) => {
+        alert(`Archiving test with ID: ${testId}`);
+        // Dodaj tutaj logikê do archiwizacji testu
+    };
 
     return (
         <div>
@@ -220,6 +226,15 @@ const CourseTests: React.FC = () => {
                                         >
                                             View report
                                         </Button>
+                                       
+                                        <Button
+                                            variant="contained"
+                                            color="blue"
+                                            onClick={() => handleArchiveTest(test.testId)}
+                                        >
+                                            Archive the Test
+                                        </Button>
+
                                     </Box>
                                 </CardContent>
                             </Card>

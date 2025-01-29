@@ -766,34 +766,51 @@
         }
       }
     },
-    "/api/TestManager/answer/add/test": {
-      "post": {
+    "/api/TestManager/CoursesList/{userId}": {
+      "get": {
         "tags": [
           "TestManager"
         ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Answer"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Answer"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/Answer"
-              }
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
             }
-          },
-          "required": true
-        },
+          }
+        ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Course"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Course"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Course"
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -875,6 +892,46 @@
         "responses": {
           "200": {
             "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/TestManager/GetTestTime/{testId}": {
+      "get": {
+        "tags": [
+          "TestManager"
+        ],
+        "parameters": [
+          {
+            "name": "testId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestTimeUpdateRequest"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestTimeUpdateRequest"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestTimeUpdateRequest"
+                }
+              }
+            }
           }
         }
       }
@@ -1002,30 +1059,6 @@
               "type": "integer",
               "format": "int32"
             }
-          }
-        }
-      },
-      "Answer": {
-        "type": "object",
-        "properties": {
-          "text": {
-            "type": "string"
-          },
-          "test": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "question": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "points": {
-            "type": "number",
-            "format": "double"
-          },
-          "key": {
-            "type": "integer",
-            "format": "int32"
           }
         }
       },
