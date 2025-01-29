@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
     Box,
     Typography,
@@ -10,12 +9,16 @@ import {
     CircularProgress,
 } from '@mui/material';
 import { ButtonAppBar } from '../comps/AppBar.tsx';
+import DeleteAccountModal from '../comps/ModalDeleteUser.tsx'
 
 export const UserProfilePage: React.FC = () => {
     const [userData, setUserData] = useState<any>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [updateError, setUpdateError] = useState<string>('');
     const [updateSuccess, setUpdateSuccess] = useState<string>('');
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const handleOpenModal = () => setIsModalOpen(true);
+    const handleCloseModal = () => setIsModalOpen(false);
     const [fieldToUpdate, setFieldToUpdate] = useState({
         login: '',
         email: '',
@@ -30,7 +33,6 @@ export const UserProfilePage: React.FC = () => {
     });
     const [activeSection, setActiveSection] = useState<string>('login'); // Active section state
 
-    const navigate = useNavigate();
     const userId = localStorage.getItem('userId');
 
     const fetchUserData = async () => {
@@ -141,10 +143,8 @@ export const UserProfilePage: React.FC = () => {
         }
     };
 
-    const handleLogout = () => {
-        localStorage.removeItem('authToken');
-        localStorage.removeItem('userId');
-        navigate('/');
+    const handleDeleteAccount = () => {
+            setIsModalOpen(true);
     };
 
     if (loading) {
@@ -345,12 +345,15 @@ export const UserProfilePage: React.FC = () => {
                             '&:hover': { borderColor: '#0056b3' },
                             marginTop: '20px',
                         }}
-                        onClick={handleLogout}
+                        onClick={handleDeleteAccount}
+
                     >
-                        Logout
+                        Delete Account
                     </Button>
                 </Paper>
             </Box>
+            <DeleteAccountModal open={isModalOpen} onClose={handleCloseModal} />
         </div>
+
     );
 };

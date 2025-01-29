@@ -4,6 +4,8 @@ using Microsoft.Extensions.Configuration;
 using Npgsql;
 using System.Data;
 using System.Text.RegularExpressions;
+using System.Transactions;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace IO.Server.Controllers
 {
@@ -254,6 +256,69 @@ namespace IO.Server.Controllers
             }
         }
 
+        [HttpDelete("DeleteAccount/{userId}")]
+        public IActionResult DeleteAccount(int userId, [FromBody] DeleteAccountRequest request)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(request.Password))
+                {
+                    return BadRequest(new { message = "Password is required." });
+                }
+
+                string query = "SELECT password FROM \"User\" WHERE userid = @UserId";
+                _connection.Open();
+                using (var command = new NpgsqlCommand(query, _connection))
+                {
+                    command.Parameters.AddWithValue("@UserId", userId);
+                    var storedPassword = command.ExecuteScalar()?.ToString();
+
+                    if (storedPassword == null || !VerifyPassword(request.Password, storedPassword))
+                    {
+                        _connection.Close();
+                        return Unauthorized(new { message = "Incorrect password." });
+                    }
+                }
+
+                // Usuwanie kursu
+                string deleteCourseQuery = "DELETE FROM \"Course\" WHERE ownerid = @ownerid";
+                using (var deleteCourseCommand = new NpgsqlCommand(deleteCourseQuery, _connection))
+                {
+                    deleteCourseCommand.Parameters.AddWithValue("@ownerid", userId);
+                    int rowsAffected = deleteCourseCommand.ExecuteNonQuery();
+                }
+
+                // Usunięcie konta
+                string deleteQuery = "DELETE FROM \"User\" WHERE userid = @UserId";
+                using (var deleteCommand = new NpgsqlCommand(deleteQuery, _connection))
+                {
+                    deleteCommand.Parameters.AddWithValue("@UserId", userId);
+                    int rowsAffected = deleteCommand.ExecuteNonQuery();
+                    _connection.Close();
+
+                    if (rowsAffected > 0)
+                    {
+                        return Ok(new { message = "Account deleted successfully." });
+                    }
+                    else
+                    {
+                        return NotFound(new { message = "User not found." });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred.", details = ex.Message });
+            }
+            finally
+            {
+                if (_connection.State == ConnectionState.Open)
+                {
+                    _connection.Close();
+                }
+            }
+        }
+
         private bool IsValidPassword(string password)
         {
             if (password.Length < 8)
@@ -294,6 +359,11 @@ namespace IO.Server.Controllers
             public string Surname { get; set; }
             public string Email { get; set; }
             public string Role { get; set; }
+        }
+
+        public class DeleteAccountRequest
+        {
+            public string Password { get; set; }
         }
     }
 }
