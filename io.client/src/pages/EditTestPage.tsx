@@ -34,24 +34,37 @@ const EditTestPage: React.FC = () => {
     const [editModalOpen, setEditModalOpen] = useState<{ open: boolean; question: Question | null }>({ open: false, question: null });
     const [shareModalOpen, setShareModalOpen] = useState<boolean>(false);
 
-    const fetchQuestions = async () => {
-        try {
-            setLoading(true);
-            setError(null);
+   const fetchQuestions = async (testName: string) => {
+    try {
+        setLoading(true);
+        setError(null);
 
-            const response = await fetch(`/api/question/byTestName/${encodeURIComponent(testName)}`);
-            if (!response.ok) {
-                throw new Error(`Error fetching questions: ${response.statusText}`);
-            }
-
-            const data: Question[] = await response.json();
-            setQuestions(data);
-        } catch (err) {
-            setError(err instanceof Error ? err.message : 'Unknown error');
-        } finally {
-            setLoading(false);
+        const response = await fetch(`/api/question/byTestName/${encodeURIComponent(testName)}`);
+        if (!response.ok) {
+            throw new Error(`Error fetching questions: ${response.statusText}`);
         }
-    };
+
+        const data: Question[] = await response.json();
+
+        // Mapowanie danych na w³aœciwoœci obiektu Question
+        const mappedData = data.map((item: any) => ({
+            id: item.questionid,
+            name: item.name,
+            category: item.category,
+            questionType: item.questiontype,
+            shared: item.shared,
+            maxPoints: item.maxpoints,
+            answerId: item.answer,
+        }));
+
+        setQuestions(mappedData);
+    } catch (err) {
+        setError(err instanceof Error ? err.message : 'Unknown error');
+    } finally {
+        setLoading(false);
+    }
+};
+
 
 
     useEffect(() => {
