@@ -63,6 +63,12 @@ const ReviewQuestions: React.FC = () => {
 
             console.log('Points submitted successfully');
             advanceQuestion();
+
+            // Przekierowanie na stronê g³ówn¹, jeœli to ostatnie pytanie
+            if (index === questions.length - 1) {  
+                window.location.href = '/';  
+            }
+
         } catch (error) {
             console.error("Error submitting points:", error);
         }
