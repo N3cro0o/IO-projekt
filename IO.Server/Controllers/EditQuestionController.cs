@@ -95,15 +95,13 @@ public class EditQuestionController : ControllerBase
             _connection.Open();
 
             const string query = @"
-                    SELECT a.answerid, q.name, q.questionbody, a.answer, a.points, q.maxpoints
+                    SELECT a.answerid, q.name,  q.questionbody, a.answer, a.points, q.maxpoints
                     FROM ""Answer"" a 
                     JOIN ""Question"" q ON a.questionid = q.questionid
-                    WHERE a.a = false AND a.b = false AND a.c = false AND a.d = false;";
+                    WHERE a.a=false AND a.b=false AND a.c=false AND a.d=false;";
 
             using (var command = new NpgsqlCommand(query, _connection))
             {
-                //command.Parameters.AddWithValue("@CourseId", courseId);
-
                 using (var reader = command.ExecuteReader())
                 {
                     while (reader.Read())
@@ -113,12 +111,12 @@ public class EditQuestionController : ControllerBase
                             aID = reader.GetInt32(0),
                             qName = reader.GetString(1),
                             qBody = reader.GetString(2),
-                            aAnswer = reader.GetString(3),
-                            aPoints = reader.GetDouble(4),
-                            qMaxPoints = reader.GetDouble(5)
+                            aAnswer = reader.GetString(2),
+                            aPoints = reader.GetString(3),
+                            qMaxPoints = reader.GetDouble(4)
                         };
                         question.Add(quest);
-                        Console.WriteLine($"Jest zajebiscie");
+                        Console.WriteLine($"ID{quest.aID} Name{quest.qName} maxPoint{quest.qMaxPoints}");
                     }
                 }
             }
@@ -126,7 +124,7 @@ public class EditQuestionController : ControllerBase
 
             if (question.Count == 0)
             {
-                return NotFound("Jest chujowo ");
+                return NotFound("Ni ma ");
             }
 
             return Ok(question);
@@ -138,6 +136,51 @@ public class EditQuestionController : ControllerBase
         }
         finally
         {
+            _connection.Close();
+        }
+    }
+    [HttpPost("answer/review")]
+    public ActionResult ReviewAnswer([FromBody] AnswerReviewRequest request)
+    {
+        if (request == null || request.AnswerId <= 0 || request.Points < 0)
+        {
+            return BadRequest("Invalid data.");
+        }
+
+        var query = "UPDATE \"Answer\" SET points = @Points WHERE answerid = @AnswerId";
+
+        try
+        {
+            // Otwarcie połączenia z bazą danych
+            _connection.Open();
+
+            using (var command = new NpgsqlCommand(query, _connection))
+            {
+                // Dodanie parametrów do zapytania
+                command.Parameters.AddWithValue("@Points", request.Points);
+                command.Parameters.AddWithValue("@AnswerId", request.AnswerId);
+
+                // Wykonanie zapytania
+                var rowsAffected = command.ExecuteNonQuery();
+
+                if (rowsAffected == 0)
+                {
+                    return NotFound("Answer not found.");
+                }
+
+                // Jeśli zapytanie zakończyło się sukcesem
+                return Ok("Points updated successfully.");
+            }
+        }
+        catch (Exception ex)
+        {
+            // Obsługa błędów
+            Console.WriteLine($"Błąd: {ex.Message}");
+            return StatusCode(500, $"Internal server error: {ex.Message}");
+        }
+        finally
+        {
+            // Zamykanie połączenia
             _connection.Close();
         }
     }
@@ -165,6 +208,12 @@ public class QuestionToShow
     public string qName { get; set; }
     public string qBody { get; set; }
     public string aAnswer { get; set; }
-    public double aPoints { get; set; }
+    public string aPoints { get; set; }
     public double qMaxPoints { get; set; }
+}
+
+public class AnswerReviewRequest
+{
+    public int AnswerId { get; set; }
+    public int Points { get; set; }
 }

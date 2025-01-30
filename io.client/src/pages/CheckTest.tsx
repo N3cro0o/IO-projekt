@@ -21,7 +21,7 @@ const ReviewQuestions: React.FC = () => {
     useEffect(() => {
         const fetchQuestions = async () => {
             try {
-                const response = await fetch(`https://localhost:59127/api/EditQuestion/GetQuestion`);
+                const response = await fetch(`https://localhost:59127/api/EditQuestion/QuestionList`);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -36,23 +36,29 @@ const ReviewQuestions: React.FC = () => {
     }, []);
 
     const submitPoints = async () => {
-        if (questions.length === 0) return;
+        if (questions.length === 0 || !questions[index]) return;
+
+        const answerData = {
+            answerId: questions[index].aID,
+            points: assignedPoints,
+        };
 
         try {
-            await fetch('https://localhost:7293/api/TestManager/answer/review', {
+            const response = await fetch('https://localhost:7293/api/TestManager/answer/review', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    answerId: questions[index].aID,
-                    points: assignedPoints,
-                }),
+                body: JSON.stringify(answerData),
             });
-            console.log('Points submitted');
-        } catch (err) {
-            console.error("Error submitting points:", err);
-        }
 
-        advanceQuestion();
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            console.log('Points submitted successfully');
+            advanceQuestion();
+        } catch (error) {
+            console.error("Error submitting points:", error);
+        }
     };
 
     const advanceQuestion = () => {
@@ -63,6 +69,7 @@ const ReviewQuestions: React.FC = () => {
             navigate("/teacher/review-complete");
         }
     };
+
 
     if (questions.length === 0) return <div>Loading...</div>;
 
