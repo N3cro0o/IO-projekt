@@ -11,7 +11,8 @@ import EditQuestionModal from '../comps/ModalEditQuestion';
 import ShareQuestionModal from '../comps/ModalShareQuestion';
 import DeleteQuestionModal from '../comps/ModalDeleteQuestion';
 import { ButtonAppBar } from '../comps/AppBar';
-import SharedQuestionModal from '../comps/SharedQuestionModal';
+// dodanie modala od sharowanych pytan 
+import SharedQuestionModal from '../comps/SharedQuestionModal'; 
 
 interface Question {
     id: number;
@@ -67,6 +68,7 @@ const EditTestPage: React.FC = () => {
     const handleCloseAddModal = () => setAddModalOpen(false);
     const handleEditQuestion = (question: Question) => setEditModalOpen({ open: true, question });
     const handleShareQuestion = () => setShareModalOpen(true);
+    // przycisk sharowanych pytan dodanie 
     const [sharedModalOpen, setSharedModalOpen] = useState<boolean>(false);
 
     const handleOpenDeleteModal = (question: Question) => {

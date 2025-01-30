@@ -26,11 +26,7 @@ namespace IO.Server.Controllers
             {
                 _connection.Open();
                 string query = @"
-                SELECT q.questionid, q.name, q.category, 
-                    CASE WHEN qt.questionid IS NOT NULL THEN true ELSE false END AS addedToTest
-                FROM ""Question"" q
-                LEFT JOIN ""QuestionToTest"" qt ON q.questionid = qt.questionid
-                WHERE q.shared = true;";
+                SELECT questionid, name, category FROM ""Question"" WHERE shared = true;";
 
                 using (var command = new NpgsqlCommand(query, _connection))
                 using (var reader = command.ExecuteReader())
@@ -43,7 +39,7 @@ namespace IO.Server.Controllers
                             Name = reader.GetString(1),
                             Category = reader.GetString(2),
                             Shared = true,
-                            AddedToTest = reader.GetBoolean(3)
+                            
                         };
                         questions.Add(question);
                     }
