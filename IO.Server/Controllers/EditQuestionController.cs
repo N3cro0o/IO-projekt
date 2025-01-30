@@ -94,13 +94,16 @@ public class EditQuestionController : ControllerBase
         {
             _connection.Open();
 
-            const string query = @"
-                    SELECT a.answerid, q.name,  q.questionbody, a.answer, a.points, q.maxpoints
+            const string query = @"SELECT a.answerid, q.name, q.questionbody, a.answer, a.points, q.maxpoints
                     FROM ""Answer"" a 
                     JOIN ""Question"" q ON a.questionid = q.questionid
-                    JOIN ""Test"" t ON a.testid=t.testid
+                    JOIN ""Test"" t ON a.testid = t.testid
                     JOIN ""QuestionToTest"" qtt ON qtt.testid = t.testid AND qtt.questionid = q.questionid
-                    WHERE a.a=false AND a.b=false AND a.c=false AND a.d=false AND t.testid=@testId;";
+                    WHERE a.a = false
+                      AND a.b = false
+                      AND a.c = false
+                      AND a.d = false
+                      AND t.testid = @testId;" ;
 
             using (var command = new NpgsqlCommand(query, _connection))
             {

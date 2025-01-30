@@ -36,7 +36,7 @@ function App() {
                     <Route path="/course/:courseId/test/:testId/edit" element={<EditTestPage />} />
                     <Route path="/student/courses" element={<CourseUser />} />
                     <Route path="/student/:testID/start" element={<StartTest />} />
-                    <Route path="/CheckTest" element={<CheckTest />} />
+                    <Route path="/CheckTest/:testId" element={<CheckTest />} />
                     <Route path="/TestToCheck" element={<TestToCheck />} />
                 </Routes>
             </HRouter>

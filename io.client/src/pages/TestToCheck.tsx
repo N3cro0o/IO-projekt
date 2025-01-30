@@ -3,12 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { Box, Button, Typography, Paper, Container, List, ListItem, ListItemText } from '@mui/material';
 
 interface Test {
-    TestId: number;
-    Name: string;
-    StartTime: string;
-    EndTime: string;
-    Category: string;
-    CourseId: number;
+    testId: number;
+    name: string;
+    startTime: string;
+    endTime: string;
+    category: string;
+    courseId: number;
 }
 
 const TestsToCheck: React.FC = () => {
@@ -41,6 +41,7 @@ const TestsToCheck: React.FC = () => {
         navigate(`/CheckTest/${testId}`);
     };
 
+    console.log("Current state of tests:", tests);
     if (tests.length === 0) return <div>Loading...</div>;
 
     return (
@@ -51,10 +52,11 @@ const TestsToCheck: React.FC = () => {
                 </Typography>
                 <List>
                     {tests.map((test) => (
-                        <ListItem button key={test.TestId} onClick={() => handleTestClick(test.TestId)}>
+
+                        <ListItem component="div" key={test.testId} onClick={() => handleTestClick(test.testId)}>
                             <ListItemText
-                                primary={test.Name}
-                                secondary={`Category: ${test.Category} | Start: ${test.StartTime} | End: ${test.EndTime}`}
+                                primary={test.name}
+                                secondary={`Category: ${test.category} | Start: ${test.startTime} | End: ${test.endTime}`}
                             />
                         </ListItem>
                     ))}
