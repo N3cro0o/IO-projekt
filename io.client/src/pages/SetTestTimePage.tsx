@@ -19,11 +19,6 @@ const SetTestTimePage: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
-        const token = localStorage.getItem('authToken');
-        if (!token) {
-            navigate('/'); // Przekierowanie na stronê g³ówn¹
-        }
-
         const fetchTestTime = async () => {
             try {
                 const response = await fetch(``);
@@ -78,6 +73,44 @@ const SetTestTimePage: React.FC = () => {
         }
     };
 
+    const fetchTestTime = async () => {
+        try {
+            const response = await fetch(`https://localhost:59127/api/TestManager/GetTestTime/${testId}`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+            console.log("Fetched data:", data); // Debugowanie w konsoli
+            setStartTime(data.startTime);
+            setEndTime(data.endTime);
+        } catch (error) {
+            console.error('Error fetching test details:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+            navigate('/'); // Przekierowanie na stronê g³ówn¹
+        }
+
+        fetchTestTime();
+    }, [testId]);
+
+
+    const getCurrentDateTime = (): string => {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const date = String(now.getDate()).padStart(2, '0');
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        return `${year}-${month}-${date}T${hours}:${minutes}`;
+    };
+
+    const minDateTime = getCurrentDateTime();
 
     if (loading) {
         return (
@@ -104,7 +137,7 @@ const SetTestTimePage: React.FC = () => {
                         padding: '32px',
                         width: '100%',
                         maxWidth: '400px',
-                        backgroundColor: '#444', // Ciemnoszare t³o kontenera
+                        backgroundColor: '#444',
                         borderRadius: '8px',
                         boxShadow: 2,
                     }}
@@ -125,6 +158,7 @@ const SetTestTimePage: React.FC = () => {
                             onChange={(e) => setStartTime(e.target.value)}
                             fullWidth
                             InputLabelProps={{ shrink: true }}
+                            inputProps={{ min: minDateTime }}
                             sx={{
                                 marginBottom: '16px',
                                 '& .MuiInputLabel-root': { color: 'white' },
@@ -141,6 +175,7 @@ const SetTestTimePage: React.FC = () => {
                             onChange={(e) => setEndTime(e.target.value)}
                             fullWidth
                             InputLabelProps={{ shrink: true }}
+                            inputProps={{ min: startTime || minDateTime }}
                             sx={{
                                 marginBottom: '16px',
                                 '& .MuiInputLabel-root': { color: 'white' },

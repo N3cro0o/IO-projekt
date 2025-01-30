@@ -279,16 +279,14 @@
             "description": "OK"
           }
         }
-      }
-    },
-    "/api/Question/questions/from/{testID}": {
+      },
       "get": {
         "tags": [
           "Question"
         ],
         "parameters": [
           {
-            "name": "testID",
+            "name": "testId",
             "in": "path",
             "required": true,
             "schema": {
@@ -1251,36 +1249,38 @@
           "name": {
             "type": "string"
           },
-          "text": {
+          "category": {
             "type": "string"
           },
           "questionType": {
             "type": "string"
           },
-          "answers": {
-            "type": "string"
-          },
-          "category": {
-            "type": "string"
-          },
           "shared": {
             "type": "boolean"
           },
-          "points": {
-            "type": "number",
-            "format": "double"
+          "answer": {
+            "type": "string"
           },
-          "correctAnswers": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "correctAnswersBinary": {
-            "type": "string",
+          "a": {
+            "type": "boolean",
             "nullable": true
           },
-          "id": {
+          "b": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "c": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "d": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "maxPoints": {
             "type": "integer",
-            "format": "int32"
+            "format": "int32",
+            "nullable": true
           }
         }
       },

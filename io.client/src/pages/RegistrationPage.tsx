@@ -98,16 +98,18 @@ export const Registration = () => {
                 navigate('/loginPage');
             } else {
                 const errorData = await response.json();
-                if (errorData.errors.login) {
-                    setErrorFields(prev => ({ ...prev, login: errorData.errors.login }));
+                console.log(errorData);
+                if (errorData.message === "Login already in use") {
+                    setErrorFields(prev => ({ ...prev, login: errorData.message }));
                 }
-                if (errorData.errors.email) {
-                    setErrorFields(prev => ({ ...prev, email: errorData.errors.email }));
+
+                if (errorData.message === "Email already in use") {
+                    setErrorFields(prev => ({ ...prev, email: errorData.message }));
                 }
-                if (errorData.errors.password) {
-                    setErrorFields(prev => ({ ...prev, password: errorData.errors.password }));
+
+                if (errorData.message === "Password should have 8 letters, 1 big letter and special character") {
+                    setErrorFields(prev => ({ ...prev, password: errorData.message }));
                 }
-                console.log(errorData.errors.password);
                 setError('Error during registration');
             }
         } catch (error) {

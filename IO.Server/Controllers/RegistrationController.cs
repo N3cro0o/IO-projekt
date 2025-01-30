@@ -27,25 +27,25 @@ namespace IO.Server.Controllers
 
             if (data == null)
             {
-                return BadRequest("Data can't be empty");
+                return BadRequest(new { Message = "Data can't be empty" });
             }
 
             // Walidacja unikalności loginu
             if (!IsUniqueLogin(data.Login))
             {
-                return BadRequest("Login already in use");
+                return BadRequest(new { Message = "Login already in use" });
             }
 
             // Walidacja unikalności e-maila
             if (!IsUniqueEmail(data.Email))
             {
-                return BadRequest("Email already in use");
+                return BadRequest(new { Message = "Email already in use" });
             }
 
             // Walidacja hasła
             if (!IsValidPassword(data.PasswordHash))
             {
-                return BadRequest("Password should have 8 letters, 1 big letter and special character");
+                return BadRequest(new { Message = "Password should have 8 letters, 1 big letter and special character" });
             }
 
             //var hashedPassword = BCrypt.Net.BCrypt.HashPassword(data.PasswordHash);
