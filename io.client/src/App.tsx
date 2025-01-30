@@ -15,6 +15,7 @@ import { UserProfilePage } from './pages/AccountManager';
 import EditTestPage from './pages/EditTestPage';
 import CourseUser from './pages/StudentCourses';
 import StartTest from './pages/TestTaker3000';
+import TestResults from './pages/testResults';
 
 import CheckTest from './pages/CheckTest';
 import TestToCheck from './pages/TestToCheck';
@@ -43,6 +44,7 @@ function App() {
                     <Route path="/TestToCheck" element={<TestToCheck />} />
                     <Route path="/SumTest/:testId/:testName" element={<SumTest />} />
                     <Route path="/CheckResults" element={<CheckResults />} />
+                    <Route path="/testResults/:testId" element={<TestResults />} />
                 </Routes>
             </HRouter>
         </div>

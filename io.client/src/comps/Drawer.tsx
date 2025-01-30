@@ -97,7 +97,7 @@ const TemporaryDrawer = ({ open, toggleDrawer, token }) => {
                 </ListItem>
             </List>
             
-            {teacher_check && (//Przycisk ucznia do sprawdzenia testów i wyników uczniów
+             (
                 <List>
                     <ListItem button component={Link} to="/TestToCheck">
                         <ListItemIcon sx={{ color: '#007bff' }}>
@@ -106,9 +106,9 @@ const TemporaryDrawer = ({ open, toggleDrawer, token }) => {
                         <ListItemText primary="Test To Check" sx={{ color: 'white' }} />
                     </ListItem>
                 </List>
-            )}
+            )
             
-            {student_check && (//Przycisk ucznia do sprawdzenia wyników
+             (
                 <List>
                     <ListItem button component={Link} to="/CheckResults">
                         <ListItemIcon sx={{ color: '#007bff' }}>
@@ -117,7 +117,7 @@ const TemporaryDrawer = ({ open, toggleDrawer, token }) => {
                         <ListItemText primary="Check Your Results" sx={{ color: 'white' }} />
                     </ListItem>
                 </List>
-            )}
+            )
         </Box>
     );
 

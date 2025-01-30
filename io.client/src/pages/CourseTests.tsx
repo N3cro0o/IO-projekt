@@ -117,7 +117,7 @@ const CourseTests: React.FC = () => {
     };
 
     const handleCheckResults = (testId: number) => {
-        navigate(`/course/${courseId}/test/${testId}/results`);
+        navigate(`/testResults/${testId}`);
     };
 
     const handleAddTest = (newTest: Test) => {
