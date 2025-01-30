@@ -53,7 +53,7 @@ const TestsToCheck: React.FC = () => {
                 <List>
                     {tests.map((test) => (
 
-                        <ListItem component="div" key={test.testId} onClick={() => handleTestClick(test.testId)}>
+                        <ListItem component="div" key={test.testId} onClick={() => handleTestClick(test.testId)}> 
                             <ListItemText
                                 primary={test.name}
                                 secondary={`Category: ${test.category} | Start: ${test.startTime} | End: ${test.endTime}`}

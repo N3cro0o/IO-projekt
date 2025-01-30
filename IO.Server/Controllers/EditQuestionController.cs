@@ -106,7 +106,9 @@ public class EditQuestionController : ControllerBase
                       AND t.testid = @testId;" ;
 
             using (var command = new NpgsqlCommand(query, _connection))
+
             {
+                command.Parameters.AddWithValue("@testId", testId);
                 using (var reader = command.ExecuteReader())
                 {
                     while (reader.Read())
@@ -213,7 +215,7 @@ public class EditQuestionController : ControllerBase
                 {
                     while (reader.Read())
                     {
-                        if (reader.GetDateTime(3) != DateTime.Now)//Nie wiem jaki jest format daty w bazie danych morze sie nie porównuja dobrze (narazie nie porownuje)
+                        if (reader.GetDateTime(3) < DateTime.Now)//Wyswietla teylko testy ukonczone 
                         {
                             var test = new Test
                             {

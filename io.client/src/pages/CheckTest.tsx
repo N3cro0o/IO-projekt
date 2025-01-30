@@ -32,7 +32,7 @@ const ReviewQuestions: React.FC = () => {
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
-
+                console.log("Response:", response);
                 const data: Question[] = await response.json();
                 setQuestions(data);
             } catch (err) {
