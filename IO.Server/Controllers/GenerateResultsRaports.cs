@@ -18,36 +18,31 @@ namespace IO.Server.Controllers
         }
 
 
-    
+
         // Pobranie i sprawdzanie wyniku ucznia
         [HttpGet("GetUserScores/{testId}")]
         public ActionResult<IEnumerable<UserScore>> GetUserScoresByTestId(int testId)
         {
             try
             {
-                // Otwieramy po³¹czenie z baz¹
                 _connection.Open();
 
-                // Zapytanie SQL, które pobiera dane o uczniach i ich punktach dla danego testu
-                const string query = @"
+                const string selectQuery = @"
             SELECT u.userid, u.name, SUM(a.points) AS totalPoints
             FROM ""User"" u
             JOIN ""Answer"" a ON u.userid = a.userid
             WHERE a.testid = @TestId
             GROUP BY u.userid, u.name
-            ORDER BY totalPoints DESC"; // Mo¿esz zmieniæ ORDER BY wed³ug w³asnych potrzeb
+            ORDER BY totalPoints DESC";
 
-                using (var command = new NpgsqlCommand(query, _connection))
+                using (var command = new NpgsqlCommand(selectQuery, _connection))
                 {
-                    // Dodanie parametru do zapytania (testId)
                     command.Parameters.AddWithValue("@TestId", testId);
 
-                    // Wykonanie zapytania
                     using (var reader = command.ExecuteReader())
                     {
                         var userScores = new List<UserScore>();
 
-                        // Przechodzimy przez wyniki zapytania
                         while (reader.Read())
                         {
                             var userScore = new UserScore
@@ -59,9 +54,28 @@ namespace IO.Server.Controllers
                             userScores.Add(userScore);
                         }
 
+                        reader.Close(); // Zamykamy reader przed wykonaniem kolejnych zapytañ
+
+                        // Jeœli s¹ wyniki, zapisujemy je do tabeli "Results"
                         if (userScores.Count > 0)
                         {
-                            return Ok(userScores); // Zwracamy listê uczniów z ich punktami
+                            foreach (var score in userScores)
+                            {
+                                const string upsertQuery = @"
+                            INSERT INTO ""Results"" (testid, userid, points) 
+                            VALUES (@TestId, @UserId, @Points)
+                            ON CONFLICT (testid, userid) 
+                            DO UPDATE SET points = EXCLUDED.points;";
+
+                                using (var upsertCommand = new NpgsqlCommand(upsertQuery, _connection))
+                                {
+                                    upsertCommand.Parameters.AddWithValue("@TestId", testId);
+                                    upsertCommand.Parameters.AddWithValue("@UserId", score.UserId);
+                                    upsertCommand.Parameters.AddWithValue("@Points", score.TotalPoints);
+                                    upsertCommand.ExecuteNonQuery();
+                                }
+                            }
+                            return Ok(userScores);
                         }
                         else
                         {
@@ -72,13 +86,11 @@ namespace IO.Server.Controllers
             }
             catch (Exception ex)
             {
-                // Obs³uga b³êdów, zwrócenie 500 w przypadku problemu z baz¹ danych
                 Console.WriteLine($"B³¹d: {ex.Message}");
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
             finally
             {
-                // Zamkniêcie po³¹czenia z baz¹ danych
                 _connection.Close();
             }
         }

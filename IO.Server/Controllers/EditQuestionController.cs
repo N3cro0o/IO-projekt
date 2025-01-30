@@ -215,7 +215,7 @@ public class EditQuestionController : ControllerBase
                 {
                     while (reader.Read())
                     {
-                        if (reader.GetDateTime(3) != DateTime.Now)//Wyswietla teylko testy ukonczone 
+                        if (reader.GetDateTime(3) != DateTime.Now)//Wyswietla teylko testy ukonczone jesli jest "<" zamiast "!=" <- do testowania
                         {
                             var test = new Test
                             {

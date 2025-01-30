@@ -15,7 +15,7 @@ const TestsToCheck: React.FC = () => {
     const [tests, setTests] = useState<Test[]>([]);
     const navigate = useNavigate();
 
-    const ownerId = 1;
+    const ownerId = 1;//(jest na sztywno)Ustawienie id uzytkownika DO POPRAWY
 
     useEffect(() => {
         const fetchTests = async () => {
@@ -59,6 +59,7 @@ const TestsToCheck: React.FC = () => {
                                 primary={test.name}
                                 secondary={`Category: ${test.category} | Start: ${test.startTime} | End: ${test.endTime}`}
                             />
+                            
                             <Box sx={{ display: 'flex', gap: 2, mt: 1 }}>
                                 <Button variant="contained" color="primary" onClick={() => handleTestClick(test.testId)}>
                                     Check Test
