@@ -86,7 +86,7 @@ const EditTestPage: React.FC = () => {
         if (!deleteModalOpen.question) return;
 
         try {
-            const response = await fetch(`/api/DeleteQuestion/DeleteQuestionByName/${encodeURIComponent(deleteModalOpen.question.name)}`, {
+            const response = await fetch(`/api/DeleteQuestion/DeleteQuestionById/${encodeURIComponent(deleteModalOpen.question.questionId)}`, {
                 method: 'DELETE',
             });
 
@@ -95,7 +95,7 @@ const EditTestPage: React.FC = () => {
             }
 
             setQuestions((prevQuestions) =>
-                prevQuestions.filter((q) => q.name !== deleteModalOpen.question?.name)
+                prevQuestions.filter((q) => q.questionId !== deleteModalOpen.question?.questionId)
             );
             setDeleteModalOpen({ open: false, question: null });
         } catch (err) {

@@ -5,18 +5,19 @@
     "version": "1.0.0"
   },
   "paths": {
-    "/api/DeleteQuestion/DeleteQuestionByName/{questionName}": {
+    "/api/DeleteQuestion/DeleteQuestionById/{questionId}": {
       "delete": {
         "tags": [
           "DeleteQuestion"
         ],
         "parameters": [
           {
-            "name": "questionName",
+            "name": "questionId",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "string"
+              "type": "integer",
+              "format": "int32"
             }
           }
         ],

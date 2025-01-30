@@ -29,12 +29,12 @@ const buttonStyle = {
     '&:hover': { backgroundColor: '#777' },
 };
 
-const DeleteQuestionModal: React.FC<DeleteQuestionModalProps> = ({ open, onClose, onConfirm, questionName }) => {
+const DeleteQuestionModal: React.FC<DeleteQuestionModalProps> = ({ open, onClose, onConfirm}) => {
     return (
         <Modal open={open} onClose={onClose}>
             <Box sx={modalStyle}>
                 <Typography variant="h6" mb={2}>Confirm Deletion</Typography>
-                <Typography mb={3}>Are you sure you want to delete "{questionName}"?</Typography>
+                <Typography mb={3}>Are you sure you want to delete this question?</Typography>
                 <Box display="flex" justifyContent="space-between">
                     <Button
                         variant="contained"
