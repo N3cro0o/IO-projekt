@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Npgsql;
 using System;
 using System.Diagnostics;
+using System.Globalization;
 
 namespace IO.Server.Controllers
 {
@@ -29,6 +30,58 @@ namespace IO.Server.Controllers
                     $"VALUES('{newQuestion.name}','{newQuestion.category}' ,'{newQuestion.questionType}' ,'{newQuestion.answer}' ,'{newQuestion.shared}' ,'{newQuestion.a}' ,'{newQuestion.b}' , '{newQuestion.c}', '{newQuestion.d}', '{newQuestion.maxPoints}', '{newQuestion.questionBody}') " +
                     "RETURNING questionid";
 
+                int newQuestionId;
+                using (var command = new NpgsqlCommand(insertQuestionQuery, _connection))
+                {
+                    newQuestionId = Convert.ToInt32(command.ExecuteScalar());
+                }
+
+                // Powiązanie pytania z testem w tabeli QuestionToTest
+                string insertQuestionToTestQuery = @"
+                    INSERT INTO ""QuestionToTest"" (testid, questionid)
+                    VALUES(@testId, @questionId); ";
+
+                using (var command = new NpgsqlCommand(insertQuestionToTestQuery, _connection))
+                {
+                    command.Parameters.AddWithValue("@testId", testId);
+                    command.Parameters.AddWithValue("@questionId", newQuestionId);
+                    command.ExecuteNonQuery();
+                }
+
+                return Ok(new { QuestionId = newQuestionId, Message = "Question added and linked to test successfully." });
+            }
+            catch (Exception ex)
+            {
+                Debug.Print(ex.ToString());
+                return StatusCode(500, "Error during adding question");
+            }
+            finally
+            {
+                _connection.Close();
+            }
+        }
+        
+        // New method with fixed Question fetching. PLEASE DONT DELETE!!!!!!!!!!!!
+        [HttpPost("FRANEKGPT/{testId}")]
+        public IActionResult AddQuestionToTestV2(int testId, [FromBody] Elements.Question quest)
+        {
+            Debug.Print("\n\n\n\n\n\n\n\n\n\n\nFrankowanie\n\n");
+            // Check if quest is properly sent
+            if (quest.IsEmpty())
+            {
+                quest.PrintQuestionOnConsole();
+                return StatusCode(500, "Invalid Question");
+            }
+            try
+            {
+                _connection.Open();
+
+                // Wstawienie nowego pytania do tabeli Question
+                string insertQuestionQuery = "INSERT INTO \"Question\" (name, category, questiontype, answer, shared, a, b, c, d, maxpoints, questionbody) " +
+                    $"VALUES('{quest.Name}','{quest.Category}','{quest.QuestionType}','{quest.Answers}','{quest.Shared}','{quest.ReturnCorrectAnswerSingle(Elements.Question.QUESTION_ANSWER.A)}'," +
+                    $"'{quest.ReturnCorrectAnswerSingle(Elements.Question.QUESTION_ANSWER.B)}','{quest.ReturnCorrectAnswerSingle(Elements.Question.QUESTION_ANSWER.C)}'," +
+                    $"'{quest.ReturnCorrectAnswerSingle(Elements.Question.QUESTION_ANSWER.D)}','{quest.Points.ToString(CultureInfo.InvariantCulture)}','{quest.Text}') " +
+                    "RETURNING questionid";
                 int newQuestionId;
                 using (var command = new NpgsqlCommand(insertQuestionQuery, _connection))
                 {

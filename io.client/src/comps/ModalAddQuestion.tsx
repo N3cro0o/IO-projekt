@@ -23,6 +23,10 @@ interface NewQuestion {
     a: boolean;
     c: boolean;
     d: boolean;
+    bText: string;
+    aText: string;
+    cText: string;
+    dText: string;
     questionBody: string;
     maxPoints: number;
 }
@@ -38,6 +42,10 @@ const AddQuestionModal: React.FC<{ testId: string; onClose: () => void; onQuesti
         b: false,
         c: false,
         d: false,
+        bText: '',
+        aText: '',
+        cText: '',
+        dText: '',
         maxPoints: 0,
         questionBody: '',
     });
@@ -59,13 +67,22 @@ const AddQuestionModal: React.FC<{ testId: string; onClose: () => void; onQuesti
         setError('');
 
         try {
-            const json = JSON.stringify(formData);
-            console.log(json);
-
-            const response = await fetch(`/api/Question/${testId}`, {
+            const answ = formData.aText + '\n' + formData.bText + '\n' + formData.cText + '\n' + formData.dText;
+            const key = (formData.a ? 8 : 0) + (formData.b ? 4 : 0) + (formData.c ? 2 : 0) + (formData.d ? 1 : 0); 
+            const response = await fetch(`/api/QuestionFranek/FRANEKGPT/${testId}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData),
+                body: JSON.stringify({
+                    ID: 0,
+                    Name: formData.name,
+                    Text: formData.questionBody,
+                    QuestionType: formData.questionType,
+                    Answers: answ,
+                    Category: formData.category,
+                    Shared: formData.shared,
+                    Points: formData.maxPoints,
+                    CorrectAnswers: key
+                }),
             });
 
             if (!response.ok) {
@@ -184,22 +201,65 @@ const AddQuestionModal: React.FC<{ testId: string; onClose: () => void; onQuesti
 
                 {formData.questionType === 'closed' && (
                     <FormGroup>
-                        {(['a', 'b', 'c', 'd'] as const).map(option => (
-                            <Box key={option} display="flex" alignItems="center">
-                                <Checkbox
-                                    onChange={(e) => handleChange(option, e.target.checked ? formData[option] : '')}
-                                    sx={{ color: '#fff', '&.Mui-checked': { color: '#007bff' } }}
-                                />
-                                <TextField
-                                    label={`Option ${option.toUpperCase()}`}
-                                    fullWidth
-                                    variant="outlined"
-                                    onChange={(e) => handleChange(option, e.target.value)}
-                                    value={formData[option]}
-                                    sx={{ mb: 2, backgroundColor: '#444', borderRadius: 1, input: { color: '#fff' }, label: { color: '#aaa' } }}
-                                />
-                            </Box>
-                        ))}
+                        <Box key={'a'} display="flex" alignItems="center">
+                            <Checkbox
+                                onChange={(e) => handleChange('a', e.target.checked)}
+                                sx={{ color: '#fff', '&.Mui-checked': { color: '#007bff' } }}
+                            />
+                            <TextField
+                                label={`Option ${'aText'}`}
+                                fullWidth
+                                variant="outlined"
+                                onChange={(e) => handleChange('aText', e.target.value)}
+                                value={formData['aText']}
+                                sx={{ mb: 2, backgroundColor: '#444', borderRadius: 1, input: { color: '#fff' }, label: { color: '#aaa' } }}
+                            />
+                        </Box>
+
+                        <Box key={'b'} display="flex" alignItems="center">
+                            <Checkbox
+                                onChange={(e) => handleChange('b', e.target.checked)}
+                                sx={{ color: '#fff', '&.Mui-checked': { color: '#007bff' } }}
+                            />
+                            <TextField
+                                label={`Option ${'bText'}`}
+                                fullWidth
+                                variant="outlined"
+                                onChange={(e) => handleChange('bText', e.target.value)}
+                                value={formData['bText']}
+                                sx={{ mb: 2, backgroundColor: '#444', borderRadius: 1, input: { color: '#fff' }, label: { color: '#aaa' } }}
+                            />
+                        </Box>
+
+                        <Box key={'c'} display="flex" alignItems="center">
+                            <Checkbox
+                                onChange={(e) => handleChange('c', e.target.checked)}
+                                sx={{ color: '#fff', '&.Mui-checked': { color: '#007bff' } }}
+                            />
+                            <TextField
+                                label={`Option ${'cText'}`}
+                                fullWidth
+                                variant="outlined"
+                                onChange={(e) => handleChange('cText', e.target.value)}
+                                value={formData['cText']}
+                                sx={{ mb: 2, backgroundColor: '#444', borderRadius: 1, input: { color: '#fff' }, label: { color: '#aaa' } }}
+                            />
+                        </Box>
+
+                        <Box key={'d'} display="flex" alignItems="center">
+                            <Checkbox
+                                onChange={(e) => handleChange('d', e.target.checked)}
+                                sx={{ color: '#fff', '&.Mui-checked': { color: '#007bff' } }}
+                            />
+                            <TextField
+                                label={`Option ${'dText'}`}
+                                fullWidth
+                                variant="outlined"
+                                onChange={(e) => handleChange('dText', e.target.value)}
+                                value={formData['dText']}
+                                sx={{ mb: 2, backgroundColor: '#444', borderRadius: 1, input: { color: '#fff' }, label: { color: '#aaa' } }}
+                            />
+                        </Box>
                     </FormGroup>
                 )}
 
