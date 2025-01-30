@@ -16,7 +16,8 @@ const TestsToCheck: React.FC = () => {
     const navigate = useNavigate();
 
     
-    const ownerId = 1; // Zast¹p odpowiednim identyfikatorem zalogowanego u¿ytkownika
+    const ownerId = 1; // Zast¹p odpowiednim identyfikatorem zalogowanego u¿ytkownika 
+    //przyda³o by sie sprawdzenie czy to nauczyciel choæ jesli to nie nauczyciel to nie wyswietli zadnego testu do sprawdzenia
 
     useEffect(() => {
         const fetchTests = async () => {
@@ -27,6 +28,7 @@ const TestsToCheck: React.FC = () => {
                 }
                 const data: Test[] = await response.json();
                 setTests(data);
+                console.log('Fetched Tests:', data);//wyswietl w konsoli co znajduje sie w tablicy data
             } catch (err) {
                 console.error("Error fetching tests:", err);
             }

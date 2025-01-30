@@ -84,7 +84,7 @@ public class EditQuestionController : ControllerBase
             await _connection.CloseAsync();
         }
     }
-    //Wyświetlanie Pytań Otwartych Do Testu Ownera
+    //Wyświetlanie Pytań Otwartych Do Testu Ownera Do Sprawdzenia
     [HttpGet("QuestionList/{testId}")]
     public ActionResult<IEnumerable<QuestionToShow>> GetQuestion(int testId)
     {
@@ -222,7 +222,7 @@ public class EditQuestionController : ControllerBase
                                 CourseId = reader.GetInt32(5)
                             };
                             tests.Add(test);
-                            Console.WriteLine($"Test wczytany: ID={test.TestId}, Name={test.Name}, CourseID={test.CourseId}");
+                            Console.WriteLine($"Test wczytany: ID={test.TestId}, Name={test.Category}, CourseID={test.CourseId}");
                         }
                         
                     }
