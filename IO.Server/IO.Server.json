@@ -69,10 +69,21 @@
         }
       }
     },
-    "/api/EditQuestion/QuestionList": {
+    "/api/EditQuestion/QuestionList/{testId}": {
       "get": {
         "tags": [
           "EditQuestion"
+        ],
+        "parameters": [
+          {
+            "name": "testId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
         ],
         "responses": {
           "200": {
@@ -135,6 +146,55 @@
         "responses": {
           "200": {
             "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/EditQuestion/TestsList/{ownerId}/tests": {
+      "get": {
+        "tags": [
+          "EditQuestion"
+        ],
+        "parameters": [
+          {
+            "name": "ownerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Test"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Test"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Test"
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -1282,7 +1342,8 @@
             "type": "string"
           },
           "aPoints": {
-            "type": "string"
+            "type": "number",
+            "format": "double"
           },
           "qMaxPoints": {
             "type": "number",

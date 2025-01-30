@@ -84,9 +84,9 @@ public class EditQuestionController : ControllerBase
             await _connection.CloseAsync();
         }
     }
-    //Wyświetlanie Pytań Otwartych
-    [HttpGet("QuestionList")]
-    public ActionResult<IEnumerable<QuestionToShow>> GetQuestion()
+    //Wyświetlanie Pytań Otwartych Do Testu Ownera
+    [HttpGet("QuestionList/{testId}")]
+    public ActionResult<IEnumerable<QuestionToShow>> GetQuestion(int testId)
     {
         var question = new List<QuestionToShow>();
 
@@ -98,7 +98,9 @@ public class EditQuestionController : ControllerBase
                     SELECT a.answerid, q.name,  q.questionbody, a.answer, a.points, q.maxpoints
                     FROM ""Answer"" a 
                     JOIN ""Question"" q ON a.questionid = q.questionid
-                    WHERE a.a=false AND a.b=false AND a.c=false AND a.d=false;";
+                    JOIN ""Test"" t ON a.testid=t.testid
+                    JOIN ""QuestionToTest"" qtt ON qtt.testid = t.testid AND qtt.questionid = q.questionid
+                    WHERE a.a=false AND a.b=false AND a.c=false AND a.d=false AND t.testid=@testId;";
 
             using (var command = new NpgsqlCommand(query, _connection))
             {
@@ -111,9 +113,9 @@ public class EditQuestionController : ControllerBase
                             aID = reader.GetInt32(0),
                             qName = reader.GetString(1),
                             qBody = reader.GetString(2),
-                            aAnswer = reader.GetString(2),
-                            aPoints = reader.GetString(3),
-                            qMaxPoints = reader.GetDouble(4)
+                            aAnswer = reader.GetString(3),
+                            aPoints = reader.GetDouble(4),
+                            qMaxPoints = reader.GetDouble(5)
                         };
                         question.Add(quest);
                         Console.WriteLine($"ID{quest.aID} Name{quest.qName} maxPoint{quest.qMaxPoints}");
@@ -151,16 +153,16 @@ public class EditQuestionController : ControllerBase
 
         try
         {
-            // Otwarcie połączenia z bazą danych
+            
             _connection.Open();
 
             using (var command = new NpgsqlCommand(query, _connection))
             {
-                // Dodanie parametrów do zapytania
+                
                 command.Parameters.AddWithValue("@Points", request.Points);
                 command.Parameters.AddWithValue("@AnswerId", request.AnswerId);
 
-                // Wykonanie zapytania
+                
                 var rowsAffected = command.ExecuteNonQuery();
 
                 if (rowsAffected == 0)
@@ -168,19 +170,81 @@ public class EditQuestionController : ControllerBase
                     return NotFound("Answer not found.");
                 }
 
-                // Jeśli zapytanie zakończyło się sukcesem
+                
                 return Ok("Points updated successfully.");
             }
         }
         catch (Exception ex)
         {
-            // Obsługa błędów
+            
             Console.WriteLine($"Błąd: {ex.Message}");
             return StatusCode(500, $"Internal server error: {ex.Message}");
         }
         finally
         {
-            // Zamykanie połączenia
+            
+            _connection.Close();
+        }
+    }
+    // Wyświetlanie Testów
+    [HttpGet("TestsList/{ownerId}/tests")]
+    public ActionResult<IEnumerable<Test>> GetTestsByOwnerId(int ownerId)
+    {
+        var tests = new List<Test>();
+
+        try
+        {
+            _connection.Open();
+
+            const string query = @"
+            SELECT t.testid, t.name, t.starttime, t.endtime, t.category, t.courseid 
+            FROM ""Test"" t
+            Join ""Course"" c ON c.courseid = t.courseid
+            WHERE c.ownerid = @ownerId";
+
+            using (var command = new NpgsqlCommand(query, _connection))
+            {
+                command.Parameters.AddWithValue("@CourseId", ownerId);
+
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        if (reader.GetDateTime(3) != DateTime.Now)//Nie wiem jaki jest format daty w bazie danych morze sie nie porównuja dobrze (narazie nie porownuje)
+                        {
+                            var test = new Test
+                            {
+                                TestId = reader.GetInt32(0),
+                                Name = reader.GetString(1),
+                                StartTime = reader.GetDateTime(2),
+                                EndTime = reader.GetDateTime(3),
+                                Category = reader.GetString(4),
+                                CourseId = reader.GetInt32(5)
+                            };
+                            tests.Add(test);
+                            Console.WriteLine($"Test wczytany: ID={test.TestId}, Name={test.Name}, CourseID={test.CourseId}");
+                        }
+                        
+                    }
+                }
+            }
+
+            Console.WriteLine($"Łączna liczba testów dla kursu {ownerId}: {tests.Count}");
+
+            if (tests.Count == 0)
+            {
+                return NotFound("No tests found for the specified course ID.");
+            }
+
+            return Ok(tests);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Błąd: {ex.Message}");
+            return StatusCode(500, $"Internal server error: {ex.Message}");
+        }
+        finally
+        {
             _connection.Close();
         }
     }
@@ -208,7 +272,7 @@ public class QuestionToShow
     public string qName { get; set; }
     public string qBody { get; set; }
     public string aAnswer { get; set; }
-    public string aPoints { get; set; }
+    public double aPoints { get; set; }
     public double qMaxPoints { get; set; }
 }
 
@@ -217,3 +281,4 @@ public class AnswerReviewRequest
     public int AnswerId { get; set; }
     public int Points { get; set; }
 }
+

@@ -95,11 +95,11 @@ const TemporaryDrawer = ({ open, toggleDrawer, token }) => {
             </List>
             <List>
                 {/* Link do User Panel */}
-                <ListItem button component={Link} to="/CheckTest">
+                <ListItem button component={Link} to="/TestToCheck">
                     <ListItemIcon sx={{ color: '#007bff' }}> {/* Kolor ikon - niebieski */}
                         <AccountBoxIcon /> {/* Ikona panelu u¿ytkownika */}
                     </ListItemIcon>
-                    <ListItemText primary="CheckTest" sx={{ color: 'white' }} /> {/* Kolor tekstu - bia³y */}
+                    <ListItemText primary="TestToCheck" sx={{ color: 'white' }} /> {/* Kolor tekstu - bia³y */}
                 </ListItem>
             </List>
         </Box>

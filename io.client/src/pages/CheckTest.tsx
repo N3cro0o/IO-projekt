@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom'; // Importujemy useParams
 import { Box, Button, TextField, Typography, Paper, Container } from '@mui/material';
-import { debug } from 'console';
 
 interface Question {
     aID: number;
@@ -18,14 +17,22 @@ const ReviewQuestions: React.FC = () => {
     const [assignedPoints, setAssignedPoints] = useState<number>(0);
     const navigate = useNavigate();
 
+    // Odczytujemy testId z URL
+    const { testId } = useParams<{ testId: string }>();
+
     useEffect(() => {
         const fetchQuestions = async () => {
+            if (!testId) {
+                console.error('No testId provided!');
+                return;
+            }
+
             try {
-                const response = await fetch(`https://localhost:59127/api/EditQuestion/QuestionList`);
+                const response = await fetch(`https://localhost:59127/api/EditQuestion/QuestionList/${testId}`);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
-                console.log("No zarycz no");
+
                 const data: Question[] = await response.json();
                 setQuestions(data);
             } catch (err) {
@@ -33,7 +40,7 @@ const ReviewQuestions: React.FC = () => {
             }
         };
         fetchQuestions();
-    }, []);
+    }, [testId]); // Dodajemy testId jako zale¿noœæ, ¿eby odœwie¿yæ zapytanie przy zmianie testId
 
     const submitPoints = async () => {
         if (questions.length === 0 || !questions[index]) return;
@@ -69,7 +76,6 @@ const ReviewQuestions: React.FC = () => {
             navigate("/teacher/review-complete");
         }
     };
-
 
     if (questions.length === 0) return <div>Loading...</div>;
 
