@@ -9,13 +9,33 @@ interface ArchiveTestModalProps {
     isArchived: boolean;
 }
 
+const modalStyle = {
+    position: 'absolute' as 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: '90%',
+    maxWidth: 400,
+    bgcolor: '#444',
+    color: 'white',
+    borderRadius: '16px',
+    boxShadow: 24,
+    p: 4,
+    textAlign: 'center',
+};
+
+const buttonStyle = {
+    color: 'white',
+    '&:hover': { backgroundColor: '#777' },
+};
+
 const ArchiveTestModal: React.FC<ArchiveTestModalProps> = ({ open, onClose, onConfirm, testName, isArchived }) => {
     const [loading, setLoading] = useState(false);
 
     const handleArchive = async (archived: boolean) => {
         setLoading(true);
         try {
-            // Simulate API call to update archive status (Here, you would connect with your API)
+            // Symulacja API calla
             setTimeout(() => {
                 onConfirm(archived);
             }, 1000);
@@ -28,37 +48,28 @@ const ArchiveTestModal: React.FC<ArchiveTestModalProps> = ({ open, onClose, onCo
 
     return (
         <Modal open={open} onClose={onClose}>
-            <Box
-                sx={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    backgroundColor: 'white',
-                    padding: 4,
-                    borderRadius: 2,
-                    maxWidth: 400,
-                    width: '100%',
-                }}
-            >
-                <Typography variant="h6" gutterBottom>
+            <Box sx={modalStyle}>
+                <Typography variant="h6" mb={2}>
                     {isArchived ? 'Unarchive' : 'Archive'} Test
                 </Typography>
-                <Typography variant="body1" gutterBottom>
+                <Typography mb={3}>
                     Are you sure you want to {isArchived ? 'unarchive' : 'archive'} the test "{testName}"?
                 </Typography>
-
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', marginTop: 2 }}>
-                    <Button onClick={onClose} variant="outlined" color="secondary">
+                <Box display="flex" justifyContent="space-between">
+                    <Button variant="contained" color="error" sx={buttonStyle} onClick={onClose}>
                         Cancel
                     </Button>
                     <Button
-                        onClick={() => handleArchive(!isArchived)}
                         variant="contained"
-                        color={isArchived ? 'warning' : 'primary'}
+                        sx={{
+                            backgroundColor: isArchived ? '#ff9800' : '#007bff',
+                            color: 'white',
+                            '&:hover': { backgroundColor: isArchived ? '#e68900' : '#0056b3' },
+                        }}
+                        onClick={() => handleArchive(!isArchived)}
                         disabled={loading}
                     >
-                        {loading ? <CircularProgress size={24} color="inherit" /> : isArchived ? 'Unarchive' : 'Archive'}
+                        {loading ? <CircularProgress size={24} sx={{ color: '#fff' }} /> : isArchived ? 'Unarchive' : 'Archive'}
                     </Button>
                 </Box>
             </Box>

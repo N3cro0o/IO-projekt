@@ -4,8 +4,8 @@ import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
-import { Button, Checkbox, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
-import { Link, useNavigate } from 'react-router-dom';
+import { Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 const style = {
     position: 'absolute',
@@ -55,7 +55,7 @@ interface Test {
     cat: string;
 }
 
-export default function ModalShowTestsStudent({ courseID, coursename, handleClose }: { courseID: number, coursename: string, handleClose: () => void }) {
+export default function ModalShowTestsStudent({ courseID, handleClose }: { courseID: number, handleClose: () => void }) {
     const [open, setOpen] = React.useState(true);  // Modal powinien otwieraæ siê tylko raz po klikniêciu przycisku
     const [tests, setTests] = useState<Test[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
@@ -80,7 +80,7 @@ export default function ModalShowTestsStudent({ courseID, coursename, handleClos
     useEffect(() => {
         const fetchUsers = async () => {
             try {
-                const response = await fetch('https://localhost:59127/api/TestManager/TestsList/' + courseID + '/tests');
+                const response = await fetch('https://localhost:59127/api/TestManager/ShowTestsList/' + courseID + '/tests');
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -111,7 +111,7 @@ export default function ModalShowTestsStudent({ courseID, coursename, handleClos
             <Box sx={style}>
                 <div style={headerStyle}>
                     <Typography id="modal-modal-title" variant="h6" component="h2">
-                        Add Users to Course: {coursename} {/*przeslac nazwe kursu */}
+                        Solve the Test {/*przeslac nazwe kursu */}
                     </Typography>
                     <IconButton onClick={handleClose} style={{ color: 'red' }}>
                         <CloseIcon />

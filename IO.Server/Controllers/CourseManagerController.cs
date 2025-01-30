@@ -41,7 +41,7 @@ namespace IO.Server.Controllers
                         string userNameF = reader.GetString(2);
                         string userNameL = reader.GetString(3);
                         string cat = reader.GetString(4);
-                        userNameF += userNameL;
+                        userNameF += " " + userNameL;
 
                         courses.Add(new Course(courseID, courseName, cat, userNameF));
                     }

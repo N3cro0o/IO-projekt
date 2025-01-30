@@ -73,6 +73,9 @@ const StartTest: React.FC = () => {
         }
 
         try {
+            const tok = localStorage.getItem('authToken');
+            const decod = jwtDecode(tok);
+
             const response = await fetch('https://localhost:7293/api/TestManager/answer/add/test', {
                 method: 'POST',
                 headers: {
@@ -81,6 +84,7 @@ const StartTest: React.FC = () => {
                 body: JSON.stringify({
                     Text: answ.userAnswer,
                     Test: parseInt(testID),
+                    User: parseInt(decod.certserialnumber),
                     Question: answ.question,
                     Points: answ.points,
                     Key: answ.key,

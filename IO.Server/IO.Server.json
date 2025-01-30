@@ -931,6 +931,55 @@
         }
       }
     },
+    "/api/TestManager/ShowTestsList/{courseId}/tests": {
+      "get": {
+        "tags": [
+          "TestManager"
+        ],
+        "parameters": [
+          {
+            "name": "courseId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Test"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Test"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Test"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/TestManager/AddTest": {
       "post": {
         "tags": [
@@ -1096,6 +1145,10 @@
             "type": "string"
           },
           "test": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "user": {
             "type": "integer",
             "format": "int32"
           },
@@ -1366,6 +1419,9 @@
           "courseId": {
             "type": "integer",
             "format": "int32"
+          },
+          "archived": {
+            "type": "boolean"
           }
         }
       },

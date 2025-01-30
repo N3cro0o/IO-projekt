@@ -58,7 +58,7 @@ export const Login = () => {
                 const data = await response.json();
                 localStorage.setItem('userId', String(data.userId));
                 localStorage.setItem('authToken', data.token);
-                navigate('/UserPanel');
+                navigate('/');
             } else {
                 setLoginError('Incorrect login details');
             }

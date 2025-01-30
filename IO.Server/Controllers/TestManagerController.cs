@@ -21,6 +21,7 @@ namespace IO.Server.Controllers
         [HttpPost("answer/add/test")]
         public ActionResult AddAnswerToDB([FromBody] Answer answ)
         {
+            Debug.Print($"{answ.User}, {answ.Text}, {answ.Key}");
             try
             {
                 int a = (answ.Key & 1 << 3) >> 3;
@@ -28,13 +29,13 @@ namespace IO.Server.Controllers
                 int c = (answ.Key & 1 << 1) >> 1;
                 int d = (answ.Key & 1 << 0) >> 0;
                 _connection.Open();
-                string query = "INSERT INTO \"Answer\" (points, answer, a, b, c, d, questionid, testid) VALUES " +
-                    $"('{answ.Points.ToString(System.Globalization.CultureInfo.InvariantCulture)}','{answ.Text}','{a}','{b}','{c}','{d}','{answ.Question}','{answ.Test}')";
+                string query = "INSERT INTO \"Answer\" (points, answer, a, b, c, d, questionid, testid, userid) VALUES " +
+                    $"('{answ.Points.ToString(System.Globalization.CultureInfo.InvariantCulture)}','{answ.Text}','{a}','{b}','{c}','{d}','{answ.Question}','{answ.Test}','{answ.User}')";
                 var com = new NpgsqlCommand(query, _connection);
                 com.ExecuteNonQuery();
                 _connection.Close();
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 Debug.Print(ex.ToString());
                 return BadRequest(ex.Message);
@@ -53,7 +54,7 @@ namespace IO.Server.Controllers
                 _connection.Open();
 
                 const string query = @"
-            SELECT testid, name, starttime, endtime, category, courseid 
+            SELECT testid, name, starttime, endtime, category, courseid, archived 
             FROM ""Test"" 
             WHERE courseid = @CourseId";
 
@@ -72,7 +73,69 @@ namespace IO.Server.Controllers
                                 StartTime = reader.GetDateTime(2),
                                 EndTime = reader.GetDateTime(3),
                                 Category = reader.GetString(4),
-                                CourseId = reader.GetInt32(5)
+                                CourseId = reader.GetInt32(5),
+                                Archived = reader.GetBoolean(6)
+                            };
+
+                            tests.Add(test);
+                            Console.WriteLine($"Test wczytany: ID={test.TestId}, Name={test.Name}, CourseID={test.CourseId}");
+                        }
+                    }
+                }
+
+                Console.WriteLine($"Łączna liczba testów dla kursu {courseId}: {tests.Count}");
+
+                if (tests.Count == 0)
+                {
+                    return NotFound("No tests found for the specified course ID.");
+                }
+
+                return Ok(tests);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Błąd: {ex.Message}");
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+            finally
+            {
+                _connection.Close();
+            }
+        }
+
+        [HttpGet("ShowTestsList/{courseId}/tests")]
+        public ActionResult<IEnumerable<Test>> ShowTestsByCourseId(int courseId)
+        {
+            var tests = new List<Test>();
+
+            try
+            {
+                _connection.Open();
+
+                const string query = @"
+        SELECT testid, name, starttime, endtime, category, courseid, archived 
+        FROM ""Test"" 
+        WHERE courseid = @CourseId 
+        AND archived = false
+        AND NOW() BETWEEN starttime AND endtime";
+
+                using (var command = new NpgsqlCommand(query, _connection))
+                {
+                    command.Parameters.AddWithValue("@CourseId", courseId);
+
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            var test = new Test
+                            {
+                                TestId = reader.GetInt32(0),
+                                Name = reader.GetString(1),
+                                StartTime = reader.GetDateTime(2),
+                                EndTime = reader.GetDateTime(3),
+                                Category = reader.GetString(4),
+                                CourseId = reader.GetInt32(5),
+                                Archived = reader.GetBoolean(6)
                             };
 
                             tests.Add(test);
@@ -308,6 +371,7 @@ public class Test
     public DateTime? EndTime { get; set; } // Poprawna nazwa i typ
     public string Category { get; set; }
     public int CourseId { get; set; }
+    public Boolean Archived { get; set; }
 }
 
 public class TestTimeUpdateRequest

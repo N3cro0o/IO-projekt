@@ -349,7 +349,7 @@ export const UserProfilePage: React.FC = () => {
                                         variant="outlined"
                                         sx={{
                                             color: '#fff',
-                                            borderColor: '#007bff',
+                                            borderColor: '#037bff',
                                             '&:hover': { borderColor: '#0056b3' },
                                         }}
                                         onClick={() => setActiveSection(section)}

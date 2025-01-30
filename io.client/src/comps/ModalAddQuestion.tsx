@@ -17,11 +17,12 @@ interface NewQuestion {
     name: string;
     category: string;
     questionType: string;
+    questionBody: string;
     answer?: string;
     options: { [key: string]: string };
     correctAnswers: { [key: string]: boolean };
     shared: boolean;
-    maxPoints?: number;
+    maxPoints: string;
 }
 
 const AddQuestionModal: React.FC<{ testId: string; onClose: () => void; onQuestionAdded: () => void; }> = ({ testId, onClose, onQuestionAdded }) => {
@@ -29,11 +30,12 @@ const AddQuestionModal: React.FC<{ testId: string; onClose: () => void; onQuesti
         name: '',
         category: '',
         questionType: 'open',
+        questionBody: '',
         answer: '',
         options: { a: '', b: '', c: '', d: '' },
         correctAnswers: { a: false, b: false, c: false, d: false },
         shared: false,
-        maxPoints: undefined,
+        maxPoints: '',
     });
 
     const [loading, setLoading] = useState(false);
@@ -137,6 +139,22 @@ const AddQuestionModal: React.FC<{ testId: string; onClose: () => void; onQuesti
                     onChange={(e) => handleChange('category', e.target.value)}
                     value={formData.category}
                     sx={{
+                        mb: 2, // Powiêkszony odstêp
+                        backgroundColor: '#444',
+                        borderRadius: 1,
+                        input: { color: '#fff' },
+                        label: { color: '#aaa' }
+                    }}
+                />
+
+                <TextField
+                    label="Question"
+                    fullWidth
+                    margin="normal"
+                    variant="outlined"
+                    onChange={(e) => handleChange('questionBody', e.target.value)}
+                    value={formData.questionBody}
+                    sx={{
                         mb: 4, // Powiêkszony odstêp
                         backgroundColor: '#444',
                         borderRadius: 1,
@@ -144,6 +162,7 @@ const AddQuestionModal: React.FC<{ testId: string; onClose: () => void; onQuesti
                         label: { color: '#aaa' }
                     }}
                 />
+
                 <TextField
                     select
                     fullWidth
@@ -172,25 +191,31 @@ const AddQuestionModal: React.FC<{ testId: string; onClose: () => void; onQuesti
                     <MenuItem value="closed">Closed</MenuItem>
                 </TextField>
 
-                {formData.questionType === 'open' ? (
-                    <TextField
-                        label="Answer"
-                        fullWidth
-                        margin="normal"
-                        variant="outlined"
-                        onChange={(e) => handleChange('answer', e.target.value)}
-                        value={formData.answer || ''}
-                        sx={{
-                            mb: 2,
-                            backgroundColor: '#444',
-                            borderRadius: 1,
-                            input: { color: '#fff' },
-                            label: { color: '#aaa' }
-                        }}
-                    />
-                ) : (
+                <TextField
+                    label="maxPoints"
+                    type="number"
+                    value={formData.maxPoints}
+                    onChange={(e) => handleChange('maxPoints', e.target.value)}
+                    fullWidth
+                    margin="normal"
+                    sx={{
+                        mb: 2,
+                        backgroundColor: '#444',
+                        borderRadius: 1,
+                        input: { color: '#fff' },
+                        label: { color: '#aaa' },
+                    }}
+                    InputProps={{
+                        inputProps: {
+                            min: 0,
+                            pattern: '\\d*',
+                        },
+                    }}
+                />
+
+                {formData.questionType === 'closed' && (
                     <FormGroup sx={{ mb: 2 }}>
-                        <Typography variant="subtitle1" mb={1}>Possible Answers</Typography>
+                        <Typography variant="subtitle1" mb={1}>Check Correct Answers</Typography>
                         {(['a', 'b', 'c', 'd'] as const).map(option => (
                             <Box key={option} display="flex" alignItems="center">
                                 <Checkbox
