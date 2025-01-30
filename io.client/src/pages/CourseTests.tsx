@@ -12,6 +12,8 @@ import {
 import { ButtonAppBar } from '../comps/AppBar.tsx';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import ModalAddTest from '../comps/modalAddTests'; // Importujemy modal do dodawania testów
+import ArchiveTestModal from '../comps/ArchiveTestModal';
+
 
 interface Test {
     testId: number;
@@ -20,6 +22,7 @@ interface Test {
     endTime: string;
     category: string;
     courseId: number;
+    archived: boolean;
 }
 
 const formatDate = (dateString: string): string => {
@@ -129,10 +132,49 @@ const CourseTests: React.FC = () => {
     };
    
 
-    const handleArchiveTest = (testId: number) => {
-        alert(`Archiving test with ID: ${testId}`);
-        // Dodaj tutaj logikê do archiwizacji testu
+    const [archiveModalOpen, setArchiveModalOpen] = useState(false);
+    const [currentTest, setCurrentTest] = useState<Test | null>(null);
+
+    const openArchiveModal = (test: Test) => {
+        setCurrentTest(test);
+        setArchiveModalOpen(true);
     };
+
+    const closeArchiveModal = () => {
+        setArchiveModalOpen(false);
+        setCurrentTest(null);
+    };
+
+   const confirmArchiveTest = async (archived: boolean) => {
+    if (!currentTest) return;
+
+    try {
+        const response = await fetch(`https://localhost:59127/api/ArchiveTest/ArchiveTest/${currentTest.testId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ archived }), // Wysy³amy tylko status archiwizacji
+        });
+
+        if (response.ok) {
+            setTests((prevTests) =>
+                prevTests.map((test) =>
+                    test.testId === currentTest.testId ? { ...test, archived } : test
+                )
+            );
+        } else {
+            console.error(`Failed to archive test: ${response.status}`);
+        }
+    } catch (error) {
+        console.error('Error archiving test:', error);
+    } finally {
+        closeArchiveModal();
+    }
+};
+
+
+
 
     return (
         <div>
@@ -229,11 +271,21 @@ const CourseTests: React.FC = () => {
                                        
                                         <Button
                                             variant="contained"
-                                            color="blue"
-                                            onClick={() => handleArchiveTest(test.testId)}
+                                            color={test.archived ? 'warning' : 'info'}
+                                            onClick={() => openArchiveModal(test)}
                                         >
-                                            Archive the Test
+                                            {test.archived ? 'Unarchive the Test' : 'Archive the Test'}
                                         </Button>
+                                        <ArchiveTestModal
+                                            open={archiveModalOpen}
+                                            onClose={closeArchiveModal}
+                                            onConfirm={confirmArchiveTest}
+                                            testName={currentTest?.name || ''}
+                                            isArchived={currentTest?.archived || false}
+                                        />
+
+
+
 
                                     </Box>
                                 </CardContent>

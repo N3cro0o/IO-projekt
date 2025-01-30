@@ -23,7 +23,7 @@ interface Question {
 }
 
 const EditTestPage: React.FC = () => {
-    const { courseId, testId } = useParams<{ courseId: string; testId: string }>();
+    const { courseId, testName } = useParams<{ courseId: string; testName: string }>();
     const navigate = useNavigate();
     const [questions, setQuestions] = useState<Question[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
@@ -39,7 +39,7 @@ const EditTestPage: React.FC = () => {
             setLoading(true);
             setError(null);
 
-            const response = await fetch(`/api/question/${testId}`);
+            const response = await fetch(`/api/question/byTestName/${encodeURIComponent(testName)}`);
             if (!response.ok) {
                 throw new Error(`Error fetching questions: ${response.statusText}`);
             }
@@ -53,9 +53,12 @@ const EditTestPage: React.FC = () => {
         }
     };
 
+
     useEffect(() => {
-        fetchQuestions();
-    }, [testId]);
+        if (testName) {
+            fetchQuestions();
+        }
+    }, [testName]);
 
     const handleAddQuestion = () => setAddModalOpen(true);
     const handleCloseAddModal = () => setAddModalOpen(false);
@@ -115,7 +118,7 @@ const EditTestPage: React.FC = () => {
                 </Box>
 
                 <Typography variant="h4" mb={2} textAlign="center" sx={{ color: '#fff' }}>
-                    Edit Test: {testId}
+                    Edit Test: {testName}
                 </Typography>
 
                 {loading ? (
@@ -175,7 +178,7 @@ const EditTestPage: React.FC = () => {
                 )}
 
                 {addModalOpen && (
-                    <AddQuestionModal testId={testId!} onClose={handleCloseAddModal} onQuestionAdded={fetchQuestions} />
+                    <AddQuestionModal testName={testName!} onClose={handleCloseAddModal} onQuestionAdded={fetchQuestions} />
                 )}
 
                 {editModalOpen.open && editModalOpen.question && (
