@@ -238,10 +238,10 @@
         }
       }
     },
-    "/api/Question/{testId}": {
+    "/api/QuestionFranek/{testId}": {
       "post": {
         "tags": [
-          "Question"
+          "QuestionFranek"
         ],
         "parameters": [
           {
@@ -282,7 +282,7 @@
       },
       "get": {
         "tags": [
-          "Question"
+          "QuestionFranek"
         ],
         "parameters": [
           {
@@ -850,6 +850,29 @@
         }
       }
     },
+    "/api/Question/questions/from/{testID}": {
+      "get": {
+        "tags": [
+          "Question"
+        ],
+        "parameters": [
+          {
+            "name": "testID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/TestManager/answer/add/test": {
       "post": {
         "tags": [
@@ -1299,6 +1322,10 @@
       "Question": {
         "type": "object",
         "properties": {
+          "questionId": {
+            "type": "integer",
+            "format": "int32"
+          },
           "name": {
             "type": "string"
           },
@@ -1315,25 +1342,23 @@
             "type": "string"
           },
           "a": {
-            "type": "boolean",
-            "nullable": true
+            "type": "boolean"
           },
           "b": {
-            "type": "boolean",
-            "nullable": true
+            "type": "boolean"
           },
           "c": {
-            "type": "boolean",
-            "nullable": true
+            "type": "boolean"
           },
           "d": {
-            "type": "boolean",
-            "nullable": true
+            "type": "boolean"
           },
           "maxPoints": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
+            "type": "number",
+            "format": "double"
+          },
+          "questionBody": {
+            "type": "string"
           }
         }
       },
@@ -1547,7 +1572,7 @@
       "name": "Account"
     },
     {
-      "name": "Question"
+      "name": "QuestionFranek"
     },
     {
       "name": "ArchiveTest"
@@ -1566,6 +1591,9 @@
     },
     {
       "name": "ShareQuestion"
+    },
+    {
+      "name": "Question"
     },
     {
       "name": "TestManager"

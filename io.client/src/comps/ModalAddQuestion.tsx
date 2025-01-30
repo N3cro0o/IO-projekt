@@ -17,50 +17,40 @@ interface NewQuestion {
     name: string;
     category: string;
     questionType: string;
-    questionBody: string;
-    answer?: string;
-    options: { [key: string]: string };
-    correctAnswers: { [key: string]: boolean };
     shared: boolean;
-    maxPoints: string;
+    answer: string;
+    b: boolean;
+    a: boolean;
+    c: boolean;
+    d: boolean;
+    questionBody: string;
+    maxPoints: number;
 }
 
 const AddQuestionModal: React.FC<{ testId: string; onClose: () => void; onQuestionAdded: () => void; }> = ({ testId, onClose, onQuestionAdded }) => {
     const [formData, setFormData] = useState<NewQuestion>({
         name: '',
         category: '',
-        questionType: 'open',
-        questionBody: '',
-        answer: '',
-        options: { a: '', b: '', c: '', d: '' },
-        correctAnswers: { a: false, b: false, c: false, d: false },
+        questionType: '',
         shared: false,
-        maxPoints: '',
+        answer: "",
+        a: false,
+        b: false,
+        c: false,
+        d: false,
+        maxPoints: 0,
+        questionBody: '',
     });
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
     const handleChange = (field: keyof NewQuestion, value: any) => {
-        setFormData({ ...formData, [field]: value });
-    };
-
-    const handleOptionChange = (option: 'a' | 'b' | 'c' | 'd', value: string) => {
-        setFormData((prev) => ({
-            ...prev,
-            options: { ...prev.options, [option]: value }
-        }));
-    };
-
-    const handleCorrectAnswerChange = (option: 'a' | 'b' | 'c' | 'd', checked: boolean) => {
-        setFormData((prev) => ({
-            ...prev,
-            correctAnswers: { ...prev.correctAnswers, [option]: checked }
-        }));
+        setFormData(prev => ({ ...prev, [field]: value }));
     };
 
     const handleSubmit = async () => {
-        if (!formData.name || !formData.category || !formData.questionType) {
+        if (!formData.name || !formData.category || !formData.questionType || !formData.questionBody || !formData.maxPoints) {
             setError("Please fill in all required fields.");
             return;
         }
@@ -69,7 +59,10 @@ const AddQuestionModal: React.FC<{ testId: string; onClose: () => void; onQuesti
         setError('');
 
         try {
-            const response = await fetch(`/api/question/${testId}`, {
+            const json = JSON.stringify(formData);
+            console.log(json);
+
+            const response = await fetch(`/api/Question/${testId}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData),
@@ -106,13 +99,7 @@ const AddQuestionModal: React.FC<{ testId: string; onClose: () => void; onQuesti
                     color: '#fff',
                 }}
             >
-                <Typography
-                    variant="h5"
-                    fontWeight="bold"
-                    mb={3}
-                    textAlign="center"
-                    sx={{ color: '#fff' }}
-                >
+                <Typography variant="h5" fontWeight="bold" mb={3} textAlign="center">
                     Add New Question
                 </Typography>
 
@@ -123,13 +110,7 @@ const AddQuestionModal: React.FC<{ testId: string; onClose: () => void; onQuesti
                     variant="outlined"
                     onChange={(e) => handleChange('name', e.target.value)}
                     value={formData.name}
-                    sx={{
-                        mb: 2,
-                        backgroundColor: '#444',
-                        borderRadius: 1,
-                        input: { color: '#fff' },
-                        label: { color: '#aaa' }
-                    }}
+                    sx={{ mb: 2, backgroundColor: '#444', borderRadius: 1, input: { color: '#fff' }, label: { color: '#aaa' } }}
                 />
                 <TextField
                     label="Category"
@@ -138,29 +119,17 @@ const AddQuestionModal: React.FC<{ testId: string; onClose: () => void; onQuesti
                     variant="outlined"
                     onChange={(e) => handleChange('category', e.target.value)}
                     value={formData.category}
-                    sx={{
-                        mb: 2, // Powiêkszony odstêp
-                        backgroundColor: '#444',
-                        borderRadius: 1,
-                        input: { color: '#fff' },
-                        label: { color: '#aaa' }
-                    }}
+                    sx={{ mb: 2, backgroundColor: '#444', borderRadius: 1, input: { color: '#fff' }, label: { color: '#aaa' } }}
                 />
 
                 <TextField
-                    label="Question"
+                    label="Question Body"
                     fullWidth
                     margin="normal"
                     variant="outlined"
                     onChange={(e) => handleChange('questionBody', e.target.value)}
                     value={formData.questionBody}
-                    sx={{
-                        mb: 4, // Powiêkszony odstêp
-                        backgroundColor: '#444',
-                        borderRadius: 1,
-                        input: { color: '#fff' },
-                        label: { color: '#aaa' }
-                    }}
+                    sx={{ mb: 4, backgroundColor: '#444', borderRadius: 1, input: { color: '#fff' }, label: { color: '#aaa' } }}
                 />
 
                 <TextField
@@ -214,28 +183,20 @@ const AddQuestionModal: React.FC<{ testId: string; onClose: () => void; onQuesti
                 />
 
                 {formData.questionType === 'closed' && (
-                    <FormGroup sx={{ mb: 2 }}>
-                        <Typography variant="subtitle1" mb={1}>Check Correct Answers</Typography>
+                    <FormGroup>
                         {(['a', 'b', 'c', 'd'] as const).map(option => (
                             <Box key={option} display="flex" alignItems="center">
                                 <Checkbox
-                                    checked={formData.correctAnswers[option]}
-                                    onChange={(e) => handleCorrectAnswerChange(option, e.target.checked)}
+                                    onChange={(e) => handleChange(option, e.target.checked ? formData[option] : '')}
                                     sx={{ color: '#fff', '&.Mui-checked': { color: '#007bff' } }}
                                 />
                                 <TextField
                                     label={`Option ${option.toUpperCase()}`}
                                     fullWidth
                                     variant="outlined"
-                                    onChange={(e) => handleOptionChange(option, e.target.value)}
-                                    value={formData.options[option]}
-                                    sx={{
-                                        mb: 2,
-                                        backgroundColor: '#444',
-                                        borderRadius: 1,
-                                        input: { color: '#fff' },
-                                        label: { color: '#aaa' }
-                                    }}
+                                    onChange={(e) => handleChange(option, e.target.value)}
+                                    value={formData[option]}
+                                    sx={{ mb: 2, backgroundColor: '#444', borderRadius: 1, input: { color: '#fff' }, label: { color: '#aaa' } }}
                                 />
                             </Box>
                         ))}
@@ -251,16 +212,10 @@ const AddQuestionModal: React.FC<{ testId: string; onClose: () => void; onQuesti
                 {error && <Typography color="error" sx={{ mb: 2 }}>{error}</Typography>}
 
                 <Box display="flex" justifyContent="space-between">
-                    <Button variant="contained" color="error" onClick={onClose} sx={{ backgroundColor: '#d32f2f', '&:hover': { backgroundColor: '#9a0007' } }}>
+                    <Button variant="contained" color="error" onClick={onClose}>
                         Cancel
                     </Button>
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={handleSubmit}
-                        disabled={loading}
-                        sx={{ backgroundColor: '#007bff', '&:hover': { backgroundColor: '#0056b3' } }}
-                    >
+                    <Button variant="contained" color="primary" onClick={handleSubmit} disabled={loading}>
                         {loading ? <CircularProgress size={24} sx={{ color: '#fff' }} /> : 'Add'}
                     </Button>
                 </Box>

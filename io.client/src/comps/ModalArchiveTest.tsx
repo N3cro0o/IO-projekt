@@ -10,7 +10,7 @@ interface ArchiveTestModalProps {
 }
 
 const modalStyle = {
-    position: 'absolute' as 'absolute',
+    position: 'absolute',
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
@@ -19,9 +19,10 @@ const modalStyle = {
     bgcolor: '#444',
     color: 'white',
     borderRadius: '16px',
-    boxShadow: 24,
+    boxShadow: '5', 
     p: 4,
     textAlign: 'center',
+    overflow: 'hidden',
 };
 
 const buttonStyle = {
@@ -35,7 +36,6 @@ const ArchiveTestModal: React.FC<ArchiveTestModalProps> = ({ open, onClose, onCo
     const handleArchive = async (archived: boolean) => {
         setLoading(true);
         try {
-            // Symulacja API calla
             setTimeout(() => {
                 onConfirm(archived);
             }, 1000);
@@ -47,7 +47,13 @@ const ArchiveTestModal: React.FC<ArchiveTestModalProps> = ({ open, onClose, onCo
     };
 
     return (
-        <Modal open={open} onClose={onClose}>
+        <Modal
+            open={open}
+            onClose={onClose}
+            BackdropProps={{
+                sx: { backgroundColor: 'transparent' } 
+            }}
+        >
             <Box sx={modalStyle}>
                 <Typography variant="h6" mb={2}>
                     {isArchived ? 'Unarchive' : 'Archive'} Test

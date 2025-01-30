@@ -86,16 +86,15 @@ const EditQuestionModal: React.FC<EditQuestionModalProps> = ({
         <Modal open={open} onClose={onClose}>
             <Box
                 sx={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
+                    backgroundColor: '#333',
+                    padding: '32px',
+                    margin: 'auto',
                     width: '90%',
-                    maxWidth: 500,
-                    bgcolor: '#333',
+                    maxWidth: '500px',
                     borderRadius: '16px',
+                    maxHeight: '90vh',
+                    overflowY: 'auto',
                     boxShadow: '0px 10px 20px rgba(0, 0, 0, 0.5)',
-                    p: 4,
                     color: '#fff',
                 }}
             >

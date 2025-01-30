@@ -13,33 +13,40 @@ import DeleteQuestionModal from '../comps/ModalDeleteQuestion';
 import { ButtonAppBar } from '../comps/AppBar';
 
 interface Question {
-    id: number;
-    name: string;
-    category: string;
-    questionType: string;
-    shared: boolean;
-    maxPoints: number;
-    answerId: number | null;
+    QuestionId: number;
+    Name: string;
+    Category: string;
+    QuestionType: string;
+    Shared: boolean;
+    MaxPoints: number
+    Answer: string;
+    A: boolean
+    B: boolean;
+    C: boolean;
+    D: boolean;
+    QuestionBody: string;
 }
 
 const EditTestPage: React.FC = () => {
     const { courseId, testId } = useParams<{ courseId: string; testId: string }>();
     const navigate = useNavigate();
+
     const [questions, setQuestions] = useState<Question[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
-    const [deleteModalOpen, setDeleteModalOpen] = useState<{ open: boolean; question: Question | null }>({ open: false, question: null });
-
+   
     const [addModalOpen, setAddModalOpen] = useState<boolean>(false);
-    const [editModalOpen, setEditModalOpen] = useState<{ open: boolean; question: Question | null }>({ open: false, question: null });
     const [shareModalOpen, setShareModalOpen] = useState<boolean>(false);
+    const [deleteModalOpen, setDeleteModalOpen] = useState<{ open: boolean; question: Question | null }>({ open: false, question: null });
+    //const [editModalOpen, setEditModalOpen] = useState<{ open: boolean; question: Question | null }>({ open: false, question: null });
+
 
     const fetchQuestions = async () => {
         try {
             setLoading(true);
             setError(null);
 
-            const response = await fetch(`/api/question/${testId}`);
+            const response = await fetch(`https://localhost:7293/api/QuestionFranek/${testId}`);
             if (!response.ok) {
                 throw new Error(`Error fetching questions: ${response.statusText}`);
             }
@@ -64,7 +71,7 @@ const EditTestPage: React.FC = () => {
 
     const handleAddQuestion = () => setAddModalOpen(true);
     const handleCloseAddModal = () => setAddModalOpen(false);
-    const handleEditQuestion = (question: Question) => setEditModalOpen({ open: true, question });
+    //const handleEditQuestion = (question: Question) => setEditModalOpen({ open: true, question });
     const handleShareQuestion = () => setShareModalOpen(true);
 
     const handleOpenDeleteModal = (question: Question) => {
@@ -106,10 +113,12 @@ const EditTestPage: React.FC = () => {
                         <Button variant="contained" color="primary" onClick={handleAddQuestion}>
                             Add New Question
                         </Button>
+
                         <Button variant="contained" color="success" onClick={() => handleShareQuestion()}>
                             Shared Questions
                         </Button>
                     </Box>
+
                     <Button
                         variant="contained"
                         color="secondary"
@@ -147,24 +156,26 @@ const EditTestPage: React.FC = () => {
                                 <th style={{ padding: '10px' }}>Category</th>
                                 <th style={{ padding: '10px' }}>Type</th>
                                 <th style={{ padding: '10px' }}>Shared</th>
+                                <th style={{ padding: '10px' }}>QuestionBody</th>
                                 <th style={{ padding: '10px' }}>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {questions.map((question) => (
-                                <tr key={question.id} style={{ borderBottom: '1px solid #555' }}>
+                                <tr key={question.questionId} style={{ borderBottom: '1px solid #555' }}>
                                     <td style={{ padding: '10px' }}>{question.name}</td>
                                     <td style={{ padding: '10px' }}>{question.category}</td>
                                     <td style={{ padding: '10px' }}>{question.questionType}</td>
                                     <td style={{ padding: '10px' }}>{question.shared ? 'Yes' : 'No'}</td>
+                                    <td style={{ padding: '10px' }}>{question.questionBody}</td>
                                     <td style={{ padding: '10px', display: 'flex', gap: '8px' }}>
-                                        <Button
-                                            variant="contained"
-                                            color="primary"
-                                            onClick={() => handleEditQuestion(question)}
-                                        >
-                                            Edit
-                                        </Button>
+                                        {/*<Button*/}
+                                        {/*    variant="contained"*/}
+                                        {/*    color="primary"*/}
+                                        {/*    onClick={() => handleEditQuestion(question)}*/}
+                                        {/*>*/}
+                                        {/*    Edit*/}
+                                        {/*</Button>*/}
                                         <Button
                                             variant="contained"
                                             color="error"
@@ -183,14 +194,14 @@ const EditTestPage: React.FC = () => {
                     <AddQuestionModal testId={testId!} onClose={handleCloseAddModal} onQuestionAdded={fetchQuestions} />
                 )}
 
-                {editModalOpen.open && editModalOpen.question && (
-                    <EditQuestionModal
-                        open={editModalOpen.open}
-                        question={editModalOpen.question}
-                        onClose={() => setEditModalOpen({ open: false, question: null })}
-                        onQuestionUpdated={fetchQuestions}
-                    />
-                )}
+                {/*{editModalOpen.open && editModalOpen.question && (*/}
+                {/*    <EditQuestionModal*/}
+                {/*        open={editModalOpen.open}*/}
+                {/*        question={editModalOpen.question}*/}
+                {/*        onClose={() => setEditModalOpen({ open: false, question: null })}*/}
+                {/*        onQuestionUpdated={fetchQuestions}*/}
+                {/*    />*/}
+                {/*)}*/}
 
                 {shareModalOpen && (
                     <ShareQuestionModal
@@ -206,7 +217,7 @@ const EditTestPage: React.FC = () => {
                         open={deleteModalOpen.open}
                         onClose={handleCloseDeleteModal}
                         onConfirm={handleConfirmDelete}
-                        questionName={deleteModalOpen.question.name}
+                        questionName={deleteModalOpen.question.Name}
                     />
                 )}
             </Box>

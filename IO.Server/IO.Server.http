@@ -5,14 +5,20 @@ Accept: application/json
 
 ###
 
-POST {{IO.Server_HostAddress}}/api/TestManager/answer/add/test
+POST {{IO.Server_HostAddress}}/api/QuestionFranek/15
 Content-Type: application/json
 {
-    "text": "Admin",
-    "test": "1",
-    "question": "2",
-    "points": "2.3",
-    "key": "4"
+    "name":"adaw",
+    "category":"dawd",
+    "questionType":"open",
+    "shared":false,
+    "answer":"",
+    "a":false,
+    "b":false,
+    "c":false,
+    "d":false,
+    "maxPoints":12,
+    "questionBody":"afawd"
 }
 ###
 GET {{IO.Server_HostAddress}}/api/main/getEnvCourses

@@ -1,23 +1,22 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using IO.Server.Elements;
+using Microsoft.AspNetCore.Mvc;
 using Npgsql;
 using System;
-using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace IO.Server.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class QuestionController : ControllerBase
+    public class QuestionFranekController : ControllerBase
     {
         private readonly NpgsqlConnection _connection;
 
-        // Constructor: Initializes the controller with a PostgreSQL connection
-        public QuestionController(NpgsqlConnection connection)
+        public QuestionFranekController(NpgsqlConnection connection)
         {
             _connection = connection;
         }
 
-        // Endpoint: Add a question to a specific test
         [HttpPost("{testId}")]
         public IActionResult AddQuestionToTest(int testId, [FromBody] Question newQuestion)
         {
@@ -25,33 +24,21 @@ namespace IO.Server.Controllers
             {
                 _connection.Open();
 
-                // Insert the question into the "Question" table
-                string insertQuestionQuery = @"
-        INSERT INTO ""Question"" (name, category, questiontype, shared, answer, a, b, c, d, maxpoints)
-        VALUES(@name, @category, @questionType::qtype, @shared, @answer, @a, @b, @c, @d, @maxpoints)
-        RETURNING questionid;";
+                // Wstawienie nowego pytania do tabeli Question
+                string insertQuestionQuery = "INSERT INTO \"Question\" (name, category, questiontype, answer, shared, a, b, c, d, maxpoints, questionbody) " +
+                    $"VALUES('{newQuestion.name}','{newQuestion.category}' ,'{newQuestion.questionType}' ,'{newQuestion.answer}' ,'{newQuestion.shared}' ,'{newQuestion.a}' ,'{newQuestion.b}' , '{newQuestion.c}', '{newQuestion.d}', '{newQuestion.maxPoints}', '{newQuestion.questionBody}') " +
+                    "RETURNING questionid";
 
                 int newQuestionId;
                 using (var command = new NpgsqlCommand(insertQuestionQuery, _connection))
                 {
-                    command.Parameters.AddWithValue("@name", newQuestion.Name);
-                    command.Parameters.AddWithValue("@category", newQuestion.Category);
-                    command.Parameters.AddWithValue("@questionType", newQuestion.QuestionType);
-                    command.Parameters.AddWithValue("@shared", newQuestion.Shared);
-                    command.Parameters.AddWithValue("@answer", (object)newQuestion.Answer ?? DBNull.Value);
-                    command.Parameters.AddWithValue("@a", newQuestion.A ?? (object)DBNull.Value);
-                    command.Parameters.AddWithValue("@b", newQuestion.B ?? (object)DBNull.Value);
-                    command.Parameters.AddWithValue("@c", newQuestion.C ?? (object)DBNull.Value);
-                    command.Parameters.AddWithValue("@d", newQuestion.D ?? (object)DBNull.Value);
-                    command.Parameters.AddWithValue("@maxpoints", (object)newQuestion.MaxPoints ?? DBNull.Value);
-
                     newQuestionId = Convert.ToInt32(command.ExecuteScalar());
                 }
 
-                // Link the new question to the specified test in "QuestionToTest"
+                // Powiązanie pytania z testem w tabeli QuestionToTest
                 string insertQuestionToTestQuery = @"
-        INSERT INTO ""QuestionToTest"" (testid, questionid)
-        VALUES(@testId, @questionId);";
+                    INSERT INTO ""QuestionToTest"" (testid, questionid)
+                    VALUES(@testId, @questionId); ";
 
                 using (var command = new NpgsqlCommand(insertQuestionToTestQuery, _connection))
                 {
@@ -64,7 +51,8 @@ namespace IO.Server.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                Debug.Print(ex.ToString());
+                return StatusCode(500, "Error during adding question");
             }
             finally
             {
@@ -72,8 +60,6 @@ namespace IO.Server.Controllers
             }
         }
 
-
-        // Endpoint: Get all questions linked to a specific test
         [HttpGet("{testId}")]
         public IActionResult GetQuestionsForTest(int testId)
         {
@@ -82,11 +68,11 @@ namespace IO.Server.Controllers
                 _connection.Open();
 
                 string query = @"
-        SELECT q.questionid, q.name, q.category, q.questiontype, q.shared, 
-               q.answer, q.a, q.b, q.c, q.d, q.maxpoints
-        FROM ""Question"" q
-        INNER JOIN ""QuestionToTest"" qt ON q.questionid = qt.questionid
-        WHERE qt.testid = @testId;";
+            SELECT q.questionid, q.name, q.category, q.questiontype, q.shared, 
+                   q.answer, q.a, q.b, q.c, q.d, q.maxpoints, q.questionbody
+            FROM ""Question"" q
+            INNER JOIN ""QuestionToTest"" qt ON q.questionid = qt.questionid
+            WHERE qt.testid = @testId;";
 
                 var questions = new List<Question>();
 
@@ -99,16 +85,18 @@ namespace IO.Server.Controllers
                         {
                             questions.Add(new Question
                             {
-                                Name = reader["name"].ToString(),
-                                Category = reader["category"].ToString(),
-                                QuestionType = reader["questiontype"].ToString(),
-                                Shared = (bool)reader["shared"],
-                                Answer = reader["answer"] as string,
-                                A = reader["a"] is DBNull ? null : (bool?)reader["a"],
-                                B = reader["b"] is DBNull ? null : (bool?)reader["b"],
-                                C = reader["c"] is DBNull ? null : (bool?)reader["c"],
-                                D = reader["d"] is DBNull ? null : (bool?)reader["d"],
-                                MaxPoints = reader["maxpoints"] is DBNull ? null : (int?)reader["maxpoints"]
+                                questionId = (int)reader["questionid"],
+                                name = reader["name"].ToString(),
+                                category = reader["category"].ToString(),
+                                questionType = reader["questiontype"].ToString(),
+                                shared = (bool)reader["shared"],
+                                answer = (string)reader["answer"],
+                                a = (bool)reader["a"], 
+                                b = (bool)reader["b"], 
+                                c = (bool)reader["c"],
+                                d = (bool)reader["d"],
+                                maxPoints = (double)reader["maxpoints"],
+                                questionBody = reader["questionbody"].ToString(),
                             });
                         }
                     }
@@ -127,19 +115,20 @@ namespace IO.Server.Controllers
         }
 
 
-        // Data model: Represents a question
         public class Question
         {
-            public string Name { get; set; }            // Question text
-            public string Category { get; set; }       // Question category
-            public string QuestionType { get; set; }   // Type: "open" or "closed"
-            public bool Shared { get; set; }           // Shared status
-            public string Answer { get; set; }         // Answer for open-ended questions
-            public bool? A { get; set; }               // Option A (true for correct)
-            public bool? B { get; set; }               // Option B (true for correct)
-            public bool? C { get; set; }               // Option C (true for correct)
-            public bool? D { get; set; }               // Option D (true for correct)
-            public int? MaxPoints { get; set; }        // Maximum points for the question
+            public int questionId { get; set; }
+            public string name { get; set; }
+            public string category { get; set; }
+            public string questionType { get; set; }
+            public bool shared { get; set; }
+            public string answer { get; set; }
+            public bool a { get; set; }
+            public bool b { get; set; }
+            public bool c { get; set; }
+            public bool d { get; set; }
+            public double maxPoints { get; set; }
+            public string questionBody { get; set; }
         }
     }
 }

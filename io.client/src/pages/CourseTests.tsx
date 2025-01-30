@@ -119,9 +119,7 @@ const CourseTests: React.FC = () => {
         navigate(`/course/${courseId}/test/${testId}/set-time`);
     };
 
-    const handleCheckResults = (testId: number) => {
-        navigate(`/course/${courseId}/test/${testId}/results`);
-    };
+
 
     const handleAddTest = (newTest: Test) => {
         setTests((prevTests) => [...prevTests, newTest]);
@@ -261,13 +259,7 @@ const CourseTests: React.FC = () => {
                                         >
                                             Edit Test
                                         </Button>
-                                        <Button
-                                            variant="contained"
-                                            color="info"
-                                            onClick={() => handleCheckResults(test.testId)}
-                                        >
-                                            View report
-                                        </Button>
+                                       
 
                                         <Button
                                             variant="contained"
@@ -283,10 +275,6 @@ const CourseTests: React.FC = () => {
                                             testName={currentTest?.name || ''}
                                             isArchived={currentTest?.archived || false}
                                         />
-
-
-
-
                                     </Box>
                                 </CardContent>
                             </Card>
