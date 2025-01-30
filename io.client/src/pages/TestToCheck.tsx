@@ -39,7 +39,8 @@ const TestsToCheck: React.FC = () => {
         navigate(`/CheckTest/${testId}`);
     };
 
-    const handleSumTestClick = (testId: number, testName:string) => {
+    const handleSumTestClick = (testId: number, testName: string) => {
+        
         navigate(`/SumTest/${testId}/${testName}`);
     };
 

@@ -28,7 +28,7 @@ namespace IO.Server.Controllers
                 _connection.Open();
 
                 const string selectQuery = @"
-            SELECT u.userid, u.name, SUM(a.points) AS totalPoints
+            SELECT u.userid, u.name, COALESCE(SUM(a.points), 0) AS totalPoints
             FROM ""User"" u
             JOIN ""Answer"" a ON u.userid = a.userid
             WHERE a.testid = @TestId

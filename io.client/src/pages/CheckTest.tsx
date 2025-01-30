@@ -65,9 +65,10 @@ const ReviewQuestions: React.FC = () => {
             advanceQuestion();
 
             // Przekierowanie na stronê g³ówn¹, jeœli to ostatnie pytanie
-            if (index === questions.length - 1) {  
-                window.location.href = '/TestToCheck';  
-            }
+            //if (index === questions.length - 1) {  
+            //    console.log("Nie daje moidu");
+            //    window.location.href = '/TestToCheck';  
+            //}
 
         } catch (error) {
             console.error("Error submitting points:", error);
@@ -79,7 +80,8 @@ const ReviewQuestions: React.FC = () => {
             setIndex(index + 1);
             setAssignedPoints(0);
         } else {
-            navigate("/TestToCheck");
+            console.log("Nie wraca");
+            navigate(-1);
         }
     };
 

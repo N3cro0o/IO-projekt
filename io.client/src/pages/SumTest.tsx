@@ -9,7 +9,7 @@ interface UserScore {
 }
 
 const SumTest: React.FC = () => {
-    
+    console.log('odpala sumTest');
     const [userScores, setUserScores] = useState<UserScore[]>([]);
     const { testId, testName } = useParams<{ testId: string, testName: string }>();
 
