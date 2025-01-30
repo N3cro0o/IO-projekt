@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using IO.Server.Elements;
+using Microsoft.AspNetCore.Mvc;
 using Npgsql;
 using System;
 using System.Threading.Tasks;
@@ -83,7 +84,65 @@ public class EditQuestionController : ControllerBase
             await _connection.CloseAsync();
         }
     }
+    //Wyświetlanie Pytań Otwartych
+    [HttpGet("QuestionList")]
+    public ActionResult<IEnumerable<QuestionToShow>> GetQuestion()
+    {
+        var question = new List<QuestionToShow>();
+
+        try
+        {
+            _connection.Open();
+
+            const string query = @"
+                    SELECT a.answerid, q.name, q.questionbody, a.answer, a.points, q.maxpoints
+                    FROM ""Answer"" a 
+                    JOIN ""Question"" q ON a.questionid = q.questionid
+                    WHERE a.a = false AND a.b = false AND a.c = false AND a.d = false;";
+
+            using (var command = new NpgsqlCommand(query, _connection))
+            {
+                //command.Parameters.AddWithValue("@CourseId", courseId);
+
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        var quest = new QuestionToShow
+                        {
+                            aID = reader.GetInt32(0),
+                            qName = reader.GetString(1),
+                            qBody = reader.GetString(2),
+                            aAnswer = reader.GetString(3),
+                            aPoints = reader.GetDouble(4),
+                            qMaxPoints = reader.GetDouble(5)
+                        };
+                        question.Add(quest);
+                        Console.WriteLine($"Jest zajebiscie");
+                    }
+                }
+            }
+            Console.WriteLine($"Łączna liczba testów dla kursu: {question.Count}");
+
+            if (question.Count == 0)
+            {
+                return NotFound("Jest chujowo ");
+            }
+
+            return Ok(question);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Błąd: {ex.Message}");
+            return StatusCode(500, $"Internal server error: {ex.Message}");
+        }
+        finally
+        {
+            _connection.Close();
+        }
+    }
 }
+
 
 public class QuestionUpdateRequest
 {
@@ -98,4 +157,14 @@ public class QuestionUpdateRequest
     public bool? C { get; set; }
     public bool? D { get; set; }
     public string? Question { get; set; }
+}
+
+public class QuestionToShow
+{
+    public int aID { get; set; }
+    public string qName { get; set; }
+    public string qBody { get; set; }
+    public string aAnswer { get; set; }
+    public double aPoints { get; set; }
+    public double qMaxPoints { get; set; }
 }

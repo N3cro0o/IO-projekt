@@ -69,6 +69,44 @@
         }
       }
     },
+    "/api/EditQuestion/QuestionList": {
+      "get": {
+        "tags": [
+          "EditQuestion"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/QuestionToShow"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/QuestionToShow"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/QuestionToShow"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/Account/showData/{userId}": {
       "get": {
         "tags": [
@@ -1179,6 +1217,32 @@
           "id": {
             "type": "integer",
             "format": "int32"
+          }
+        }
+      },
+      "QuestionToShow": {
+        "type": "object",
+        "properties": {
+          "aID": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "qName": {
+            "type": "string"
+          },
+          "qBody": {
+            "type": "string"
+          },
+          "aAnswer": {
+            "type": "string"
+          },
+          "aPoints": {
+            "type": "number",
+            "format": "double"
+          },
+          "qMaxPoints": {
+            "type": "number",
+            "format": "double"
           }
         }
       },

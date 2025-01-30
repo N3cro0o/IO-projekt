@@ -93,6 +93,15 @@ const TemporaryDrawer = ({ open, toggleDrawer, token }) => {
                     <ListItemText primary="Account Managment" sx={{ color: 'white' }} /> {/* Kolor tekstu - bia³y */}
                 </ListItem>
             </List>
+            <List>
+                {/* Link do User Panel */}
+                <ListItem button component={Link} to="/CheckTest">
+                    <ListItemIcon sx={{ color: '#007bff' }}> {/* Kolor ikon - niebieski */}
+                        <AccountBoxIcon /> {/* Ikona panelu u¿ytkownika */}
+                    </ListItemIcon>
+                    <ListItemText primary="CheckTest" sx={{ color: 'white' }} /> {/* Kolor tekstu - bia³y */}
+                </ListItem>
+            </List>
         </Box>
     );
 

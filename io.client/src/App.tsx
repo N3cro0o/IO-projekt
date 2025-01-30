@@ -15,6 +15,7 @@ import { UserProfilePage } from './pages/AccountManager';
 import EditTestPage from './pages/EditTestPage';
 import CourseUser from './pages/StudentCourses';
 import StartTest from './pages/TestTaker3000';
+import CheckTest from './pages/CheckTest';
 
 function App() {
     const [token, setToken] = useState(-1);
@@ -34,7 +35,7 @@ function App() {
                     <Route path="/course/:courseId/test/:testId/edit" element={<EditTestPage />} />
                     <Route path="/student/courses" element={<CourseUser />} />
                     <Route path="/student/:testID/start" element={<StartTest />} />
-
+                    <Route path="/student/:testID/start" element={<CheckTest />} />
                 </Routes>
             </HRouter>
         </div>
