@@ -95,12 +95,74 @@ namespace IO.Server.Controllers
             }
         }
 
-    }
+
+
+            [HttpGet("Results/{userId}")]
+            public ActionResult<IEnumerable<TestResult>> GetResultsByUserId(int userId)
+            {
+                var results = new List<TestResult>();
+
+                try
+                {
+                    _connection.Open();
+
+                    const string query = @"
+                        SELECT t.name, t.category, r.points, r.feedback 
+                        FROM ""Results"" r 
+                        JOIN ""Test"" t ON t.testid = r.testid 
+                        WHERE r.userid = @userId";
+    
+                using (var command = new NpgsqlCommand(query, _connection))
+                    {
+                        command.Parameters.AddWithValue("@userId", userId);
+
+                        using (var reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                var result = new TestResult
+                                {
+                                    TestName = reader.GetString(0),
+                                    Category = reader.GetString(1),
+                                    Points = reader.GetInt32(2),
+                                    Feedback = reader.IsDBNull(3) ? null : reader.GetString(3)
+                                };
+                                results.Add(result);
+                            }
+                        }
+                    }
+
+                    if (results.Count == 0)
+                    {
+                        return NotFound("No results found for the specified user ID.");
+                    }
+
+                    return Ok(results);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error: {ex.Message}");
+                    return StatusCode(500, $"Internal server error: {ex.Message}");
+                }
+                finally
+                {
+                    _connection.Close();
+                }
+            }
+
+        }
     public class UserScore
     {
         public int UserId { get; set; } // Identyfikator u¿ytkownika
         public string UserName { get; set; } // Nazwa u¿ytkownika
         public double TotalPoints { get; set; } // Suma punktów zdobytych przez u¿ytkownika
     }
+        public class TestResult
+        {
+            public string TestName { get; set; }
+            public string Category { get; set; }
+            public int Points { get; set; }
+            public string Feedback { get; set; }
+        }
 
-}
+    }

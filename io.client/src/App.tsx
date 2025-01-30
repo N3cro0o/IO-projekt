@@ -19,6 +19,7 @@ import StartTest from './pages/TestTaker3000';
 import CheckTest from './pages/CheckTest';
 import TestToCheck from './pages/TestToCheck';
 import SumTest from './pages/SumTest';
+import CheckResults from './pages/CheckResults';
 
 function App() {
     const [token, setToken] = useState(-1);
@@ -41,6 +42,7 @@ function App() {
                     <Route path="/CheckTest/:testId" element={<CheckTest />} />
                     <Route path="/TestToCheck" element={<TestToCheck />} />
                     <Route path="/SumTest/:testId/:testName" element={<SumTest />} />
+                    <Route path="/CheckResults" element={<CheckResults />} />
                 </Routes>
             </HRouter>
         </div>

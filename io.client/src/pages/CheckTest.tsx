@@ -66,7 +66,7 @@ const ReviewQuestions: React.FC = () => {
 
             // Przekierowanie na stronê g³ówn¹, jeœli to ostatnie pytanie
             if (index === questions.length - 1) {  
-                window.location.href = '/';  
+                window.location.href = '/TestToCheck';  
             }
 
         } catch (error) {
