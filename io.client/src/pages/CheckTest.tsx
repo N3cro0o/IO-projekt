@@ -44,7 +44,7 @@ const ReviewQuestions: React.FC = () => {
         };
 
         try {
-            const response = await fetch('https://localhost:7293/api/TestManager/answer/review', {
+            const response = await fetch('https://localhost:7293/api/EditQuestion/answer/review', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(answerData),
