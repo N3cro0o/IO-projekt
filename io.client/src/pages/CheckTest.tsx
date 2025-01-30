@@ -79,7 +79,7 @@ const ReviewQuestions: React.FC = () => {
             setIndex(index + 1);
             setAssignedPoints(0);
         } else {
-            navigate("/teacher/review-complete");
+            navigate("/TestToCheck");
         }
     };
 
