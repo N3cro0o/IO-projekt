@@ -40,7 +40,7 @@ function App() {
                     <Route path="/student/:testID/start" element={<StartTest />} />
                     <Route path="/CheckTest/:testId" element={<CheckTest />} />
                     <Route path="/TestToCheck" element={<TestToCheck />} />
-                    <Route path="/SumTest/:testId" element={<SumTest />} />
+                    <Route path="/SumTest/:testId/:testName" element={<SumTest />} />
                 </Routes>
             </HRouter>
         </div>

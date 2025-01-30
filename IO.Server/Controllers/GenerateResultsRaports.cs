@@ -18,54 +18,7 @@ namespace IO.Server.Controllers
         }
 
 
-    // Pobranie tytu³u testu na podstawie testId
-    [HttpGet("TestTitle/{testId}")]
-    public ActionResult<string> GetTestTitleById(int testId)
-    {
-        try
-        {
-            // Otwieramy po³¹czenie z baz¹
-            _connection.Open();
-
-            // Zapytanie SQL, które pobiera tytu³ testu na podstawie testId
-            const string query = @"
-            SELECT name
-            FROM ""Test""
-            WHERE testid = @TestId";
-
-            using (var command = new NpgsqlCommand(query, _connection))
-            {
-                // Dodanie parametru do zapytania
-                command.Parameters.AddWithValue("@TestId", testId);
-
-                // Wykonanie zapytania
-                using (var reader = command.ExecuteReader())
-                {
-                    if (reader.Read()) // Jeœli test zosta³ znaleziony
-                    {
-                        string testTitle = reader.GetString(0); // Pobranie tytu³u testu
-                        return Ok(testTitle); // Zwracamy tytu³ testu
-                    }
-                    else
-                    {
-                        // Jeœli test o danym ID nie istnieje
-                        return NotFound("Test not found.");
-                    }
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            // Obs³uga b³êdów, zwrócenie 500 w przypadku problemu z baz¹ danych
-            Console.WriteLine($"B³¹d: {ex.Message}");
-            return StatusCode(500, $"Internal server error: {ex.Message}");
-        }
-        finally
-        {
-            // Zamkniêcie po³¹czenia z baz¹ danych
-            _connection.Close();
-        }
-    }
+    
         // Pobranie i sprawdzanie wyniku ucznia
         [HttpGet("GetUserScores/{testId}")]
         public ActionResult<IEnumerable<UserScore>> GetUserScoresByTestId(int testId)
@@ -101,7 +54,7 @@ namespace IO.Server.Controllers
                             {
                                 UserId = reader.GetInt32(0),
                                 UserName = reader.GetString(1),
-                                TotalPoints = reader.GetInt32(2)
+                                TotalPoints = reader.GetDouble(2)
                             };
                             userScores.Add(userScore);
                         }
@@ -135,7 +88,7 @@ namespace IO.Server.Controllers
     {
         public int UserId { get; set; } // Identyfikator u¿ytkownika
         public string UserName { get; set; } // Nazwa u¿ytkownika
-        public int TotalPoints { get; set; } // Suma punktów zdobytych przez u¿ytkownika
+        public double TotalPoints { get; set; } // Suma punktów zdobytych przez u¿ytkownika
     }
 
 }

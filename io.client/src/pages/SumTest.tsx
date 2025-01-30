@@ -9,9 +9,9 @@ interface UserScore {
 }
 
 const SumTest: React.FC = () => {
-    const [testTitle, setTestTitle] = useState<string>('');
+    
     const [userScores, setUserScores] = useState<UserScore[]>([]);
-    const { testId } = useParams<{ testId: string }>();
+    const { testId, testName } = useParams<{ testId: string, testName: string }>();
 
     useEffect(() => {
         const fetchTestData = async () => {
@@ -21,30 +21,27 @@ const SumTest: React.FC = () => {
             }
 
             try {
-                // Pobieramy dane o teúcie
-                const testResponse = await fetch(`https://localhost:59127/api/GenerateResultsRaports/TestTitle/${testId}`);
-                if (!testResponse.ok) {
-                    throw new Error(`HTTP error! status: ${testResponse.status}`);
-                }
-                const testData = await testResponse.json();
-                setTestTitle(testData.title); // Zak≥adamy, øe odpowiedü zawiera tytu≥ testu
-
                 // Pobieramy dane o uøytkownikach i punktach
                 const scoreResponse = await fetch(`https://localhost:59127/api/GenerateResultsRaports/GetUserScores/${testId}`);
+                const scoreResponseText = await scoreResponse.text(); // Odczytujemy odpowiedü jako tekst
+                console.log("Score Response:", scoreResponseText); // Logowanie odpowiedzi
+
                 if (!scoreResponse.ok) {
                     throw new Error(`HTTP error! status: ${scoreResponse.status}`);
                 }
-                const scoresData: UserScore[] = await scoreResponse.json();
+
+                const scoresData: UserScore[] = JSON.parse(scoreResponseText); // RÍczne parsowanie odpowiedzi
                 setUserScores(scoresData); // Ustawiamy dane o punktach uøytkownikÛw
             } catch (err) {
                 console.error('Error fetching test data:', err);
             }
         };
 
+
         fetchTestData();
     }, [testId]);
 
-    if (!testTitle || userScores.length === 0) {
+    if ( userScores.length === 0) {
         return <div>Loading...</div>;
     }
 
@@ -52,7 +49,7 @@ const SumTest: React.FC = () => {
         <Container maxWidth="lg" sx={{ mt: 4 }}>
             <Paper sx={{ p: 3, backgroundColor: '#333', color: '#fff', borderRadius: 2 }}>
                 <Typography variant="h5" fontWeight="bold" gutterBottom>
-                    {testTitle}
+                    {testName}
                 </Typography>
 
                 <TableContainer component={Paper} sx={{ mt: 2, backgroundColor: '#444' }}>

@@ -39,8 +39,8 @@ const TestsToCheck: React.FC = () => {
         navigate(`/CheckTest/${testId}`);
     };
 
-    const handleSumTestClick = (testId: number) => {
-        navigate(`/SumTest/${testId}`);
+    const handleSumTestClick = (testId: number, testName:string) => {
+        navigate(`/SumTest/${testId}/${testName}`);
     };
 
     console.log("Current state of tests:", tests);
@@ -63,7 +63,7 @@ const TestsToCheck: React.FC = () => {
                                 <Button variant="contained" color="primary" onClick={() => handleTestClick(test.testId)}>
                                     Check Test
                                 </Button>
-                                <Button variant="contained" color="secondary" onClick={() => handleSumTestClick(test.testId)}>
+                                <Button variant="contained" color="secondary" onClick={() => handleSumTestClick(test.testId,test.name)}>
                                     SumTest
                                 </Button>
                             </Box>
