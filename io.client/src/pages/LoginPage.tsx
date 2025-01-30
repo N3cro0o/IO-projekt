@@ -1,12 +1,11 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { ButtonAppBar } from '../comps/AppBar.tsx';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import { Alert } from '@mui/material';
-import { jwtDecode } from "jwt-decode";
 
 export const Login = () => {
     const [formData, setFormData] = useState({
@@ -16,15 +15,23 @@ export const Login = () => {
 
     const [loginError, setLoginError] = useState('');
     const [passwordError, setPasswordError] = useState('');
-    const navigate = useNavigate(); // hook do nawigacji w React Router v6
+    const navigate = useNavigate();
+
+    // Sprawdzenie, czy użytkownik jest już zalogowany
+    useEffect(() => {
+        const token = localStorage.getItem('authToken');
+        if (token) {
+            navigate('/'); // Przekierowanie na stronę główną
+        }
+    }, [navigate]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value }); // Aktualizacja formData na podstawie nazwy pola
+        setFormData({ ...formData, [name]: value });
     };
 
     const checkLogin = async (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault(); // Zapobiega przeładowaniu strony
+        event.preventDefault();
 
         setLoginError('');
         setPasswordError('');
@@ -49,14 +56,14 @@ export const Login = () => {
 
             if (response.ok) {
                 const data = await response.json();
-                localStorage.setItem('userId', String(data.userId)); // Zapisz ID użytkownika
-                localStorage.setItem('authToken', data.token); // Zapisz token
+                localStorage.setItem('userId', String(data.userId));
+                localStorage.setItem('authToken', data.token);
                 navigate('/UserPanel');
             } else {
                 setLoginError('Incorrect login details');
             }
         } catch (error) {
-            setLoginError('An error occurred while logging in ');
+            setLoginError('An error occurred while logging in');
         }
     };
 
@@ -95,11 +102,6 @@ export const Login = () => {
                                 },
                             }}
                         />
-                        {loginError && (
-                            <Alert severity="error" sx={{ marginBottom: '16px' }}>
-                                {loginError}
-                            </Alert>
-                        )}
                         <TextField
                             label="Password"
                             name="password"
@@ -116,9 +118,9 @@ export const Login = () => {
                                 },
                             }}
                         />
-                        {passwordError && (
+                        {loginError && (
                             <Alert severity="error" sx={{ marginBottom: '16px' }}>
-                                {passwordError}
+                                {loginError}
                             </Alert>
                         )}
                         <Button

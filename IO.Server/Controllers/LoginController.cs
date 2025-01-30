@@ -26,7 +26,7 @@ namespace IO.Server.Controllers
         {
             if (data == null)
             {
-                return BadRequest("Dane nie mogą być puste");
+                return BadRequest("Data cannot be empty");
             }
 
             if (!ModelState.IsValid)

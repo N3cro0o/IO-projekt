@@ -5,6 +5,7 @@ import ModalChangeUsers from '../comps/ModalKickUsersFromCourse.tsx';
 import ModalAddCourse from '../comps/ModalAddCourse.tsx';
 import { ButtonAppBar } from '../comps/AppBar.tsx';
 import { jwtDecode } from "jwt-decode";
+import { useNavigate } from 'react-router-dom';
 
 export const CourseUser = () => {
     const [loading, setLoading] = useState<boolean>(true);
@@ -28,7 +29,13 @@ export const CourseUser = () => {
         }));
     };
 
+    const navigate = useNavigate();
     useEffect(() => {
+
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+            navigate('/'); // Przekierowanie na stronê g³ówn¹
+        }
 
         const fetchCourses = async () => {
             try {

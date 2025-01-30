@@ -27,43 +27,29 @@ namespace IO.Server.Controllers
 
             if (data == null)
             {
-                return BadRequest("Dane nie mogą być puste");
+                return BadRequest("Data can't be empty");
             }
 
             // Walidacja unikalności loginu
             if (!IsUniqueLogin(data.Login))
             {
-                return BadRequest("Login jest już zajęty");
+                return BadRequest("Login already in use");
             }
 
             // Walidacja unikalności e-maila
             if (!IsUniqueEmail(data.Email))
             {
-                return BadRequest("Adres e-mail jest już zajęty");
+                return BadRequest("Email already in use");
             }
 
             // Walidacja hasła
             if (!IsValidPassword(data.PasswordHash))
             {
-                return BadRequest("Hasło musi zawierać co najmniej 8 znaków, jedną dużą literę i jeden znak specjalny");
+                return BadRequest("Password should have 8 letters, 1 big letter and special character");
             }
 
             //var hashedPassword = BCrypt.Net.BCrypt.HashPassword(data.PasswordHash);
             var hashedPassword = PasswordHasher.HashPasswordWithSHA256(data.PasswordHash);
-
-            //// Wyświetlenie danych w logu serwera
-            //Console.WriteLine($"Login: {data.Login}");
-            //Console.WriteLine($"First Name: {data.FirstName}");
-            //Console.WriteLine($"Last Name: {data.LastName}");
-            //Console.WriteLine($"Email: {data.Email}");
-            //Console.WriteLine($"Password (hashed): {data.PasswordHash}");
-
-            //// Zwrot danych jako odpowiedź
-            //return Ok(new
-            //{
-            //    Message = "Dane odebrane pomyślnie",
-            //    ReceivedData = data
-            //});
 
             string role = "student";
             string query = "INSERT INTO \"User\"(login, name, surname, email, password, role) VALUES ";
@@ -74,7 +60,7 @@ namespace IO.Server.Controllers
                 _connection.Open();
                 using NpgsqlCommand npgsqlCommand = new NpgsqlCommand(query, _connection);
                 npgsqlCommand.ExecuteNonQuery();
-                return Ok(new { Message = "Rejestracja zakończona sukcesem" });
+                return Ok(new { Message = "Registration ended successfully" });
             }
             catch (Exception ex)
             {

@@ -19,6 +19,11 @@ const SetTestTimePage: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+            navigate('/'); // Przekierowanie na stronê g³ówn¹
+        }
+
         const fetchTestTime = async () => {
             try {
                 const response = await fetch(``);

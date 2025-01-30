@@ -5,6 +5,7 @@ import ModalChangeUsers from '../comps/ModalKickUsersFromCourse.tsx';
 import ModalAddCourse from '../comps/ModalAddCourse.tsx';
 import { ButtonAppBar } from '../comps/AppBar.tsx';
 import { jwtDecode } from "jwt-decode";
+import { useNavigate } from 'react-router-dom';
 
 export const Course = () => {
     const [loading, setLoading] = useState<boolean>(true);
@@ -32,9 +33,21 @@ export const Course = () => {
         }));
     };
 
+    const navigate = useNavigate();
+
     useEffect(() => {
 
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+            navigate('/'); // Przekierowanie na stronê g³ówn¹
+        }
+
         const fetchCourses = async () => {
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                localStorage.removeItem('authToken');
+                navigate('/');
+            }
             try {
                 const userId = localStorage.getItem('userId');
                 console.log('User ID from localStorage:', userId);
@@ -192,7 +205,7 @@ export const Course = () => {
                     {/* Modal dla dodawania kursu */}
                     {openModalAddCourse && (
                         <ModalAddCourse
-                            ownerId={1}  
+                            ownerId={1}
                             open={openModalAddCourse}
                             handleClose={handleCloseAddCourseModal}
                             refreshCourses={refreshCourses} // Przekazujemy refreshCourses

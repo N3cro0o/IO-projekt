@@ -43,11 +43,6 @@ export function ButtonAppBar() {
         const token = localStorage.getItem('authToken');
         if (token) {
             setIsLoggedIn(true); // Je¿eli token istnieje, u¿ytkownik jest zalogowany
-            console.log('AppBar\n' + token);
-            setToken(token);
-            console.log('Hook\n' + tokenJwt);
-            //const d = jwtDecode(tokenJwt);
-            //console.log(d);
         } else {
             setIsLoggedIn(false); // Jeœli token nie istnieje, u¿ytkownik nie jest zalogowany
         }

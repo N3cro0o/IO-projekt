@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -26,6 +26,14 @@ export const Registration = () => {
         password: '',
     });
     const navigate = useNavigate();
+
+    // Sprawdzenie, czy u¿ytkownik jest ju¿ zalogowany
+    useEffect(() => {
+        const token = localStorage.getItem('authToken');
+        if (token) {
+            navigate('/'); // Przekierowanie na stronê g³ówn¹
+        }
+    }, [navigate]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -90,7 +98,17 @@ export const Registration = () => {
                 navigate('/loginPage');
             } else {
                 const errorData = await response.json();
-                setError(errorData.Message || 'Error during registration');
+                if (errorData.errors.login) {
+                    setErrorFields(prev => ({ ...prev, login: errorData.errors.login }));
+                }
+                if (errorData.errors.email) {
+                    setErrorFields(prev => ({ ...prev, email: errorData.errors.email }));
+                }
+                if (errorData.errors.password) {
+                    setErrorFields(prev => ({ ...prev, password: errorData.errors.password }));
+                }
+                console.log(errorData.errors.password);
+                setError('Error during registration');
             }
         } catch (error) {
             console.log(error);

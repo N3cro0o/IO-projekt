@@ -11,7 +11,7 @@ import {
     Container
 } from '@mui/material';
 import { ButtonAppBar } from '../comps/AppBar.tsx';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 interface Question {
     answersClosed: string;
@@ -42,6 +42,13 @@ const StartTest: React.FC = () => {
     const [answersClosed, setAnswersClosed] = useState<string[]>([]);
     const [selectedValues, setSelectedValues] = useState<boolean[]>([false, false, false, false]);
     const [answerText, setAnswerText] = useState<string>("");
+
+    useEffect(() => {
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+            navigate('/'); // Przekierowanie na stronê g³ówn¹
+        }
+    }, [navigate]);
 
     const handleCheckboxChange = (value: number, checked: boolean) => {
         try {

@@ -54,6 +54,11 @@ const EditTestPage: React.FC = () => {
     };
 
     useEffect(() => {
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+            navigate('/'); // Przekierowanie na stronê g³ówn¹
+        }
+
         fetchQuestions();
     }, [testId]);
 
