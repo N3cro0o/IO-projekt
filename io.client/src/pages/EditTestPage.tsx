@@ -11,6 +11,7 @@ import EditQuestionModal from '../comps/ModalEditQuestion';
 import ShareQuestionModal from '../comps/ModalShareQuestion';
 import DeleteQuestionModal from '../comps/ModalDeleteQuestion';
 import { ButtonAppBar } from '../comps/AppBar';
+import SharedQuestionModal from '../comps/SharedQuestionModal';
 
 interface Question {
     id: number;
@@ -66,6 +67,7 @@ const EditTestPage: React.FC = () => {
     const handleCloseAddModal = () => setAddModalOpen(false);
     const handleEditQuestion = (question: Question) => setEditModalOpen({ open: true, question });
     const handleShareQuestion = () => setShareModalOpen(true);
+    const [sharedModalOpen, setSharedModalOpen] = useState<boolean>(false);
 
     const handleOpenDeleteModal = (question: Question) => {
         setDeleteModalOpen({ open: true, question });
@@ -109,6 +111,12 @@ const EditTestPage: React.FC = () => {
                         <Button variant="contained" color="success" onClick={() => handleShareQuestion()}>
                             Shared Questions
                         </Button>
+                               
+                        <Button //Przycisk Add Shared Question 
+                            variant="contained" color="success" onClick={() => setSharedModalOpen(true)}>
+                            Add Shared Question
+                        </Button>
+
                     </Box>
                     <Button
                         variant="contained"
@@ -199,6 +207,10 @@ const EditTestPage: React.FC = () => {
                         questions={questions}
                         onShareUpdate={fetchQuestions}
                     />
+                )}
+                
+                {sharedModalOpen && ( //£¥CZENIE Z MODALEM SHARED QUESTION
+                    <SharedQuestionModal open={sharedModalOpen} onClose={() => setSharedModalOpen(false)} testId={testId} />
                 )}
 
                 {deleteModalOpen.open && deleteModalOpen.question && (

@@ -126,9 +126,18 @@ const ModalAddTest: React.FC<ModalAddTestProps> = ({ open, handleClose, courseId
                     type="datetime-local"
                     InputLabelProps={{ shrink: true }}
                     value={newTest.endTime}
-                    onChange={(e) => setNewTest({ ...newTest, endTime: e.target.value })}
+                    //NIE MOZNA WYBRAC DATY WCZENSIEJSZEJ NIZ DATA ROZPOCZECIA
+                    onChange={(e) => {
+                        const endTime = e.target.value;
+                        if (newTest.startTime && endTime < newTest.startTime) {
+                            alert("End date cannot be earlier than the start date.");
+                            return;
+                        }
+                        setNewTest({ ...newTest, endTime });
+                    }}
+                    //KONIEC
                     sx={inputStyle}
-                    inputProps={{ min: minDateTime }}
+                    inputProps={{ min: newTest.startTime || minDateTime }}
                 />
                 <TextField
                     fullWidth
