@@ -54,7 +54,7 @@ namespace IO.Server.Controllers
                             userScores.Add(userScore);
                         }
 
-                        reader.Close(); // Zamykamy reader przed wykonaniem kolejnych zapytañ
+                        reader.Close(); 
 
                         // Jeœli s¹ wyniki, zapisujemy je do tabeli "Results"
                         if (userScores.Count > 0)
@@ -100,14 +100,15 @@ namespace IO.Server.Controllers
             [HttpGet("Results/{userId}")]
             public ActionResult<IEnumerable<TestResult>> GetResultsByUserId(int userId)
             {
-                var results = new List<TestResult>();
+            Console.WriteLine($"Odpala BMW");
+            var results = new List<TestResult>();
 
                 try
                 {
                     _connection.Open();
 
                     const string query = @"
-                        SELECT t.name, t.category, r.points, r.feedback 
+                        SELECT t.name, t.category, r.points
                         FROM ""Results"" r 
                         JOIN ""Test"" t ON t.testid = r.testid 
                         WHERE r.userid = @userId";
@@ -124,8 +125,8 @@ namespace IO.Server.Controllers
                                 {
                                     TestName = reader.GetString(0),
                                     Category = reader.GetString(1),
-                                    Points = reader.GetInt32(2),
-                                    Feedback = reader.IsDBNull(3) ? null : reader.GetString(3)
+                                    Points = reader.GetDouble(2),
+                                    
                                 };
                                 results.Add(result);
                             }
@@ -153,16 +154,16 @@ namespace IO.Server.Controllers
         }
     public class UserScore
     {
-        public int UserId { get; set; } // Identyfikator u¿ytkownika
-        public string UserName { get; set; } // Nazwa u¿ytkownika
-        public double TotalPoints { get; set; } // Suma punktów zdobytych przez u¿ytkownika
+        public int UserId { get; set; } 
+        public string UserName { get; set; } 
+        public double TotalPoints { get; set; } 
     }
         public class TestResult
         {
             public string TestName { get; set; }
             public string Category { get; set; }
-            public int Points { get; set; }
-            public string Feedback { get; set; }
+            public double Points { get; set; }
+ 
         }
 
     }

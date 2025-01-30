@@ -1567,11 +1567,8 @@
             "type": "string"
           },
           "points": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "feedback": {
-            "type": "string"
+            "type": "number",
+            "format": "double"
           }
         }
       },
