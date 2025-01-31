@@ -38,7 +38,7 @@ const EditTestPage: React.FC = () => {
     const [addModalOpen, setAddModalOpen] = useState<boolean>(false);
     const [shareModalOpen, setShareModalOpen] = useState<boolean>(false);
     const [deleteModalOpen, setDeleteModalOpen] = useState<{ open: boolean; question: Question | null }>({ open: false, question: null });
-    //const [editModalOpen, setEditModalOpen] = useState<{ open: boolean; question: Question | null }>({ open: false, question: null });
+    const [editModalOpen, setEditModalOpen] = useState<{ open: boolean; question: Question | null }>({ open: false, question: null });
 
 
     const fetchQuestions = async () => {
@@ -72,7 +72,10 @@ const EditTestPage: React.FC = () => {
 
     const handleAddQuestion = () => setAddModalOpen(true);
     const handleCloseAddModal = () => setAddModalOpen(false);
-    //const handleEditQuestion = (question: Question) => setEditModalOpen({ open: true, question });
+    const handleEditQuestion = (question: Question) => {
+        setEditModalOpen({ open: true, question });
+        localStorage.setItem('questID', ''+question.QuestionId);
+    };
     const handleShareQuestion = () => setShareModalOpen(true);
 
     const handleOpenDeleteModal = (question: Question) => {
@@ -170,13 +173,13 @@ const EditTestPage: React.FC = () => {
                                     <td style={{ padding: '10px' }}>{question.shared ? 'Yes' : 'No'}</td>
                                     <td style={{ padding: '10px' }}>{question.questionBody}</td>
                                     <td style={{ padding: '10px', display: 'flex', gap: '8px' }}>
-                                        {/*<Button*/}
-                                        {/*    variant="contained"*/}
-                                        {/*    color="primary"*/}
-                                        {/*    onClick={() => handleEditQuestion(question)}*/}
-                                        {/*>*/}
-                                        {/*    Edit*/}
-                                        {/*</Button>*/}
+                                        <Button
+                                            variant="contained"
+                                            color="primary"
+                                            onClick={() => handleEditQuestion(question)}
+                                        >
+                                            Edit
+                                        </Button>
                                         <Button
                                             variant="contained"
                                             color="error"
@@ -195,14 +198,14 @@ const EditTestPage: React.FC = () => {
                     <AddQuestionModal testId={testId!} onClose={handleCloseAddModal} onQuestionAdded={fetchQuestions} />
                 )}
 
-                {/*{editModalOpen.open && editModalOpen.question && (*/}
-                {/*    <EditQuestionModal*/}
-                {/*        open={editModalOpen.open}*/}
-                {/*        question={editModalOpen.question}*/}
-                {/*        onClose={() => setEditModalOpen({ open: false, question: null })}*/}
-                {/*        onQuestionUpdated={fetchQuestions}*/}
-                {/*    />*/}
-                {/*)}*/}
+                {editModalOpen.open && editModalOpen.question && (
+                    <EditQuestionModal
+                        open={editModalOpen.open}
+                        question={editModalOpen.question}
+                        onClose={() => setEditModalOpen({ open: false, question: null })}
+                        onQuestionUpdated={fetchQuestions}
+                    />
+                )}
 
                 {shareModalOpen && (
                     <ShareQuestionModal

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Modal,
     Box,
@@ -7,31 +7,75 @@ import {
     Button,
     FormControlLabel,
     Checkbox,
-    Grid,
+    FormGroup,
+    Switch,
     MenuItem,
-    Select
+    CircularProgress,
 } from '@mui/material';
 
 interface Question {
-    id: number;
     name: string;
     category: string;
     questionType: string;
     shared: boolean;
+    answer: string;
+    b: boolean;
+    a: boolean;
+    c: boolean;
+    d: boolean;
+    bText: string;
+    aText: string;
+    cText: string;
+    dText: string;
+    questionBody: string;
     maxPoints: number;
-    answerId: number | null;
-    answerA?: string;
-    answerB?: string;
-    answerC?: string;
-    answerD?: string;
-    correctAnswer?: string;
+}
+interface QuestToTake {
+    QuestionId: number;
+    Name: string;
+    Category: string;
+    QuestionType: string;
+    Shared: boolean;
+    MaxPoints: number
+    Answer: string;
+    A: boolean
+    B: boolean;
+    C: boolean;
+    D: boolean;
+    QuestionBody: string;
+}
+
+interface Question1 {
+    answersClosed: string;
+    category: string;
+    key: number;
+    id: number;
+    name: string;
+    points: number;
+    type: string;
+    text: string;
+    shared: boolean;
 }
 
 interface EditQuestionModalProps {
     open: boolean;
-    question: Question;
+    question: QuestToTake;
     onClose: () => void;
     onQuestionUpdated: () => void;
+}
+
+const mapQuestion = (apiData: any): Question1 => {
+    return apiData.map((quest) => ({
+        answersClosed: quest.answers,
+        category: quest.category,
+        key: quest.correctAnswers,
+        id: quest.id,
+        name: quest.name,
+        points: quest.points,
+        type: quest.questionType,
+        text: quest.text,
+        shared: quest.shared
+    }));
 }
 
 const EditQuestionModal: React.FC<EditQuestionModalProps> = ({
@@ -40,33 +84,68 @@ const EditQuestionModal: React.FC<EditQuestionModalProps> = ({
     onClose,
     onQuestionUpdated,
 }) => {
-    const [name, setName] = useState(question.name);
-    const [category, setCategory] = useState(question.category);
-    const [questionType, setQuestionType] = useState(question.questionType);
-    const [shared, setShared] = useState(question.shared);
-    const [maxPoints, setMaxPoints] = useState(question.maxPoints);
+    const [formData, setFormData] = useState<Question>();
 
-    const [answerA, setAnswerA] = useState(question.answerA || "");
-    const [answerB, setAnswerB] = useState(question.answerB || "");
-    const [answerC, setAnswerC] = useState(question.answerC || "");
-    const [answerD, setAnswerD] = useState(question.answerD || "");
-    const [correctAnswer, setCorrectAnswer] = useState(question.correctAnswer || "");
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
+
+    const handleChange = (field: keyof Question, value: any) => {
+        setFormData(prev => ({ ...prev, [field]: value }));
+    };
+
+    useEffect(() => {
+        const fetchQuestion = async () => {
+            try {
+                const qqidd = localStorage.getItem('questID');
+                const response = await fetch(`https://localhost:59127/api/Question/FRANEKGPT/getID/${qqidd}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                const quest = mapQuestion(data);
+                const str = quest.answersClosed.split('\n');
+
+                const a = ((quest.key & 1 << 3) >> 3) == 1;
+                const b = ((quest.key & 1 << 2) >> 2) == 1;
+                const c = ((quest.key & 1 << 1) >> 1) == 1;
+                const d = ((quest.key & 1 << 0) >> 0) == 1;
+
+                const exitQuestion = {
+                    name: quest.name,
+                    category: quest.category,
+                    questionType: quest.category,
+                    shared: quest.shared,
+                    answer: "",
+                    b: b,
+                    a: a,
+                    c: c,
+                    d: d,
+                    bText: str[0],
+                    aText: str[1],
+                    cText: str[2],
+                    dText: str[3],
+                    questionBody: quest.text,
+                    maxPoints: quest.points,
+                }
+                setFormData(exitQuestion);
+                setLoading(false);
+            }
+            catch (err) {
+                console.error(err);
+                setError(err);
+            }
+        }
+
+        fetchQuestion();
+    },);
 
     const handleSubmit = async () => {
-        const updatedQuestion = {
-            name,
-            category,
-            questionType,
-            shared,
-            maxPoints,
-            ...(questionType === 'closed' && { answerA, answerB, answerC, answerD, correctAnswer }),
-        };
 
         try {
             const response = await fetch(`/api/EditQuestion/EditQuestionByName/${encodeURIComponent(name)}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(updatedQuestion),
+
             });
 
             if (!response.ok) {
@@ -81,6 +160,8 @@ const EditQuestionModal: React.FC<EditQuestionModalProps> = ({
             alert(`Error updating question: ${err.message}`);
         }
     };
+
+    if (loading) return <div>loading...</div>
 
     return (
         <Modal open={open} onClose={onClose}>
@@ -108,73 +189,67 @@ const EditQuestionModal: React.FC<EditQuestionModalProps> = ({
                     Edit Question
                 </Typography>
                 <TextField
-                    label="Name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    label="Question Name"
                     fullWidth
                     margin="normal"
-                    sx={{
-                        mb: 2,
-                        backgroundColor: '#444',
-                        borderRadius: 1,
-                        input: { color: '#fff' },
-                        label: { color: '#aaa' },
-                    }}
+                    variant="outlined"
+                    onChange={(e) => handleChange('name', e.target.value)}
+                    value={formData.name}
+                    sx={{ mb: 2, backgroundColor: '#444', borderRadius: 1, input: { color: '#fff' }, label: { color: '#aaa' } }}
                 />
                 <TextField
                     label="Category"
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
                     fullWidth
                     margin="normal"
-                    sx={{
-                        mb: 2,
-                        backgroundColor: '#444',
-                        borderRadius: 1,
-                        input: { color: '#fff' },
-                        label: { color: '#aaa' },
-                    }}
+                    variant="outlined"
+                    onChange={(e) => handleChange('category', e.target.value)}
+                    value={formData.category}
+                    sx={{ mb: 2, backgroundColor: '#444', borderRadius: 1, input: { color: '#fff' }, label: { color: '#aaa' } }}
                 />
+
+                <TextField
+                    label="Question Body"
+                    fullWidth
+                    margin="normal"
+                    variant="outlined"
+                    onChange={(e) => handleChange('questionBody', e.target.value)}
+                    value={formData.questionBody}
+                    sx={{ mb: 4, backgroundColor: '#444', borderRadius: 1, input: { color: '#fff' }, label: { color: '#aaa' } }}
+                />
+
                 <TextField
                     select
                     fullWidth
                     label="Question Type"
-                    value={questionType}
-                    onChange={(e) => setQuestionType(e.target.value)}
+                    variant="outlined"
+                    value={formData.questionType}
+                    onChange={(e) => handleChange('questionType', e.target.value)}
                     sx={{
                         mb: 2,
                         backgroundColor: '#444',
                         borderRadius: 1,
                         input: { color: '#fff' },
                         label: { color: '#aaa' },
-                        '.MuiSelect-select': {
-                            color: '#fff',
-                        },
-                        '.MuiPaper-root': {
-                            backgroundColor: '#444',
-                            color: '#fff',
-                        },
+                        '.MuiSelect-select': { color: '#fff' },
+                        '.MuiPaper-root': { backgroundColor: '#444', color: '#fff' }
                     }}
                     SelectProps={{
                         MenuProps: {
                             PaperProps: {
-                                sx: {
-                                    bgcolor: '#444',
-                                    color: '#fff',
-                                },
-                            },
-                        },
+                                sx: { bgcolor: '#444', color: '#fff' }
+                            }
+                        }
                     }}
                 >
                     <MenuItem value="open">Open</MenuItem>
-                    <MenuItem value="closed">Close</MenuItem>
+                    <MenuItem value="closed">Closed</MenuItem>
                 </TextField>
 
                 <TextField
-                    label="Max Points"
+                    label="maxPoints"
                     type="number"
-                    value={maxPoints}
-                    onChange={(e) => setMaxPoints(Number(e.target.value))}
+                    value={formData.maxPoints}
+                    onChange={(e) => handleChange('maxPoints', e.target.value)}
                     fullWidth
                     margin="normal"
                     sx={{
@@ -192,118 +267,84 @@ const EditQuestionModal: React.FC<EditQuestionModalProps> = ({
                     }}
                 />
 
-                <FormControlLabel
-                    control={
-                        <Checkbox
-                            checked={shared}
-                            onChange={(e) => setShared(e.target.checked)}
-                            sx={{ color: '#fff', '&.Mui-checked': { color: '#007bff' } }}
-                        />
-                    }
-                    label="Shared"
-                    sx={{ color: '#fff', mb: 2 }}
-                />
+                {formData.questionType === 'closed' && (
+                    <FormGroup>
+                        <Box key={'a'} display="flex" alignItems="center">
+                            <Checkbox
+                                onChange={(e) => handleChange('a', e.target.checked)}
+                                sx={{ color: '#fff', '&.Mui-checked': { color: '#007bff' } }}
+                            />
+                            <TextField
+                                label={`Option ${'aText'}`}
+                                fullWidth
+                                variant="outlined"
+                                onChange={(e) => handleChange('aText', e.target.value)}
+                                value={formData['aText']}
+                                sx={{ mb: 2, backgroundColor: '#444', borderRadius: 1, input: { color: '#fff' }, label: { color: '#aaa' } }}
+                            />
+                        </Box>
 
-                {questionType === 'closed' && (
-                    <Box mt={2}>
-                        <Typography variant="subtitle1" mb={1}>
-                            Answers
-                        </Typography>
-                        <Grid container spacing={2}>
-                            <Grid item xs={6}>
-                                <TextField
-                                    label="Answer A"
-                                    value={answerA}
-                                    onChange={(e) => setAnswerA(e.target.value)}
-                                    fullWidth
-                                    sx={{
-                                        mb: 2,
-                                        backgroundColor: '#444',
-                                        borderRadius: 1,
-                                        input: { color: '#fff' },
-                                        label: { color: '#aaa' },
-                                    }}
-                                />
-                            </Grid>
-                            <Grid item xs={6}>
-                                <TextField
-                                    label="Answer B"
-                                    value={answerB}
-                                    onChange={(e) => setAnswerB(e.target.value)}
-                                    fullWidth
-                                    sx={{
-                                        mb: 2,
-                                        backgroundColor: '#444',
-                                        borderRadius: 1,
-                                        input: { color: '#fff' },
-                                        label: { color: '#aaa' },
-                                    }}
-                                />
-                            </Grid>
-                            <Grid item xs={6}>
-                                <TextField
-                                    label="Answer C"
-                                    value={answerC}
-                                    onChange={(e) => setAnswerC(e.target.value)}
-                                    fullWidth
-                                    sx={{
-                                        mb: 2,
-                                        backgroundColor: '#444',
-                                        borderRadius: 1,
-                                        input: { color: '#fff' },
-                                        label: { color: '#aaa' },
-                                    }}
-                                />
-                            </Grid>
-                            <Grid item xs={6}>
-                                <TextField
-                                    label="Answer D"
-                                    value={answerD}
-                                    onChange={(e) => setAnswerD(e.target.value)}
-                                    fullWidth
-                                    sx={{
-                                        mb: 2,
-                                        backgroundColor: '#444',
-                                        borderRadius: 1,
-                                        input: { color: '#fff' },
-                                        label: { color: '#aaa' },
-                                    }}
-                                />
-                            </Grid>
-                        </Grid>
-                        <TextField
-                            label="Correct Answer (A, B, C, D)"
-                            value={correctAnswer}
-                            onChange={(e) => setCorrectAnswer(e.target.value.toUpperCase())}
-                            fullWidth
-                            margin="normal"
-                            sx={{
-                                mb: 2,
-                                backgroundColor: '#444',
-                                borderRadius: 1,
-                                input: { color: '#fff' },
-                                label: { color: '#aaa' },
-                            }}
-                        />
-                    </Box>
+                        <Box key={'b'} display="flex" alignItems="center">
+                            <Checkbox
+                                onChange={(e) => handleChange('b', e.target.checked)}
+                                sx={{ color: '#fff', '&.Mui-checked': { color: '#007bff' } }}
+                            />
+                            <TextField
+                                label={`Option ${'bText'}`}
+                                fullWidth
+                                variant="outlined"
+                                onChange={(e) => handleChange('bText', e.target.value)}
+                                value={formData['bText']}
+                                sx={{ mb: 2, backgroundColor: '#444', borderRadius: 1, input: { color: '#fff' }, label: { color: '#aaa' } }}
+                            />
+                        </Box>
+
+                        <Box key={'c'} display="flex" alignItems="center">
+                            <Checkbox
+                                onChange={(e) => handleChange('c', e.target.checked)}
+                                sx={{ color: '#fff', '&.Mui-checked': { color: '#007bff' } }}
+                            />
+                            <TextField
+                                label={`Option ${'cText'}`}
+                                fullWidth
+                                variant="outlined"
+                                onChange={(e) => handleChange('cText', e.target.value)}
+                                value={formData['cText']}
+                                sx={{ mb: 2, backgroundColor: '#444', borderRadius: 1, input: { color: '#fff' }, label: { color: '#aaa' } }}
+                            />
+                        </Box>
+
+                        <Box key={'d'} display="flex" alignItems="center">
+                            <Checkbox
+                                onChange={(e) => handleChange('d', e.target.checked)}
+                                sx={{ color: '#fff', '&.Mui-checked': { color: '#007bff' } }}
+                            />
+                            <TextField
+                                label={`Option ${'dText'}`}
+                                fullWidth
+                                variant="outlined"
+                                onChange={(e) => handleChange('dText', e.target.value)}
+                                value={formData['dText']}
+                                sx={{ mb: 2, backgroundColor: '#444', borderRadius: 1, input: { color: '#fff' }, label: { color: '#aaa' } }}
+                            />
+                        </Box>
+                    </FormGroup>
                 )}
 
-                <Box mt={4} display="flex" justifyContent="space-between">
-                    <Button
-                        variant="contained"
-                        color="error"
-                        onClick={onClose}
-                        sx={{ backgroundColor: '#d32f2f', '&:hover': { backgroundColor: '#9a0007' } }}
-                    >
+                <FormControlLabel
+                    control={<Switch checked={formData.shared} onChange={(e) => handleChange('shared', e.target.checked)} />}
+                    label="Shared"
+                    sx={{ mb: 2, color: '#fff' }}
+                />
+
+                {error && <Typography color="error" sx={{ mb: 2 }}>{error}</Typography>}
+
+                <Box display="flex" justifyContent="space-between">
+                    <Button variant="contained" color="error" onClick={onClose}>
                         Cancel
                     </Button>
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={handleSubmit}
-                        sx={{ backgroundColor: '#007bff', '&:hover': { backgroundColor: '#0056b3' } }}
-                    >
-                        Save
+                    <Button variant="contained" color="primary" onClick={handleSubmit} disabled={loading}>
+                        {loading ? <CircularProgress size={24} sx={{ color: '#fff' }} /> : 'Add'}
                     </Button>
                 </Box>
             </Box>
