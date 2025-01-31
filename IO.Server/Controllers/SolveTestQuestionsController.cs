@@ -68,5 +68,53 @@ namespace IO.Server.Controllers
                 _connection.Close();
             }
         }
+        
+        [HttpGet("FRANEKGPT/getID/{questID}")]
+        public IActionResult GetQuestionById(int questID)
+        {
+            try
+            {
+                _connection.Open();
+
+                string query = $"SELECT * FROM \"Question\" WHERE questionid = '{questID}' ORDER BY questionid";
+
+                Question questions = new Question();
+
+                using (var command = new NpgsqlCommand(query, _connection))
+                {
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            int id = reader.GetInt32(0);
+                            string name = reader.GetString(1);
+                            string cat = reader.GetString(2);
+                            string questionType = reader.GetString(3);
+                            bool shared = reader.GetBoolean(4);
+                            double points = reader.GetDouble(10);
+                            string text = reader.GetString(11);
+                            bool a = reader.GetBoolean(6);
+                            bool b = reader.GetBoolean(7);
+                            bool c = reader.GetBoolean(8);
+                            bool d = reader.GetBoolean(9);
+                            int key = (d ? 1 : 0) + (c ? 2 : 0) + (b ? 4 : 0) + (a ? 8 : 0);
+                            var q = new Question(name, text, questionType, reader.GetString(5), points, key, cat, shared, id);
+                            questions = q;
+                        }
+                    }
+                }
+
+                return Ok(questions);
+            }
+            catch (Exception ex)
+            {
+                Debug.Print(ex.ToString());
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+            finally
+            {
+                _connection.Close();
+            }
+        }
     }
 }
