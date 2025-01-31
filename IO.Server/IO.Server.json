@@ -303,6 +303,49 @@
         }
       }
     },
+    "/api/QuestionFranek/FRANEKGPT/{testId}": {
+      "post": {
+        "tags": [
+          "QuestionFranek"
+        ],
+        "parameters": [
+          {
+            "name": "testId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Question2"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Question2"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Question2"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/ArchiveTest/ArchiveTest/{testId}": {
       "put": {
         "tags": [
@@ -1360,6 +1403,45 @@
           },
           "questionBody": {
             "type": "string"
+          }
+        }
+      },
+      "Question2": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "questionType": {
+            "type": "string"
+          },
+          "answers": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string"
+          },
+          "shared": {
+            "type": "boolean"
+          },
+          "points": {
+            "type": "number",
+            "format": "double"
+          },
+          "correctAnswers": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "correctAnswersBinary": {
+            "type": "string",
+            "nullable": true
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },
