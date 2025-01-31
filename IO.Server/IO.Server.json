@@ -813,6 +813,95 @@
         }
       }
     },
+    "/api/GenerateResultsRaports/{testId}": {
+      "get": {
+        "tags": [
+          "GenerateResultsRaports"
+        ],
+        "parameters": [
+          {
+            "name": "testId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestInfo"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestInfo"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestInfo"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/GenerateResultsRaports/{testId}/results": {
+      "get": {
+        "tags": [
+          "GenerateResultsRaports"
+        ],
+        "parameters": [
+          {
+            "name": "testId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TestRaprts"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TestRaprts"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TestRaprts"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/Login/login": {
       "post": {
         "tags": [
@@ -1534,6 +1623,18 @@
           }
         }
       },
+      "TestInfo": {
+        "type": "object",
+        "properties": {
+          "testName": {
+            "type": "string"
+          },
+          "maxPoints": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
       "TestModel": {
         "type": "object",
         "properties": {
@@ -1554,6 +1655,31 @@
           "endTime": {
             "type": "string",
             "format": "date-time"
+          }
+        }
+      },
+      "TestRaprts": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "surname": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "points": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "passed": {
+            "type": "boolean"
           }
         }
       },

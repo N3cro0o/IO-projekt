@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Text.RegularExpressions;
 using IO.Server.Elements;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
@@ -153,8 +154,113 @@ namespace IO.Server.Controllers
                     _connection.Close();
                 }
             }
+        [HttpGet("{testId}")]
+        public ActionResult<TestInfo> GetTestInfo(int testId)
+        {
+            Console.WriteLine($"Odpala Skoda");
+            try
+            {
+                _connection.Open();
+                const string query = @"SELECT t.name, SUM(q.maxpoints) 
+                                      FROM ""Test"" t
+                                      JOIN ""QuestionToTest"" qtt ON qtt.testid = t.testid
+                                      JOIN ""Question"" q ON q.questionid = qtt.questionid
+                                      WHERE t.testid = @TestId
+                                      GROUP BY t.testid; ";
 
+                using (var command = new NpgsqlCommand(query, _connection))
+                {
+                    command.Parameters.AddWithValue("@TestId", testId);
+                    using (var reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            Console.WriteLine($"name: {reader.GetString(0)}, points: {reader.GetInt32(1)}");
+                            return Ok(new TestInfo
+                            {
+                                TestName = reader.GetString(0),
+                                MaxPoints = reader.GetDouble(1)
+                            });
+                            
+                        }
+                        return NotFound("Test not found");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+            finally
+            {
+                _connection.Close();
+            }
         }
+
+        [HttpGet("{testId}/results")]
+        public ActionResult<IEnumerable<TestRaprts>> GetTestResults(int testId)
+        {
+            Console.WriteLine($"Odpala Matiz");
+            try
+            {
+                _connection.Open();
+                int maxPoints = 0;
+                const string maxPointsQuery = @"SELECT SUM(q.maxpoints) FROM ""QuestionToTest"" qtt
+                                              JOIN ""Question"" q ON q.questionid = qtt.questionid
+                                              WHERE qtt.testid = @TestId";
+                using (var command = new NpgsqlCommand(maxPointsQuery, _connection))
+                {
+                    command.Parameters.AddWithValue("@TestId", testId);
+                    object result = command.ExecuteScalar();
+                    if (result != DBNull.Value)
+                    {
+                        maxPoints = Convert.ToInt32(result);
+                    }
+                }
+
+                const string resultsQuery = @"SELECT u.userid, u.name, u.surname, u.email, r.points 
+                                             FROM ""Results"" r 
+                                             JOIN ""User"" u ON u.userid = r.userid 
+                                             WHERE r.testid = @TestId";
+
+                using (var command = new NpgsqlCommand(resultsQuery, _connection))
+                {
+                    command.Parameters.AddWithValue("@TestId", testId);
+                    using (var reader = command.ExecuteReader())
+                    {
+                        var results = new List<TestRaprts>();
+                        while (reader.Read())
+                        {
+                            var testResult = new TestRaprts
+                            {
+                                UserId = reader.GetInt32(0),
+                                Name = reader.GetString(1),
+                                Surname = reader.GetString(2),
+                                Email = reader.GetString(3),
+                                Points = reader.GetInt32(4),
+                                Passed = reader.GetInt32(4) >= (maxPoints * 0.5)
+                            };
+                            results.Add(testResult);
+                        }
+                        return Ok(results);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+            finally
+            {
+                _connection.Close();
+            }
+        }
+    }
+
+    
+
+
+}
     public class UserScore
     {
         public int UserId { get; set; } 
@@ -169,4 +275,18 @@ namespace IO.Server.Controllers
  
         }
 
-    }
+public class TestInfo
+{
+    public string TestName { get; set; }
+    public double MaxPoints { get; set; }
+}
+
+public class TestRaprts
+{
+    public int UserId { get; set; }
+    public string Name { get; set; }
+    public string Surname { get; set; }
+    public string Email { get; set; }
+    public int Points { get; set; }
+    public bool Passed { get; set; }
+}

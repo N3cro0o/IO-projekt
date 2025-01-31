@@ -23,14 +23,14 @@ const TestResults: React.FC = () => {
     useEffect(() => {
         const fetchTestData = async () => {
             try {
-                const testResponse = await fetch(`https://localhost:59127/api/test/${testId}`);
+                const testResponse = await fetch(`https://localhost:59127/api/GenerateResultsRaports/${testId}`);
                 if (!testResponse.ok) {
                     throw new Error(`HTTP status ${testResponse.status} - ${testResponse.statusText}`);
                 }
                 const testData: TestInfo = await testResponse.json();
                 setTestInfo(testData);
 
-                const resultsResponse = await fetch(`https://localhost:59127/api/test/${courseId}/${testId}/results`);
+                const resultsResponse = await fetch(`https://localhost:59127/api/GenerateResultsRaports/${testId}/results`);
                 if (!resultsResponse.ok) {
                     throw new Error(`HTTP status ${resultsResponse.status} - ${resultsResponse.statusText}`);
                 }
