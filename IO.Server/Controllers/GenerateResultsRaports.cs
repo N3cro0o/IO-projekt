@@ -175,7 +175,7 @@ namespace IO.Server.Controllers
                     {
                         if (reader.Read())
                         {
-                            Console.WriteLine($"name: {reader.GetString(0)}, points: {reader.GetInt32(1)}");
+                            Console.WriteLine($"name: {reader.GetString(0)}, points: {reader.GetDouble(1)}");
                             return Ok(new TestInfo
                             {
                                 TestName = reader.GetString(0),
@@ -204,7 +204,7 @@ namespace IO.Server.Controllers
             try
             {
                 _connection.Open();
-                int maxPoints = 0;
+                double maxPoints = 0.0;
                 const string maxPointsQuery = @"SELECT SUM(q.maxpoints) FROM ""QuestionToTest"" qtt
                                               JOIN ""Question"" q ON q.questionid = qtt.questionid
                                               WHERE qtt.testid = @TestId";
@@ -214,7 +214,7 @@ namespace IO.Server.Controllers
                     object result = command.ExecuteScalar();
                     if (result != DBNull.Value)
                     {
-                        maxPoints = Convert.ToInt32(result);
+                        maxPoints = Convert.ToDouble(result);
                     }
                 }
 
@@ -237,8 +237,8 @@ namespace IO.Server.Controllers
                                 Name = reader.GetString(1),
                                 Surname = reader.GetString(2),
                                 Email = reader.GetString(3),
-                                Points = reader.GetInt32(4),
-                                Passed = reader.GetInt32(4) >= (maxPoints * 0.5)
+                                Points = reader.GetDouble(4),
+                                Passed = reader.GetDouble(4) >= (maxPoints * 0.5)
                             };
                             results.Add(testResult);
                         }
@@ -287,6 +287,6 @@ public class TestRaprts
     public string Name { get; set; }
     public string Surname { get; set; }
     public string Email { get; set; }
-    public int Points { get; set; }
+    public double Points { get; set; }
     public bool Passed { get; set; }
 }
