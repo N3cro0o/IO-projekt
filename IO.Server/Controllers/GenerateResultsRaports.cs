@@ -381,7 +381,7 @@ namespace IO.Server.Controllers
                     {
                         while (reader.Read())
                         {
-                            if (reader.GetDateTime(3) != DateTime.Now)//Wyswietla teylko testy ukonczone jesli jest "<" zamiast "!=" <- do testowania
+                            if (reader.GetDateTime(3) < DateTime.Now)//Wyswietla teylko testy ukonczone jesli jest "<" zamiast "!=" <- do testowania
                             {
                                 var test = new Test
                                 {
