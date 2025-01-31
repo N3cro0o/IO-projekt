@@ -20,7 +20,7 @@ const TestsToCheck: React.FC = () => {
     useEffect(() => {
         const fetchTests = async () => {
             try {
-                const response = await fetch(`https://localhost:59127/api/EditQuestion/TestsList/${ownerId}/tests`);
+                const response = await fetch(`https://localhost:59127/api/GenerateResultsRaports/TestsList/${ownerId}/tests`);
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }

@@ -28,7 +28,7 @@ const ReviewQuestions: React.FC = () => {
             }
 
             try {
-                const response = await fetch(`https://localhost:59127/api/EditQuestion/QuestionList/${testId}`);
+                const response = await fetch(`https://localhost:59127/api/GenerateResultsRaports/QuestionList/${testId}`);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -51,7 +51,7 @@ const ReviewQuestions: React.FC = () => {
         };
 
         try {
-            const response = await fetch('https://localhost:7293/api/EditQuestion/answer/review', {
+            const response = await fetch('https://localhost:7293/api/GenerateResultsRaports/answer/review', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(answerData),
