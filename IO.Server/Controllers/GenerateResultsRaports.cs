@@ -154,6 +154,7 @@ namespace IO.Server.Controllers
                     _connection.Close();
                 }
             }
+
         [HttpGet("{testId}")]
         public ActionResult<TestInfo> GetTestInfo(int testId)
         {
@@ -206,8 +207,8 @@ namespace IO.Server.Controllers
                 _connection.Open();
                 double maxPoints = 0.0;
                 const string maxPointsQuery = @"SELECT SUM(q.maxpoints) FROM ""QuestionToTest"" qtt
-                                              JOIN ""Question"" q ON q.questionid = qtt.questionid
-                                              WHERE qtt.testid = @TestId";
+                                      JOIN ""Question"" q ON q.questionid = qtt.questionid
+                                      WHERE qtt.testid = @TestId";
                 using (var command = new NpgsqlCommand(maxPointsQuery, _connection))
                 {
                     command.Parameters.AddWithValue("@TestId", testId);
@@ -219,9 +220,9 @@ namespace IO.Server.Controllers
                 }
 
                 const string resultsQuery = @"SELECT u.userid, u.name, u.surname, u.email, r.points 
-                                             FROM ""Results"" r 
-                                             JOIN ""User"" u ON u.userid = r.userid 
-                                             WHERE r.testid = @TestId";
+                                     FROM ""Results"" r 
+                                     JOIN ""User"" u ON u.userid = r.userid 
+                                     WHERE r.testid = @TestId";
 
                 using (var command = new NpgsqlCommand(resultsQuery, _connection))
                 {
@@ -229,19 +230,54 @@ namespace IO.Server.Controllers
                     using (var reader = command.ExecuteReader())
                     {
                         var results = new List<TestRaprts>();
+                        int passedUsers = 0;
+                        int failedUsers = 0;
+                        double totalPoints = 0;
+
                         while (reader.Read())
                         {
+                            var points = reader.GetDouble(4);
                             var testResult = new TestRaprts
                             {
                                 UserId = reader.GetInt32(0),
                                 Name = reader.GetString(1),
                                 Surname = reader.GetString(2),
                                 Email = reader.GetString(3),
-                                Points = reader.GetDouble(4),
-                                Passed = reader.GetDouble(4) >= (maxPoints * 0.5)
+                                Points = points,
+                                Passed = points >= (maxPoints * 0.5)
                             };
+
+                            if (testResult.Passed)
+                            {
+                                passedUsers++;
+                            }
+                            else
+                            {
+                                failedUsers++;
+                            }
+
+                            totalPoints += points;
                             results.Add(testResult);
                         }
+
+                        // Zamkniêcie po³¹czenia po wykonaniu zapytania "Results"
+                        _connection.Close();
+
+                        // Ponowne otwarcie po³¹czenia, aby dodaæ raport
+                        _connection.Open();
+
+                        // Dodanie rekordu do tabeli "Report"
+                        double averagePoints = results.Count > 0 ? totalPoints / results.Count : 0;
+                        const string insertReportQuery = @"INSERT INTO ""Report"" (""passeduser"", ""faileduser"", ""result"") 
+                                                    VALUES (@PassedUsers, @FailedUsers, @Result)";
+                        using (var insertCommand = new NpgsqlCommand(insertReportQuery, _connection))
+                        {
+                            insertCommand.Parameters.AddWithValue("@PassedUsers", passedUsers);
+                            insertCommand.Parameters.AddWithValue("@FailedUsers", failedUsers);
+                            insertCommand.Parameters.AddWithValue("@Result", averagePoints);
+                            insertCommand.ExecuteNonQuery();
+                        }
+
                         return Ok(results);
                     }
                 }
@@ -252,12 +288,18 @@ namespace IO.Server.Controllers
             }
             finally
             {
-                _connection.Close();
+                // Upewnij siê, ¿e po³¹czenie jest zamkniête na koñcu
+                if (_connection.State == System.Data.ConnectionState.Open)
+                {
+                    _connection.Close();
+                }
             }
         }
+
+
     }
 
-    
+
 
 
 }
