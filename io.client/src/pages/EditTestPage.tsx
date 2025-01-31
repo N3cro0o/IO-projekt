@@ -87,6 +87,11 @@ const EditTestPage: React.FC = () => {
         setDeleteModalOpen({ open: false, question: null });
     };
 
+    const handleCloseSharedModal = () => {
+        setSharedModalOpen(false);
+        fetchQuestions();
+    }
+
     const handleConfirmDelete = async () => {
         if (!deleteModalOpen.question) return;
 
@@ -226,7 +231,7 @@ const EditTestPage: React.FC = () => {
                 )}
 
                 {sharedModalOpen && ( //£¥CZENIE Z MODALEM SHARED QUESTION
-                    <SharedQuestionModal open={sharedModalOpen} onClose={() => setSharedModalOpen(false)} testId={testId} />
+                    <SharedQuestionModal open={sharedModalOpen} onClose={handleCloseSharedModal} testId={testId} />
                 )}
 
                 {deleteModalOpen.open && deleteModalOpen.question && (
