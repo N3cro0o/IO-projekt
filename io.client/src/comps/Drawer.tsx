@@ -52,7 +52,7 @@ const TemporaryDrawer = ({ open, toggleDrawer, token }) => {
                 </ListItemIcon>
                 <ListItemText primary="Home" sx={{ color: 'white' }} /> {/* Kolor tekstu - bia³y */}
             </ListItem>
-            
+
             {/* Your Courses link */}
             {(user_check || admin_check) && (
                 <List>
@@ -94,6 +94,26 @@ const TemporaryDrawer = ({ open, toggleDrawer, token }) => {
                     <ListItemText primary="Account Managment" sx={{ color: 'white' }} /> {/* Kolor tekstu - bia³y */}
                 </ListItem>
             </List>
+
+               <List>
+                   <ListItem button component={Link} to="/TestToCheck">
+                       <ListItemIcon sx={{ color: '#007bff' }}>
+                           <AssignmentIcon />
+                       </ListItemIcon>
+                       <ListItemText primary="Test To Check" sx={{ color: 'white' }} />
+                   </ListItem>
+               </List>
+
+            {user_check && (
+                <List>
+                    <ListItem button component={Link} to="/CheckResults">
+                        <ListItemIcon sx={{ color: '#007bff' }}>
+                            <AssignmentIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="Check Your Results" sx={{ color: 'white' }} />
+                    </ListItem>
+                </List>
+            )}
         </Box>
     );
 
