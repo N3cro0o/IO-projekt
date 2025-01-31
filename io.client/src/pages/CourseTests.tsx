@@ -46,6 +46,7 @@ const CourseTests: React.FC = () => {
     const [modalOpen, setModalOpen] = useState(false); // Zarz¹dzanie stanem modala do testów
 
     useEffect(() => {
+        window.scrollTo(0, 0);
         const fetchTests = async () => {
             try {
                 const response = await fetch(`https://localhost:59127/api/TestManager/TestsList/${courseId}/tests`);

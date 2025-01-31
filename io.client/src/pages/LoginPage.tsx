@@ -19,6 +19,7 @@ export const Login = () => {
 
     // Sprawdzenie, czy użytkownik jest już zalogowany
     useEffect(() => {
+        window.scrollTo(0, 0);
         const token = localStorage.getItem('authToken');
         if (token) {
             navigate('/'); // Przekierowanie na stronę główną

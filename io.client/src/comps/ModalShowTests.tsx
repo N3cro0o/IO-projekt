@@ -77,6 +77,8 @@ export default function ModalShowTestsStudent({ courseID, handleClose }: { cours
         }));
     };
 
+    const formatDate = (date: string) => new Date(date).toLocaleString('pl-PL');
+
     useEffect(() => {
         const fetchUsers = async () => {
             try {
@@ -98,6 +100,7 @@ export default function ModalShowTestsStudent({ courseID, handleClose }: { cours
 
         fetchUsers();
     }, [courseID]);
+
 
     if (loading) return <div>Loading...</div>;
 
@@ -141,8 +144,8 @@ export default function ModalShowTestsStudent({ courseID, handleClose }: { cours
 
                                             </TableCell>
                                             <TableCell style={{ color: '#fff' }}>{test.name}</TableCell>
-                                            <TableCell style={{ color: '#fff' }}>{test.start}</TableCell>
-                                            <TableCell style={{ color: '#fff' }}>{test.end}</TableCell>
+                                            <TableCell style={{ color: '#fff' }}>{formatDate(test.start)}</TableCell>
+                                            <TableCell style={{ color: '#fff' }}>{formatDate(test.end)}</TableCell>
                                         </TableRow>
                                     ))}
                                 </TableBody>

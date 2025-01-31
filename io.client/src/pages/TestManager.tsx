@@ -16,6 +16,7 @@ const UserPanel: React.FC = () => {
     const navigate = useNavigate(); // Hook do nawigacji
 
     useEffect(() => {
+        window.scrollTo(0, 0);
         const token = localStorage.getItem('authToken');
         if (!token) {
             navigate('/'); // Przekierowanie na stronê g³ówn¹

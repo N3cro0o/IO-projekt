@@ -36,7 +36,7 @@ export const Course = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-
+        window.scrollTo(0, 0);
         const token = localStorage.getItem('authToken');
         if (!token) {
             navigate('/'); // Przekierowanie na stronê g³ówn¹
