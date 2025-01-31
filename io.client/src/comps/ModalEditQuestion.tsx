@@ -65,17 +65,17 @@ interface EditQuestionModalProps {
 }
 
 const mapQuestion = (apiData: any): Question1 => {
-    return apiData.map((quest) => ({
-        answersClosed: quest.answers,
-        category: quest.category,
-        key: quest.correctAnswers,
-        id: quest.id,
-        name: quest.name,
-        points: quest.points,
-        type: quest.questionType,
-        text: quest.text,
-        shared: quest.shared
-    }));
+    return {
+        answersClosed: apiData.answers,
+        category: apiData.category,
+        key: apiData.correctAnswers,
+        id: apiData.id,
+        name: apiData.name,
+        points: apiData.points,
+        type: apiData.questionType,
+        text: apiData.text,
+        shared: apiData.shared
+    };
 }
 
 const EditQuestionModal: React.FC<EditQuestionModalProps> = ({
@@ -101,7 +101,7 @@ const EditQuestionModal: React.FC<EditQuestionModalProps> = ({
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
-                const data = await response.json();
+                const data: Question1 = await response.json();
                 const quest = mapQuestion(data);
                 const str = quest.answersClosed.split('\n');
 
@@ -113,7 +113,7 @@ const EditQuestionModal: React.FC<EditQuestionModalProps> = ({
                 const exitQuestion = {
                     name: quest.name,
                     category: quest.category,
-                    questionType: quest.category,
+                    questionType: quest.type,
                     shared: quest.shared,
                     answer: "",
                     b: b,
