@@ -70,6 +70,38 @@
         }
       }
     },
+    "/api/EditQuestion/franiowanie/question": {
+      "post": {
+        "tags": [
+          "EditQuestion"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Question"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Question"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/Question"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/Account/showData/{userId}": {
       "get": {
         "tags": [
@@ -259,17 +291,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Question"
+                "$ref": "#/components/schemas/Question2"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/Question"
+                "$ref": "#/components/schemas/Question2"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/Question"
+                "$ref": "#/components/schemas/Question2"
               }
             }
           },
@@ -323,17 +355,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Question2"
+                "$ref": "#/components/schemas/Question"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/Question2"
+                "$ref": "#/components/schemas/Question"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/Question2"
+                "$ref": "#/components/schemas/Question"
               }
             }
           },
@@ -1540,6 +1572,45 @@
       "Question": {
         "type": "object",
         "properties": {
+          "name": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "questionType": {
+            "type": "string"
+          },
+          "answers": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string"
+          },
+          "shared": {
+            "type": "boolean"
+          },
+          "points": {
+            "type": "number",
+            "format": "double"
+          },
+          "correctAnswers": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "correctAnswersBinary": {
+            "type": "string",
+            "nullable": true
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "Question2": {
+        "type": "object",
+        "properties": {
           "questionId": {
             "type": "integer",
             "format": "int32"
@@ -1577,45 +1648,6 @@
           },
           "questionBody": {
             "type": "string"
-          }
-        }
-      },
-      "Question2": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "text": {
-            "type": "string"
-          },
-          "questionType": {
-            "type": "string"
-          },
-          "answers": {
-            "type": "string"
-          },
-          "category": {
-            "type": "string"
-          },
-          "shared": {
-            "type": "boolean"
-          },
-          "points": {
-            "type": "number",
-            "format": "double"
-          },
-          "correctAnswers": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "correctAnswersBinary": {
-            "type": "string",
-            "nullable": true
-          },
-          "id": {
-            "type": "integer",
-            "format": "int32"
           }
         }
       },
