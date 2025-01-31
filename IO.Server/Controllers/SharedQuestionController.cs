@@ -18,7 +18,7 @@ namespace IO.Server.Controllers
 
         // Pobieranie TYLKO pytań, które mają shared = true
         [HttpGet]
-        public ActionResult<IEnumerable<SharedQuestion>> GetSharedQuestions()
+        public ActionResult<IEnumerable<SharedQuestion>> GetSharedQuestions([FromQuery] string testId)
         {
             List<SharedQuestion> questions = new List<SharedQuestion>();
 
@@ -39,7 +39,6 @@ namespace IO.Server.Controllers
                             Name = reader.GetString(1),
                             Category = reader.GetString(2),
                             Shared = true,
-
                         };
                         questions.Add(question);
                     }
@@ -57,15 +56,49 @@ namespace IO.Server.Controllers
             }
         }
 
+
+        [HttpGet("test/{testid}")]
+        public ActionResult<IEnumerable<int>> GetQuestionsForTest(int testid)
+        {
+            List<int> questionIds = new List<int>();
+
+            try
+            {
+                _connection.Open();
+                string query = @"
+        SELECT questionid FROM ""QuestionToTest"" WHERE testid = @testid";
+
+                using (var command = new NpgsqlCommand(query, _connection))
+                {
+                    command.Parameters.AddWithValue("@testid", testid);
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            questionIds.Add(reader.GetInt32(0));
+                        }
+                    }
+                }
+
+                return Ok(questionIds);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+            finally
+            {
+                _connection.Close();
+            }
+        }
+
         // Aktualizacja pola shared i dodanie/usunięcie pytania z testu
         [HttpPatch("{id}/{testid}")]
         public IActionResult UpdateSharedStatus(int id, int testid, [FromBody] SharedStatusUpdateRequest request)
         {
-            Console.WriteLine($"Wlaczam kontroler o id{id}");
             try
             {
                 _connection.Open();
-
                 using (var transaction = _connection.BeginTransaction())
                 {
                     string updateQuery = "UPDATE \"Question\" SET shared = @shared WHERE questionid = @id";
@@ -76,13 +109,12 @@ namespace IO.Server.Controllers
                         updateCommand.ExecuteNonQuery();
                     }
 
-                    // Obsługa dodania/usunięcia pytania do/z testu
                     if (request.AddToTest)
                     {
                         string insertQuery = "INSERT INTO \"QuestionToTest\" (testid, questionid) VALUES (@testid, @id) ON CONFLICT DO NOTHING;";
                         using (var insertCommand = new NpgsqlCommand(insertQuery, _connection))
                         {
-                            insertCommand.Parameters.AddWithValue("@testid", request.TestId);
+                            insertCommand.Parameters.AddWithValue("@testid", testid);
                             insertCommand.Parameters.AddWithValue("@id", id);
                             insertCommand.ExecuteNonQuery();
                         }
@@ -92,7 +124,7 @@ namespace IO.Server.Controllers
                         string deleteQuery = "DELETE FROM \"QuestionToTest\" WHERE questionid = @id AND testid = @testid;";
                         using (var deleteCommand = new NpgsqlCommand(deleteQuery, _connection))
                         {
-                            deleteCommand.Parameters.AddWithValue("@testid", request.TestId);
+                            deleteCommand.Parameters.AddWithValue("@testid", testid);
                             deleteCommand.Parameters.AddWithValue("@id", id);
                             deleteCommand.ExecuteNonQuery();
                         }
@@ -114,7 +146,12 @@ namespace IO.Server.Controllers
         }
     }
 
-
+    public class SharedStatusUpdateRequest
+    {
+        public bool Shared { get; set; }
+        public bool AddToTest { get; set; }
+        public int TestId { get; set; }
+    }
 
     public class SharedQuestion
     {
@@ -122,13 +159,5 @@ namespace IO.Server.Controllers
         public string Name { get; set; }
         public string Category { get; set; }
         public bool Shared { get; set; }
-        public bool AddedToTest { get; set; }
-    }
-
-    public class SharedStatusUpdateRequest
-    {
-        public bool Shared { get; set; }
-        public bool AddToTest { get; set; }
-        public int TestId { get; set; } // Identyfikator testu
     }
 }

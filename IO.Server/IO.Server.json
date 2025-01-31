@@ -858,6 +858,15 @@
         "tags": [
           "SharedQuestion"
         ],
+        "parameters": [
+          {
+            "name": "testId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -883,6 +892,58 @@
                   "type": "array",
                   "items": {
                     "$ref": "#/components/schemas/SharedQuestion"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/SharedQuestion/test/{testid}": {
+      "get": {
+        "tags": [
+          "SharedQuestion"
+        ],
+        "parameters": [
+          {
+            "name": "testid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer",
+                    "format": "int32"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer",
+                    "format": "int32"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer",
+                    "format": "int32"
                   }
                 }
               }
@@ -1617,9 +1678,6 @@
             "type": "string"
           },
           "shared": {
-            "type": "boolean"
-          },
-          "addedToTest": {
             "type": "boolean"
           }
         }
