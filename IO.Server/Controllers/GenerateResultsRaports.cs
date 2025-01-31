@@ -4,6 +4,7 @@ using IO.Server.Elements;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Npgsql;
+using static IO.Server.Elements.Question;
 
 namespace IO.Server.Controllers
 {
@@ -295,7 +296,7 @@ namespace IO.Server.Controllers
                 }
             }
         }
-        //Wyświetlanie Pytań Otwartych Do Testu Ownera Do Sprawdzenia
+        // Wyświetlanie Pytań Otwartych Do Testu Ownera Do Sprawdzenia
         [HttpGet("QuestionList/{testId}")]
         public ActionResult<IEnumerable<QuestionToShow>> GetQuestion(int testId)
         {
@@ -305,16 +306,21 @@ namespace IO.Server.Controllers
             {
                 _connection.Open();
 
-                const string query = @"SELECT a.answerid, q.name, q.questionbody, a.answer, a.points, q.maxpoints
-                    FROM ""Answer"" a 
-                    JOIN ""Question"" q ON a.questionid = q.questionid
-                    JOIN ""Test"" t ON a.testid = t.testid
-                    JOIN ""QuestionToTest"" qtt ON qtt.testid = t.testid AND qtt.questionid = q.questionid
-                    WHERE q.questiontype='open'
-                      AND t.testid = @testId;";
+                const string query = @"
+            SELECT 
+                a.answerid, 
+                q.name, 
+                q.questionbody, 
+                a.answer, 
+                a.points, 
+                q.maxpoints
+            FROM ""Question"" q 
+            LEFT JOIN ""QuestionToTest"" qtt ON qtt.questionid = q.questionid
+            LEFT JOIN ""Test"" t ON qtt.testid = t.testid
+            LEFT JOIN ""Answer"" a ON a.questionid = q.questionid AND a.testid = t.testid
+            WHERE t.testid = @testId AND q.questiontype = 'open';";
 
                 using (var command = new NpgsqlCommand(query, _connection))
-
                 {
                     command.Parameters.AddWithValue("@testId", testId);
                     using (var reader = command.ExecuteReader())
@@ -323,23 +329,23 @@ namespace IO.Server.Controllers
                         {
                             var quest = new QuestionToShow
                             {
-                                aID = reader.GetInt32(0),
-                                qName = reader.GetString(1),
-                                qBody = reader.GetString(2),
-                                aAnswer = reader.GetString(3),
-                                aPoints = reader.GetDouble(4),
-                                qMaxPoints = reader.GetDouble(5)
+                                aID = reader.IsDBNull(0) ? 0 : reader.GetInt32(0),
+                                qName = reader.IsDBNull(1) ? string.Empty : reader.GetString(1),
+                                qBody = reader.IsDBNull(2) ? string.Empty : reader.GetString(2),
+                                aAnswer = reader.IsDBNull(3) ? string.Empty : reader.GetString(3),
+                                aPoints = reader.IsDBNull(4) ? 0.0 : reader.GetDouble(4),
+                                qMaxPoints = reader.IsDBNull(5) ? 0.0 : reader.GetDouble(5)
                             };
                             question.Add(quest);
                             Console.WriteLine($"ID{quest.aID} Name{quest.qName} maxPoint{quest.qMaxPoints}");
                         }
                     }
                 }
-                Console.WriteLine($"Łączna liczba testów dla kursu: {question.Count}");
+                Console.WriteLine($"Łączna liczba pytań dla testu: {question.Count}");
 
                 if (question.Count == 0)
                 {
-                    return NotFound("Ni ma ");
+                    return NotFound("Nie znaleziono żadnych pytań.");
                 }
 
                 return Ok(question);
@@ -365,10 +371,10 @@ namespace IO.Server.Controllers
                 _connection.Open();
 
                 const string query = @"
-            SELECT t.testid, t.name, t.starttime, t.endtime, t.category, t.courseid 
-            FROM ""Test"" t
-            Join ""Course"" c ON c.courseid = t.courseid
-            WHERE c.ownerid = @ownerId";
+                    SELECT t.testid, t.name, t.starttime, t.endtime, t.category, t.courseid 
+                    FROM ""Test"" t
+                    Join ""Course"" c ON c.courseid = t.courseid
+                            ";
 
                 using (var command = new NpgsqlCommand(query, _connection))
                 {
@@ -378,7 +384,7 @@ namespace IO.Server.Controllers
                     {
                         while (reader.Read())
                         {
-                            if (reader.GetDateTime(3) < DateTime.Now)//Wyswietla teylko testy ukonczone jesli jest "<" zamiast "!=" <- do testowania
+                            if (reader.GetDateTime(3) != DateTime.Now)//Wyswietla teylko testy ukonczone jesli jest "<" zamiast "!=" <- do testowania
                             {
                                 var test = new Test
                                 {
