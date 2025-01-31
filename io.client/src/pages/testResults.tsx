@@ -49,11 +49,11 @@ const TestResults: React.FC = () => {
     }, [courseId, testId]);
 
     if (loading) {
-        return <p>£adowanie wyników...</p>;
+        return <p style={{ color: 'white' }}>£adowanie wyników...</p>;
     }
 
     if (error) {
-        return <p>Wyst¹pi³ b³¹d: {error}</p>;
+        return <p style={{ color: 'white' }}>Wyst¹pi³ b³¹d: {error}</p>;
     }
 
     const passedCount = results.filter(result => result.passed).length;
@@ -61,16 +61,16 @@ const TestResults: React.FC = () => {
     const passRate = results.length > 0 ? ((passedCount / results.length) * 100).toFixed(2) : '0';
 
     return (
-        <div>
+        <div style={{ color: 'white' }}>
             <ButtonAppBar />
             <div style={{ display: 'flex', justifyContent: 'center', padding: '50px' }}>
-        <div>
-            <h1>Wyniki testu: {testInfo?.testName}</h1>
-            <p><strong>Kurs:</strong> {courseId}</p>
-            <p><strong>Liczba uczniów:</strong> {results.length}</p>
-            <p><strong>Zda³o:</strong> {passedCount}</p>
-            <p><strong>Nie zda³o:</strong> {failedCount}</p>
-            <p><strong>Procent zdawalnoœci:</strong> {passRate}%</p>
+                <div>
+                    <h1>Wyniki testu: {testInfo?.testName}</h1>
+                    <p><strong>Kurs:</strong> {courseId}</p>
+                    <p><strong>Liczba uczniów:</strong> {results.length}</p>
+                    <p><strong>Zda³o:</strong> {passedCount}</p>
+                    <p><strong>Nie zda³o:</strong> {failedCount}</p>
+                    <p><strong>Procent zdawalnoœci:</strong> {passRate}%</p>
                 </div>
             </div>
         </div>
