@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Box, Button, Typography, Paper, Container, List, ListItem, ListItemText } from '@mui/material';
-
+import { ButtonAppBar } from '../comps/AppBar.tsx';
 interface Test {
     testId: number;
     name: string;
@@ -48,6 +48,9 @@ const TestsToCheck: React.FC = () => {
     if (tests.length === 0) return <div>Loading...</div>;
 
     return (
+        <div>
+            <ButtonAppBar />
+            <div style={{ display: 'flex', justifyContent: 'center', padding: '50px' }}>
         <Container maxWidth="sm" sx={{ mt: 4 }}>
             <Paper sx={{ p: 3, backgroundColor: '#333', color: '#fff', borderRadius: 2 }}>
                 <Typography variant="h5" fontWeight="bold" gutterBottom>
@@ -73,7 +76,9 @@ const TestsToCheck: React.FC = () => {
                     ))}
                 </List>
             </Paper>
-        </Container>
+                </Container>
+            </div>
+        </div>
     );
 };
 

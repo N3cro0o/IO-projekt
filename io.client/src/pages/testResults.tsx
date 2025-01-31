@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { ButtonAppBar } from '../comps/AppBar.tsx';
 
 interface TestResult {
     userId: number;
@@ -61,12 +62,17 @@ const TestResults: React.FC = () => {
 
     return (
         <div>
+            <ButtonAppBar />
+            <div style={{ display: 'flex', justifyContent: 'center', padding: '50px' }}>
+        <div>
             <h1>Wyniki testu: {testInfo?.testName}</h1>
             <p><strong>Kurs:</strong> {courseId}</p>
             <p><strong>Liczba uczniów:</strong> {results.length}</p>
             <p><strong>Zda³o:</strong> {passedCount}</p>
             <p><strong>Nie zda³o:</strong> {failedCount}</p>
             <p><strong>Procent zdawalnoœci:</strong> {passRate}%</p>
+                </div>
+            </div>
         </div>
     );
 };

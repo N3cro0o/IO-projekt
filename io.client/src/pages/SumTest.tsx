@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Container, Paper, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
-
+import { ButtonAppBar } from '../comps/AppBar.tsx';
 interface UserScore {
     userId: number;  // Identyfikator u¿ytkownika
     userName: string;  // Nazwa u¿ytkownika
@@ -46,6 +46,9 @@ const SumTest: React.FC = () => {
     }
 
     return (
+        <div>
+            <ButtonAppBar />
+            <div style={{ display: 'flex', justifyContent: 'center', padding: '50px' }}>
         <Container maxWidth="lg" sx={{ mt: 4 }}>
             <Paper sx={{ p: 3, backgroundColor: '#333', color: '#fff', borderRadius: 2 }}>
                 <Typography variant="h5" fontWeight="bold" gutterBottom>
@@ -71,7 +74,9 @@ const SumTest: React.FC = () => {
                     </Table>
                 </TableContainer>
             </Paper>
-        </Container>
+                </Container>
+            </div>
+        </div>
     );
 };
 

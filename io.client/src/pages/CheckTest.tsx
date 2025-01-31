@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom'; // Importujemy useParams
 import { Box, Button, TextField, Typography, Paper, Container } from '@mui/material';
+import { ButtonAppBar } from '../comps/AppBar.tsx';
 
 interface Question {
     aID: number;
@@ -90,41 +91,46 @@ const ReviewQuestions: React.FC = () => {
     const currentQuestion = questions[index];
 
     return (
-        <Container maxWidth="sm" sx={{ mt: 4 }}>
-            <Paper sx={{ p: 3, backgroundColor: '#333', color: '#fff', borderRadius: 2 }}>
-                <Typography variant="h5" fontWeight="bold" gutterBottom>
-                    Review Open Question
-                </Typography>
-                <Typography variant="h6" gutterBottom>
-                    {currentQuestion.qName}
-                </Typography>
-                <Paper sx={{ p: 2, backgroundColor: '#444', borderRadius: 1 }}>
-                    <Typography variant="body1">{currentQuestion.qBody}</Typography>
-                </Paper>
-                <Typography variant="h6" mt={2}>
-                    Student Answer:
-                </Typography>
-                <Paper sx={{ p: 2, backgroundColor: '#555', borderRadius: 1 }}>
-                    <Typography variant="body1">{currentQuestion.aAnswer}</Typography>
-                </Paper>
-                <TextField
-                    label="Assign Points"
-                    type="number"
-                    fullWidth
-                    margin="normal"
-                    variant="outlined"
-                    inputProps={{ min: 0, max: currentQuestion.qMaxPoints }}
-                    onChange={(e) => setAssignedPoints(parseFloat(e.target.value) || 0)}
-                    value={assignedPoints}
-                    sx={{ backgroundColor: '#444', borderRadius: 1, input: { color: '#fff' }, label: { color: '#aaa' } }}
-                />
-                <Box mt={2} display="flex" justifyContent="space-between">
-                    <Button variant="contained" color="primary" onClick={submitPoints}>
-                        Submit & Next
-                    </Button>
-                </Box>
-            </Paper>
-        </Container>
+        <div>
+            <ButtonAppBar />
+            <div style={{ display: 'flex', justifyContent: 'center', padding: '50px' }}>
+                <Container maxWidth="sm" sx={{ mt: 4 }}>
+                    <Paper sx={{ p: 3, backgroundColor: '#333', color: '#fff', borderRadius: 2 }}>
+                        <Typography variant="h5" fontWeight="bold" gutterBottom>
+                            Review Open Question
+                        </Typography>
+                        <Typography variant="h6" gutterBottom>
+                            {currentQuestion.qName}
+                        </Typography>
+                        <Paper sx={{ p: 2, backgroundColor: '#444', borderRadius: 1 }}>
+                            <Typography variant="body1">{currentQuestion.qBody}</Typography>
+                        </Paper>
+                        <Typography variant="h6" mt={2}>
+                            Student Answer:
+                        </Typography>
+                        <Paper sx={{ p: 2, backgroundColor: '#555', borderRadius: 1 }}>
+                            <Typography variant="body1">{currentQuestion.aAnswer}</Typography>
+                        </Paper>
+                        <TextField
+                            label="Assign Points"
+                            type="number"
+                            fullWidth
+                            margin="normal"
+                            variant="outlined"
+                            inputProps={{ min: 0, max: currentQuestion.qMaxPoints }}
+                            onChange={(e) => setAssignedPoints(parseFloat(e.target.value) || 0)}
+                            value={assignedPoints}
+                            sx={{ backgroundColor: '#444', borderRadius: 1, input: { color: '#fff' }, label: { color: '#aaa' } }}
+                        />
+                        <Box mt={2} display="flex" justifyContent="space-between">
+                            <Button variant="contained" color="primary" onClick={submitPoints}>
+                                Submit & Next
+                            </Button>
+                        </Box>
+                    </Paper>
+                        </Container>
+            </div>
+        </div>
     );
 };
 
