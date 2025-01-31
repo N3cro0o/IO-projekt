@@ -64,8 +64,8 @@ const TemporaryDrawer = ({ open, toggleDrawer, token }) => {
                     </ListItem>
                 </List>
             )}
-
-            {user_check && (
+            {/* Course management link */}
+            {(!user_check || admin_check) && (
                 <List>
                     {/* Link do Course Management */}
                     <ListItem button component={Link} to="/CourseManagment">
@@ -76,15 +76,17 @@ const TemporaryDrawer = ({ open, toggleDrawer, token }) => {
                     </ListItem>
                 </List>
             )}
-            <List>
-                {/* Link do User Panel */}
-                <ListItem button component={Link} to="/UserPanel">
-                    <ListItemIcon sx={{ color: '#007bff' }}> {/* Kolor ikon - niebieski */}
-                        <AssignmentIcon /> {/* Ikona panelu u¿ytkownika */}
-                    </ListItemIcon>
-                    <ListItemText primary="Tests Managment" sx={{ color: 'white' }} /> {/* Kolor tekstu - bia³y */}
-                </ListItem>
-            </List>
+            {(!user_check || admin_check) && (
+                <List>
+                    {/* Link do Test management */}
+                    <ListItem button component={Link} to="/UserPanel">
+                        <ListItemIcon sx={{ color: '#007bff' }}> {/* Kolor ikon - niebieski */}
+                            <AssignmentIcon /> {/* Ikona panelu u¿ytkownika */}
+                        </ListItemIcon>
+                        <ListItemText primary="Tests Managment" sx={{ color: 'white' }} /> {/* Kolor tekstu - bia³y */}
+                    </ListItem>
+                </List>
+            )}
             <List>
                 {/* Link do User Panel */}
                 <ListItem button component={Link} to="/AccountManager">
@@ -95,16 +97,17 @@ const TemporaryDrawer = ({ open, toggleDrawer, token }) => {
                 </ListItem>
             </List>
 
-               <List>
-                   <ListItem button component={Link} to="/TestToCheck">
-                       <ListItemIcon sx={{ color: '#007bff' }}>
-                           <AssignmentIcon />
-                       </ListItemIcon>
-                       <ListItemText primary="Test To Check" sx={{ color: 'white' }} />
-                   </ListItem>
-               </List>
-
-            {user_check && (
+            {(!user_check || admin_check) && (
+                <List>
+                    <ListItem button component={Link} to="/TestToCheck">
+                        <ListItemIcon sx={{ color: '#007bff' }}>
+                            <AssignmentIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="Test To Check" sx={{ color: 'white' }} />
+                    </ListItem>
+                </List>
+            )}
+            {(user_check || admin_check) && (
                 <List>
                     <ListItem button component={Link} to="/CheckResults">
                         <ListItemIcon sx={{ color: '#007bff' }}>
