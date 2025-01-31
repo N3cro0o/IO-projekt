@@ -52,8 +52,8 @@ namespace IO.Server.Controllers
                                 TotalPoints = reader.GetDouble(2)
                             };
                             userScores.Add(userScore);
+                            Console.WriteLine($"id: {userScore.UserId}, name: {userScore.UserName}, points: {userScore.TotalPoints}");
                         }
-
                         reader.Close(); 
 
                         // Jeœli s¹ wyniki, zapisujemy je do tabeli "Results"
@@ -74,7 +74,10 @@ namespace IO.Server.Controllers
                                     upsertCommand.Parameters.AddWithValue("@Points", score.TotalPoints);
                                     upsertCommand.ExecuteNonQuery();
                                 }
+                                
                             }
+                            
+
                             return Ok(userScores);
                         }
                         else
