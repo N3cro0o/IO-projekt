@@ -1,7 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Npgsql;
+using IO.Server.Elements;
 using System;
 using System.Threading.Tasks;
+using System.Diagnostics;
+using System.Globalization;
+
 
 [Route("api/EditQuestion")]
 [ApiController]
@@ -81,6 +85,45 @@ public class EditQuestionController : ControllerBase
         finally
         {
             await _connection.CloseAsync();
+        }
+    }
+    
+    [HttpPost("franiowanie/question")]
+    public IActionResult EditQuestionByBody([FromBody] Question request)
+    {
+        if (request.IsEmpty())
+        {
+            throw new ArgumentNullException(nameof(request.Name));
+        }
+        Debug.Print("\n\n\n\n\n\n\n\n\n\n\n\n\n1");
+        request.PrintQuestionOnConsole();
+        try
+        {
+            _connection.Open();
+
+            int a = (request.CorrectAnswers & (1 << 3)) >> 3;
+            int b = (request.CorrectAnswers & (1 << 2)) >> 2;
+            int c = (request.CorrectAnswers & (1 << 1)) >> 1;
+            int d = (request.CorrectAnswers & (1 << 0)) >> 0;
+            int shared = request.Shared ? 1 : 0;
+            Debug.Print("\n\n\n\n\n\n\n\n\n\n\n\n\n1");
+            string query_question = $"UPDATE \"Question\" SET name = '{request.Name}', category = '{request.Category}', " +
+                $"questiontype = '{request.QuestionType.ToString().ToLower()}', shared = '{shared}', maxpoints = '{request.Points.ToString(CultureInfo.InvariantCulture)}', questionbody = '{request.Text}', " +
+                $"answer = '{request.Answers}', a = '{a}', b = '{b}', c = '{c}', d = '{d}' WHERE \"questionid\" = '{request.ID}'";
+            var command = new NpgsqlCommand(query_question, _connection);
+            Debug.Print("\n\n\n\n\n\n\n\n\n\n\n\n\n1");
+            command.ExecuteNonQuery();
+            Debug.Print("\n\n\n\n\n\n\n\n\n\n\n\n\n1");
+            return Ok(new { message = "Question updated successfully." });
+        }
+        catch (Exception ex)
+        {
+            Debug.Print(ex.ToString());
+            return StatusCode(500, new { message = "An error occurred while updating the question.", details = ex.Message });
+        }
+        finally
+        {
+            _connection.Close();
         }
     }
 }

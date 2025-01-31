@@ -85,7 +85,7 @@ const EditQuestionModal: React.FC<EditQuestionModalProps> = ({
     onQuestionUpdated,
 }) => {
     const [formData, setFormData] = useState<Question>();
-
+    const [set, setSet] = useState(false);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
 
@@ -129,25 +129,48 @@ const EditQuestionModal: React.FC<EditQuestionModalProps> = ({
                 }
                 setFormData(exitQuestion);
                 setLoading(false);
+                setSet(true);
             }
             catch (err) {
                 console.error(err);
                 setError(err);
             }
         }
-
-        fetchQuestion();
+        if (!set)
+            fetchQuestion();
     },);
 
     const handleSubmit = async () => {
 
         try {
-            const response = await fetch(`/api/EditQuestion/EditQuestionByName/${encodeURIComponent(name)}`, {
-                method: 'PUT',
+            const answ = formData.aText + '\n' + formData.bText + '\n' + formData.cText + '\n' + formData.dText;
+            const key = (formData.a ? 8 : 0) + (formData.b ? 4 : 0) + (formData.c ? 2 : 0) + (formData.d ? 1 : 0);
+            console.log(JSON.stringify({
+                ID: 0,
+                Name: formData.name,
+                Text: formData.questionBody,
+                QuestionType: formData.questionType,
+                Answers: answ,
+                Category: formData.category,
+                Shared: formData.shared,
+                Points: formData.maxPoints,
+                CorrectAnswers: key
+            }));
+            const response = await fetch(`https://localhost:59127/api/EditQuestion/franiowanie/question`, {
+                method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-
+                body: JSON.stringify({
+                    ID: 0,
+                    Name: formData.name,
+                    Text: formData.questionBody,
+                    QuestionType: formData.questionType,
+                    Answers: answ,
+                    Category: formData.category,
+                    Shared: formData.shared,
+                    Points: formData.maxPoints,
+                    CorrectAnswers: key
+                }),
             });
-
             if (!response.ok) {
                 const errorMessage = await response.text();
                 throw new Error(errorMessage);
@@ -344,7 +367,7 @@ const EditQuestionModal: React.FC<EditQuestionModalProps> = ({
                         Cancel
                     </Button>
                     <Button variant="contained" color="primary" onClick={handleSubmit} disabled={loading}>
-                        {loading ? <CircularProgress size={24} sx={{ color: '#fff' }} /> : 'Add'}
+                        {loading ? <CircularProgress size={24} sx={{ color: '#fff' }} /> : 'Update'}
                     </Button>
                 </Box>
             </Box>
