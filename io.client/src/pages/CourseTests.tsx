@@ -143,6 +143,9 @@ const CourseTests: React.FC = () => {
         setArchiveModalOpen(false);
         setCurrentTest(null);
     };
+    const handleCheckResults = (testId: number) => {
+        navigate(`/testResults/${testId}`);
+    };
 
     const confirmArchiveTest = async (archived: boolean) => {
         if (!currentTest) return;
@@ -269,6 +272,14 @@ const CourseTests: React.FC = () => {
                                         >
                                             {test.archived ? 'Unarchive the Test' : 'Archive the Test'}
                                         </Button>
+                                        <Button
+                                            variant="contained"
+                                            color="info"
+                                            onClick={() => handleCheckResults(test.testId)}
+                                        >
+                                            View report
+                                        </Button>
+
                                         <ArchiveTestModal
                                             open={archiveModalOpen}
                                             onClose={closeArchiveModal}
