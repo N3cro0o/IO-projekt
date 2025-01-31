@@ -143,6 +143,7 @@ const EditQuestionModal: React.FC<EditQuestionModalProps> = ({
     const handleSubmit = async () => {
 
         try {
+            const qqidd = localStorage.getItem('questID');
             const answ = formData.aText + '\n' + formData.bText + '\n' + formData.cText + '\n' + formData.dText;
             const key = (formData.a ? 8 : 0) + (formData.b ? 4 : 0) + (formData.c ? 2 : 0) + (formData.d ? 1 : 0);
             console.log(JSON.stringify({
@@ -160,7 +161,7 @@ const EditQuestionModal: React.FC<EditQuestionModalProps> = ({
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    ID: 0,
+                    ID: qqidd,
                     Name: formData.name,
                     Text: formData.questionBody,
                     QuestionType: formData.questionType,
