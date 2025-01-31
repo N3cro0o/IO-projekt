@@ -11,6 +11,7 @@ import EditQuestionModal from '../comps/ModalEditQuestion';
 import ShareQuestionModal from '../comps/ModalShareQuestion';
 import DeleteQuestionModal from '../comps/ModalDeleteQuestion';
 import { ButtonAppBar } from '../comps/AppBar';
+import SharedQuestionModal from '../comps/ModalSharedQuestion';
 
 interface Question {
     QuestionId: number;
@@ -39,7 +40,7 @@ const EditTestPage: React.FC = () => {
     const [shareModalOpen, setShareModalOpen] = useState<boolean>(false);
     const [deleteModalOpen, setDeleteModalOpen] = useState<{ open: boolean; question: Question | null }>({ open: false, question: null });
     const [editModalOpen, setEditModalOpen] = useState<{ open: boolean; question: Question | null }>({ open: false, question: null });
-
+    const [sharedModalOpen, setSharedModalOpen] = useState<boolean>(false);
 
     const fetchQuestions = async () => {
         try {
@@ -123,7 +124,15 @@ const EditTestPage: React.FC = () => {
                         <Button variant="contained" color="success" onClick={() => handleShareQuestion()}>
                             Shared Questions
                         </Button>
+
+                        <Button //Przycisk Add Shared Question 
+                            variant="contained" color="success" onClick={() => setSharedModalOpen(true)}>
+                            Add Shared Question
+                        </Button>
+
                     </Box>
+
+                   
 
                     <Button
                         variant="contained"
@@ -216,6 +225,10 @@ const EditTestPage: React.FC = () => {
                         questions={questions}
                         onShareUpdate={fetchQuestions}
                     />
+                )}
+
+                {sharedModalOpen && ( //£¥CZENIE Z MODALEM SHARED QUESTION
+                    <SharedQuestionModal open={sharedModalOpen} onClose={() => setSharedModalOpen(false)} testId={testId} />
                 )}
 
                 {deleteModalOpen.open && deleteModalOpen.question && (
