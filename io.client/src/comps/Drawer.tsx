@@ -65,7 +65,7 @@ const TemporaryDrawer = ({ open, toggleDrawer, token }) => {
                 </List>
             )}
 
-            {!user_check && (
+            {user_check && (
                 <List>
                     {/* Link do Course Management */}
                     <ListItem button component={Link} to="/CourseManagment">

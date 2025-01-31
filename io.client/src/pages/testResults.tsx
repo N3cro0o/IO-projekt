@@ -65,12 +65,12 @@ const TestResults: React.FC = () => {
             <ButtonAppBar />
             <div style={{ display: 'flex', justifyContent: 'center', padding: '50px' }}>
                 <div>
-                    <h1>Wyniki testu: {testInfo?.testName}</h1>
-                    <p><strong>Kurs:</strong> {courseId}</p>
-                    <p><strong>Liczba uczniów:</strong> {results.length}</p>
-                    <p><strong>Zda³o:</strong> {passedCount}</p>
-                    <p><strong>Nie zda³o:</strong> {failedCount}</p>
-                    <p><strong>Procent zdawalnoœci:</strong> {passRate}%</p>
+                    <h1>Test result: {testInfo?.testName}</h1>
+                    <p><strong>Course:</strong> {courseId}</p>
+                    <p><strong>Students number:</strong> {results.length}</p>
+                    <p><strong>Passed:</strong> {passedCount}</p>
+                    <p><strong>Failed:</strong> {failedCount}</p>
+                    <p><strong>Passed percentage:</strong> {passRate}%</p>
                 </div>
             </div>
         </div>
