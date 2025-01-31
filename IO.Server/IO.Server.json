@@ -853,6 +853,96 @@
         }
       }
     },
+    "/api/SharedQuestion": {
+      "get": {
+        "tags": [
+          "SharedQuestion"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SharedQuestion"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SharedQuestion"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SharedQuestion"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/SharedQuestion/{id}/{testid}": {
+      "patch": {
+        "tags": [
+          "SharedQuestion"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "testid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SharedStatusUpdateRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SharedStatusUpdateRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SharedStatusUpdateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/ShareQuestion/UpdateSharedStatus": {
       "put": {
         "tags": [
@@ -902,6 +992,29 @@
         "parameters": [
           {
             "name": "testID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Question/FRANEKGPT/getID/{questID}": {
+      "get": {
+        "tags": [
+          "Question"
+        ],
+        "parameters": [
+          {
+            "name": "questID",
             "in": "path",
             "required": true,
             "schema": {
@@ -1490,6 +1603,42 @@
           }
         }
       },
+      "SharedQuestion": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string"
+          },
+          "shared": {
+            "type": "boolean"
+          },
+          "addedToTest": {
+            "type": "boolean"
+          }
+        }
+      },
+      "SharedStatusUpdateRequest": {
+        "type": "object",
+        "properties": {
+          "shared": {
+            "type": "boolean"
+          },
+          "addToTest": {
+            "type": "boolean"
+          },
+          "testId": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
       "SharedUpdateRequest": {
         "type": "object",
         "properties": {
@@ -1671,6 +1820,9 @@
     },
     {
       "name": "Registration"
+    },
+    {
+      "name": "SharedQuestion"
     },
     {
       "name": "ShareQuestion"
