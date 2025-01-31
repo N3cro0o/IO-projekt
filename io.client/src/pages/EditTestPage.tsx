@@ -53,6 +53,7 @@ const EditTestPage: React.FC = () => {
             }
 
             const data: Question[] = await response.json();
+            console.log(data);
             setQuestions(data);
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Unknown error');
@@ -75,7 +76,8 @@ const EditTestPage: React.FC = () => {
     const handleCloseAddModal = () => setAddModalOpen(false);
     const handleEditQuestion = (question: Question) => {
         setEditModalOpen({ open: true, question });
-        localStorage.setItem('questID', ''+question.QuestionId);
+        console.log(question.questionId);
+        localStorage.setItem('questID', String(question.questionId));
     };
     const handleShareQuestion = () => setShareModalOpen(true);
 
