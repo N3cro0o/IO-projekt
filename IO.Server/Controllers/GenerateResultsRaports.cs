@@ -310,10 +310,7 @@ namespace IO.Server.Controllers
                     JOIN ""Question"" q ON a.questionid = q.questionid
                     JOIN ""Test"" t ON a.testid = t.testid
                     JOIN ""QuestionToTest"" qtt ON qtt.testid = t.testid AND qtt.questionid = q.questionid
-                    WHERE a.a = false
-                      AND a.b = false
-                      AND a.c = false
-                      AND a.d = false
+                    WHERE q.questiontype='open'
                       AND t.testid = @testId;";
 
                 using (var command = new NpgsqlCommand(query, _connection))
