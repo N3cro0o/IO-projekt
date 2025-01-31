@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
     Box,
     Typography,
@@ -10,17 +9,23 @@ import {
     CircularProgress,
 } from '@mui/material';
 import { ButtonAppBar } from '../comps/AppBar.tsx';
+import DeleteAccountModal from '../comps/ModalDeleteUser.tsx'
+import { useNavigate } from 'react-router-dom';
 
 export const UserProfilePage: React.FC = () => {
     const [userData, setUserData] = useState<any>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [updateError, setUpdateError] = useState<string>('');
     const [updateSuccess, setUpdateSuccess] = useState<string>('');
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const handleOpenModal = () => setIsModalOpen(true);
+    const handleCloseModal = () => setIsModalOpen(false);
     const [fieldToUpdate, setFieldToUpdate] = useState({
         login: '',
         email: '',
         name: '',
         surname: '',
+        Password: '',
     });
     const [passwordData, setPasswordData] = useState({
         currentPassword: '',
@@ -29,8 +34,16 @@ export const UserProfilePage: React.FC = () => {
     });
     const [activeSection, setActiveSection] = useState<string>('login'); // Active section state
 
-    const navigate = useNavigate();
     const userId = localStorage.getItem('userId');
+
+    const navigate = useNavigate();
+    useEffect(() => {
+        window.scrollTo(0, 0);
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+            navigate('/'); // Przekierowanie na stronê g³ówn¹
+        }
+    }, [navigate]);
 
     const fetchUserData = async () => {
         try {
@@ -53,6 +66,7 @@ export const UserProfilePage: React.FC = () => {
                 email: '',
                 name: '',
                 surname: '',
+                Password: '',
             });
         } catch (error) {
             setUpdateError('An error occurred while fetching user data.');
@@ -87,18 +101,27 @@ export const UserProfilePage: React.FC = () => {
                 body: JSON.stringify({
                     fieldName,
                     value: fieldToUpdate[fieldName],
+                    Password: fieldToUpdate.Password
                 }),
             });
 
-            if (!response.ok) {
-                throw new Error(`Failed to update ${fieldName}`);
+            if (response.ok) {
+                setUpdateSuccess(`${fieldName} updated successfully!`);
+                setFieldToUpdate({ ...fieldToUpdate, [fieldName]: '' });
+                await fetchUserData();
             }
-
-            setUpdateSuccess(`${fieldName} updated successfully!`);
-            setFieldToUpdate({ ...fieldToUpdate, [fieldName]: '' });
-            await fetchUserData();
+            else {
+                const errorData = await response.json();
+                if (errorData.message) {
+                    setUpdateError(errorData.message);
+                }
+                else {
+                    setUpdateError(`An error occurred while updating ${fieldName}.`);
+                    throw new Error(`Failed to update ${fieldName}`);
+                }
+            }
         } catch (error) {
-            setUpdateError(`An error occurred while updating ${fieldName}.`);
+                setUpdateError(`An error occurred while updating ${fieldName}.`);
         }
     };
 
@@ -122,26 +145,32 @@ export const UserProfilePage: React.FC = () => {
                 }),
             });
 
-            if (!response.ok) {
-                throw new Error('Failed to update password');
+            if (response.ok) {
+                setUpdateSuccess('Password updated successfully!');
+                setPasswordData({
+                    currentPassword: '',
+                    newPassword: '',
+                    confirmPassword: '',
+                });
+                await fetchUserData();
             }
-
-            setUpdateSuccess('Password updated successfully!');
-            setPasswordData({
-                currentPassword: '',
-                newPassword: '',
-                confirmPassword: '',
-            });
-            await fetchUserData();
+            else {
+                const errorData = await response.json();
+                if (errorData.message) {
+                    setUpdateError(errorData.message);
+                }
+                else {
+                    setUpdateError('An error occurred while updating the password.');
+                    throw new Error(`Failed to update password`);
+                }
+            }
         } catch (error) {
             setUpdateError('An error occurred while updating the password.');
         }
     };
 
-    const handleLogout = () => {
-        localStorage.removeItem('authToken');
-        localStorage.removeItem('userId');
-        navigate('/');
+    const handleDeleteAccount = () => {
+        setIsModalOpen(true);
     };
 
     if (loading) {
@@ -238,6 +267,23 @@ export const UserProfilePage: React.FC = () => {
                         onChange={handleChange}
                         fullWidth
                         sx={{
+                            marginBottom: '8px',
+                            '& .MuiInputLabel-root': { color: 'white' },
+                            '& .MuiInputBase-root': {
+                                backgroundColor: '#333',
+                                color: 'white',
+                            },
+                        }}
+                    />
+                    <TextField
+                        label="Password"
+                        name="Password"
+                        value={fieldToUpdate.Password}
+                        onChange={handleChange}
+                        type="password"
+                        fullWidth
+                        sx={{
+                            marginBottom: '8px',
                             '& .MuiInputLabel-root': { color: 'white' },
                             '& .MuiInputBase-root': {
                                 backgroundColor: '#333',
@@ -304,7 +350,7 @@ export const UserProfilePage: React.FC = () => {
                                         variant="outlined"
                                         sx={{
                                             color: '#fff',
-                                            borderColor: '#007bff',
+                                            borderColor: '#037bff',
                                             '&:hover': { borderColor: '#0056b3' },
                                         }}
                                         onClick={() => setActiveSection(section)}
@@ -325,12 +371,15 @@ export const UserProfilePage: React.FC = () => {
                             '&:hover': { borderColor: '#0056b3' },
                             marginTop: '20px',
                         }}
-                        onClick={handleLogout}
+                        onClick={handleDeleteAccount}
+
                     >
-                        Logout
+                        Delete Account
                     </Button>
                 </Paper>
             </Box>
+            <DeleteAccountModal open={isModalOpen} onClose={handleCloseModal} />
         </div>
+
     );
 };

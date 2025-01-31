@@ -12,6 +12,7 @@ import HomeIcon from '@mui/icons-material/Home'; // Ikona dla ekranu g堯wnego
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import { jwtDecode } from "jwt-decode";
+import AutoAwesomeMosaicIcon from '@mui/icons-material/AutoAwesomeMosaic';
 
 
 const TemporaryDrawer = ({ open, toggleDrawer, token }) => {
@@ -28,7 +29,7 @@ const TemporaryDrawer = ({ open, toggleDrawer, token }) => {
                 admin_check = true;
             }
         } catch (error) {
-            console.error('Piedolony lag muzgu:', error);
+            console.log();
         }
     }
 
@@ -51,20 +52,20 @@ const TemporaryDrawer = ({ open, toggleDrawer, token }) => {
                 </ListItemIcon>
                 <ListItemText primary="Home" sx={{ color: 'white' }} /> {/* Kolor tekstu - bia造 */}
             </ListItem>
-            
+
             {/* Your Courses link */}
             {(user_check || admin_check) && (
                 <List>
                     <ListItem button component={Link} to="/student/courses">
                         <ListItemIcon sx={{ color: '#007bff' }}> {/* Kolor ikon - niebieski */}
-                            <DashboardIcon /> {/* Ikona dashboard */}
+                            <AutoAwesomeMosaicIcon />
                         </ListItemIcon>
                         <ListItemText primary="Your courses" sx={{ color: 'white' }} /> {/* Kolor tekstu - bia造 */}
                     </ListItem>
                 </List>
             )}
-
-            {!user_check && (
+            {/* Course management link */}
+            {(!user_check || admin_check) && (
                 <List>
                     {/* Link do Course Management */}
                     <ListItem button component={Link} to="/CourseManagment">
@@ -75,15 +76,17 @@ const TemporaryDrawer = ({ open, toggleDrawer, token }) => {
                     </ListItem>
                 </List>
             )}
-            <List>
-                {/* Link do User Panel */}
-                <ListItem button component={Link} to="/UserPanel">
-                    <ListItemIcon sx={{ color: '#007bff' }}> {/* Kolor ikon - niebieski */}
-                        <AssignmentIcon /> {/* Ikona panelu u篡tkownika */}
-                    </ListItemIcon>
-                    <ListItemText primary="Tests Managment" sx={{ color: 'white' }} /> {/* Kolor tekstu - bia造 */}
-                </ListItem>
-            </List>
+            {(!user_check || admin_check) && (
+                <List>
+                    {/* Link do Test management */}
+                    <ListItem button component={Link} to="/UserPanel">
+                        <ListItemIcon sx={{ color: '#007bff' }}> {/* Kolor ikon - niebieski */}
+                            <AssignmentIcon /> {/* Ikona panelu u篡tkownika */}
+                        </ListItemIcon>
+                        <ListItemText primary="Tests Managment" sx={{ color: 'white' }} /> {/* Kolor tekstu - bia造 */}
+                    </ListItem>
+                </List>
+            )}
             <List>
                 {/* Link do User Panel */}
                 <ListItem button component={Link} to="/AccountManager">
@@ -93,6 +96,27 @@ const TemporaryDrawer = ({ open, toggleDrawer, token }) => {
                     <ListItemText primary="Account Managment" sx={{ color: 'white' }} /> {/* Kolor tekstu - bia造 */}
                 </ListItem>
             </List>
+
+            {(!user_check || admin_check) && (
+                <List>
+                    <ListItem button component={Link} to="/TestToCheck">
+                        <ListItemIcon sx={{ color: '#007bff' }}>
+                            <AssignmentIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="Test To Check" sx={{ color: 'white' }} />
+                    </ListItem>
+                </List>
+            )}
+            {(user_check || admin_check) && (
+                <List>
+                    <ListItem button component={Link} to="/CheckResults">
+                        <ListItemIcon sx={{ color: '#007bff' }}>
+                            <AssignmentIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="Check Your Results" sx={{ color: 'white' }} />
+                    </ListItem>
+                </List>
+            )}
         </Box>
     );
 

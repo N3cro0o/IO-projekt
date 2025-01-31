@@ -11,7 +11,7 @@ import {
     Container
 } from '@mui/material';
 import { ButtonAppBar } from '../comps/AppBar.tsx';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 interface Question {
     answersClosed: string;
@@ -43,6 +43,13 @@ const StartTest: React.FC = () => {
     const [selectedValues, setSelectedValues] = useState<boolean[]>([false, false, false, false]);
     const [answerText, setAnswerText] = useState<string>("");
 
+    useEffect(() => {
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+            navigate('/'); // Przekierowanie na stronê g³ówn¹
+        }
+    }, [navigate]);
+
     const handleCheckboxChange = (value: number, checked: boolean) => {
         try {
             let data = selectedValues;
@@ -66,6 +73,9 @@ const StartTest: React.FC = () => {
         }
 
         try {
+            const tok = localStorage.getItem('authToken');
+            const decod = jwtDecode(tok);
+
             const response = await fetch('https://localhost:7293/api/TestManager/answer/add/test', {
                 method: 'POST',
                 headers: {
@@ -74,6 +84,7 @@ const StartTest: React.FC = () => {
                 body: JSON.stringify({
                     Text: answ.userAnswer,
                     Test: parseInt(testID),
+                    User: parseInt(decod.certserialnumber),
                     Question: answ.question,
                     Points: answ.points,
                     Key: answ.key,
@@ -121,7 +132,7 @@ const StartTest: React.FC = () => {
     }
 
     useEffect(() => {
-
+        window.scrollTo(0, 0);
         const fetchQuestions = async () => {
             try {
                 const response = await fetch(`https://localhost:59127/api/question/questions/from/${testID}`);
@@ -145,27 +156,25 @@ const StartTest: React.FC = () => {
     if (loading) return <div>Loading...</div>;
     return (
         <div>
-            <div id="loginContainer" style={{ marginTop: '20px' }}>
+            <ButtonAppBar />
+            <div id="loginContainer" style={{ marginTop: '-80px' }}>
                 <Box
                     sx={{
-                        backgroundColor: '#333',
+                        background: 'linear-gradient(135deg, #121212, #1e1e1e)',
                         padding: '32px',
                         margin: 'auto',
-                        width: '90%',
-                        maxWidth: '500px',
+                        width: '80%',
+                        maxWidth: '1000px',
                         borderRadius: '16px',
-                        maxHeight: '90vh',
-                        overflowY: 'auto',
-                        boxShadow: '0px 10px 20px rgba(0, 0, 0, 0.5)',
+                        boxShadow: '0px 10px 30px rgba(0, 0, 0, 0.7)',
                         color: '#fff',
                     }}
                 >
                     <Typography
-                        variant="h5"
+                        variant="h4"
                         fontWeight="bold"
-                        mb={3}
                         textAlign="center"
-                        sx={{ color: '#fff' }}
+                        sx={{ color: 'white' }}
                     >
                         TEST TIME
                     </Typography>
@@ -173,72 +182,79 @@ const StartTest: React.FC = () => {
                     <Typography
                         variant="h5"
                         fontWeight="bold"
-                        mb={3}
                         textAlign="center"
-                        sx={{ color: '#fff' }}
+                        sx={{ color: '#ccc', opacity: 0.9, mt: 2 }}
                     >
                         {question?.text}
                     </Typography>
 
-
-                    {question?.type === 'closed' ? (
-                        <div>
+                    {question?.type === 'closed' && (
+                        <Box mt={3}>
                             {answersClosed.map((answer, i) => (
-                                <Box key={i} display="flex" alignItems="center" gap={2}>
+                                <Box
+                                    key={i}
+                                    display="flex"
+                                    alignItems="center"
+                                    gap={2}
+                                    sx={{
+                                        background: 'rgba(255, 255, 255, 0.1)',
+                                        padding: '12px',
+                                        borderRadius: '8px',
+                                        mb: 2,
+                                        transition: '0.3s',
+                                        '&:hover': { background: 'rgba(255, 255, 255, 0.2)' },
+                                    }}
+                                >
                                     <Checkbox
                                         onChange={(e) => handleCheckboxChange(i, e.target.checked)}
-                                        sx={{ color: '#fff', '&.Mui-checked': { color: '#007bff' } }}
+                                        sx={{
+                                            color: '#fff',
+                                            '&.Mui-checked': { color: '#00e6e6' },
+                                        }}
                                     />
-                                    <Typography
-                                        variant="h6"
-                                        sx={{ color: '#fff' }}
-                                    >
+                                    <Typography variant="h6" sx={{ color: '#fff' }}>
                                         {answer}
                                     </Typography>
                                 </Box>
                             ))}
-                        </div>
+                        </Box>
+                    )}
 
-                    ) : question?.type === 'open' ? (
-                        <div>
-                            <Typography
-                                variant="h5"
-                                fontWeight="bold"
-                                mb={3}
-                                textAlign="center"
-                                sx={{ color: '#fff' }}>
-                                Answer below
-                            </Typography>
+                    {question?.type === 'open' && (
+                        <TextField
+                            label="Your answer"
+                            fullWidth
+                            margin="normal"
+                            variant="outlined"
+                            onChange={(e) => setAnswerText(e.target.value)}
+                            value={answerText || ''}
+                            sx={{
+                                backgroundColor: '#222',
+                                borderRadius: '8px',
+                                input: { color: '#fff' },
+                                label: { color: '#bbb' },
+                                '& fieldset': { borderColor: '#00e6e6' },
+                            }}
+                        />
+                    )}
 
-                            <TextField
-                                label="Answer"
-                                fullWidth
-                                margin="normal"
-                                variant="outlined"
-                                onChange={(e) => setAnswerText(e.target.value)}
-                                value={answerText || ''}
-                                sx={{
-                                    mb: 2,
-                                    backgroundColor: '#444',
-                                    borderRadius: 1,
-                                    input: { color: '#fff' },
-                                    label: { color: '#aaa' },
-                                }}
-                            />
-                        </div>
-                    ) : (<div />)}
-
-                    <Box display="flex" justifyContent="space-between">
+                    <Box display="flex" justifyContent="center" mt={4}>
                         <Button
                             variant="contained"
-                            color="primary"
                             onClick={advanceQuestion}
-                            sx={{ backgroundColor: '#007bff', '&:hover': { backgroundColor: '#0056b3' } }}
+                            sx={{
+                                background: 'linear-gradient(135deg, #00e6e6, #0072ff)',
+                                padding: '12px 24px',
+                                borderRadius: '10px',
+                                fontSize: '1.1rem',
+                                '&:hover': { background: 'linear-gradient(135deg, #0072ff, #00e6e6)' },
+                            }}
                         >
                             Next question
                         </Button>
                     </Box>
                 </Box>
+
             </div >
         </div >);
 }

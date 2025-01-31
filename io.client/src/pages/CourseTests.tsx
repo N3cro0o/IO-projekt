@@ -11,7 +11,9 @@ import {
 } from '@mui/material';
 import { ButtonAppBar } from '../comps/AppBar.tsx';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
-import ModalAddTest from '../comps/ModalAddTests'; // Importujemy modal do dodawania testów
+import ModalAddTest from '../comps/modalAddTests'; // Importujemy modal do dodawania testów
+import ArchiveTestModal from '../comps/ModalArchiveTest';
+
 
 interface Test {
     testId: number;
@@ -20,6 +22,7 @@ interface Test {
     endTime: string;
     category: string;
     courseId: number;
+    archived: boolean;
 }
 
 const formatDate = (dateString: string): string => {
@@ -43,6 +46,7 @@ const CourseTests: React.FC = () => {
     const [modalOpen, setModalOpen] = useState(false); // Zarz¹dzanie stanem modala do testów
 
     useEffect(() => {
+        window.scrollTo(0, 0);
         const fetchTests = async () => {
             try {
                 const response = await fetch(`https://localhost:59127/api/TestManager/TestsList/${courseId}/tests`);
@@ -116,9 +120,7 @@ const CourseTests: React.FC = () => {
         navigate(`/course/${courseId}/test/${testId}/set-time`);
     };
 
-    const handleCheckResults = (testId: number) => {
-        navigate(`/course/${courseId}/test/${testId}/results`);
-    };
+
 
     const handleAddTest = (newTest: Test) => {
         setTests((prevTests) => [...prevTests, newTest]);
@@ -127,6 +129,54 @@ const CourseTests: React.FC = () => {
     const handleEditTest = (testId: number) => {
         navigate(`/course/${courseId}/test/${testId}/edit`);
     };
+
+
+    const [archiveModalOpen, setArchiveModalOpen] = useState(false);
+    const [currentTest, setCurrentTest] = useState<Test | null>(null);
+
+    const openArchiveModal = (test: Test) => {
+        setCurrentTest(test);
+        setArchiveModalOpen(true);
+    };
+
+    const closeArchiveModal = () => {
+        setArchiveModalOpen(false);
+        setCurrentTest(null);
+    };
+    const handleCheckResults = (testId: number) => {
+        navigate(`/testResults/${testId}`);
+    };
+
+    const confirmArchiveTest = async (archived: boolean) => {
+        if (!currentTest) return;
+
+        try {
+            const response = await fetch(`https://localhost:59127/api/ArchiveTest/ArchiveTest/${currentTest.testId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ archived }), // Wysy³amy tylko status archiwizacji
+            });
+
+            if (response.ok) {
+                setTests((prevTests) =>
+                    prevTests.map((test) =>
+                        test.testId === currentTest.testId ? { ...test, archived } : test
+                    )
+                );
+            } else {
+                console.error(`Failed to archive test: ${response.status}`);
+            }
+        } catch (error) {
+            console.error('Error archiving test:', error);
+        } finally {
+            closeArchiveModal();
+        }
+    };
+
+
+
 
     return (
         <div>
@@ -213,6 +263,15 @@ const CourseTests: React.FC = () => {
                                         >
                                             Edit Test
                                         </Button>
+                                       
+
+                                        <Button
+                                            variant="contained"
+                                            color={test.archived ? 'warning' : 'null'}
+                                            onClick={() => openArchiveModal(test)}
+                                        >
+                                            {test.archived ? 'Unarchive the Test' : 'Archive the Test'}
+                                        </Button>
                                         <Button
                                             variant="contained"
                                             color="info"
@@ -220,6 +279,14 @@ const CourseTests: React.FC = () => {
                                         >
                                             View report
                                         </Button>
+
+                                        <ArchiveTestModal
+                                            open={archiveModalOpen}
+                                            onClose={closeArchiveModal}
+                                            onConfirm={confirmArchiveTest}
+                                            testName={currentTest?.name || ''}
+                                            isArchived={currentTest?.archived || false}
+                                        />
                                     </Box>
                                 </CardContent>
                             </Card>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -26,6 +26,15 @@ export const Registration = () => {
         password: '',
     });
     const navigate = useNavigate();
+
+    // Sprawdzenie, czy u¿ytkownik jest ju¿ zalogowany
+    useEffect(() => {
+        window.scrollTo(0, 0);
+        const token = localStorage.getItem('authToken');
+        if (token) {
+            navigate('/'); // Przekierowanie na stronê g³ówn¹
+        }
+    }, [navigate]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -90,7 +99,19 @@ export const Registration = () => {
                 navigate('/loginPage');
             } else {
                 const errorData = await response.json();
-                setError(errorData.Message || 'Error during registration');
+                console.log(errorData);
+                if (errorData.message === "Login already in use") {
+                    setErrorFields(prev => ({ ...prev, login: errorData.message }));
+                }
+
+                if (errorData.message === "Email already in use") {
+                    setErrorFields(prev => ({ ...prev, email: errorData.message }));
+                }
+
+                if (errorData.message === "Password should have 8 letters, 1 big letter and special character") {
+                    setErrorFields(prev => ({ ...prev, password: errorData.message }));
+                }
+                setError('Error during registration');
             }
         } catch (error) {
             console.log(error);

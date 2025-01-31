@@ -15,33 +15,33 @@ public class DeleteQuestionController : ControllerBase
     }
 
     // Metoda do usuwania pytania po jego nazwie
-    [HttpDelete("DeleteQuestionByName/{questionName}")]
-    public ActionResult DeleteQuestionByName(string questionName)
+    [HttpDelete("DeleteQuestionById/{questionId}")]
+    public ActionResult DeleteQuestionByName(int questionId)
     {
         try
         {
             // Otwieranie połączenia z bazą danych
             _connection.Open();
 
-            const string query = @"DELETE FROM ""Question"" WHERE name = @QuestionName";
+            const string query = @"DELETE FROM ""Question"" WHERE questionid = @QuestionId";
 
             // Przygotowanie i wykonanie zapytania SQL
             using (var command = new NpgsqlCommand(query, _connection))
             {
-                command.Parameters.AddWithValue("@QuestionName", questionName);
+                command.Parameters.AddWithValue("@QuestionId", questionId);
 
                 int rowsAffected = command.ExecuteNonQuery();
 
                 // Jeśli brak wierszy do usunięcia, zwróć 404
                 if (rowsAffected == 0)
                 {
-                    return NotFound(new { message = $"No question found with name '{questionName}'." });
+                    return NotFound(new { message = $"Question not found" });
                 }
             }
 
             // Logowanie i zwrócenie odpowiedzi sukcesu
-            Console.WriteLine($"Question with name '{questionName}' was successfully deleted.");
-            return Ok(new { message = $"Question with name '{questionName}' has been deleted." });
+            Console.WriteLine($"Question was successfully deleted.");
+            return Ok(new { message = $"Question has been deleted." });
         }
         catch (Exception ex)
         {

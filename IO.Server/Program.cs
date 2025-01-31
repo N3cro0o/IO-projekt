@@ -21,7 +21,7 @@ namespace IO.Server
             builder.Services.AddScoped<NpgsqlConnection>(provider =>
             {
                 // Connection string do bazy danych PostgreSQL
-                var connectionString = "Host=localhost; Port = 5432; Database = TesatWiezy; User Id = postgres; Password = 12345;";
+                var connectionString = "Host=localhost; Port=5432; Database=TesatyWiezyV2; User Id=postgres; Password=admin;";
                 return new NpgsqlConnection(connectionString);
             });
 

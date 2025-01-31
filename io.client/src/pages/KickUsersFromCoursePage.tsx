@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Checkbox, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 interface User {
     id: number;
@@ -15,8 +16,15 @@ const ChangeUserList: React.FC<UserListProps & { onUsersRemoved: () => void }> =
     const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [selectedUserIds, setSelectedUserIds] = useState<Set<number>>(new Set());
+    const navigate = useNavigate();
 
     useEffect(() => {
+
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+            navigate('/'); // Przekierowanie na stronê g³ówn¹
+        }
+
         const fetchUsers = async () => {
             try {
                 const response = await fetch('https://localhost:7293/api/CoursesManager/KickUsersList/' + courseId);

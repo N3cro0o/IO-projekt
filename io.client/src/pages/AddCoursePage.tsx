@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState} from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
@@ -10,6 +10,7 @@ interface AddCourseProps {
     handleClose: () => void;
     refreshCourses: () => void;
 }
+
 
 export const AddCourse: React.FC<AddCourseProps> = ({ ownerId, handleClose, refreshCourses }) => {
     const [formData, setFormData] = useState({
@@ -82,7 +83,13 @@ export const AddCourse: React.FC<AddCourseProps> = ({ ownerId, handleClose, refr
                 refreshCourses(); // Odœwie¿enie listy kursów
                 handleClose(); // Zamykanie modala po pomyœlnym dodaniu kursu
             } else {
-                setError('Failed to create the course');
+                const errorData = await response.json();
+                if (errorData.message) {
+                    setError(errorData.message);
+                }
+                else {
+                    setError('Failed to create the course');
+                }
             }
         } catch (error) {
             setError('Error while creating the course');

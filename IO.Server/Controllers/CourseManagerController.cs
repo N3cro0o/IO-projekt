@@ -41,7 +41,7 @@ namespace IO.Server.Controllers
                         string userNameF = reader.GetString(2);
                         string userNameL = reader.GetString(3);
                         string cat = reader.GetString(4);
-                        userNameF += userNameL;
+                        userNameF += " " + userNameL;
 
                         courses.Add(new Course(courseID, courseName, cat, userNameF));
                     }
@@ -121,20 +121,35 @@ namespace IO.Server.Controllers
         {
             try
             {
-
                 _connection.Open();
 
-                // Insert the new course into the database
-                string query = "INSERT INTO \"Course\" (name, category, description, ownerid) VALUES (@name, @category, @description, @ownerid)";
+                // Sprawdzenie, czy kurs o takiej samej nazwie już istnieje dla danego ownerid
+                string checkQuery = "SELECT COUNT(*) FROM \"Course\" WHERE name = @name AND ownerid = @ownerid";
 
-                using (var command = new NpgsqlCommand(query, _connection))
+                using (var checkCommand = new NpgsqlCommand(checkQuery, _connection))
                 {
-                    command.Parameters.AddWithValue("@name", course.Name);
-                    command.Parameters.AddWithValue("@category", course.Category);
-                    command.Parameters.AddWithValue("@description", course.Description);
-                    command.Parameters.AddWithValue("@ownerid", course.OwnerId);
+                    checkCommand.Parameters.AddWithValue("@name", course.Name);
+                    checkCommand.Parameters.AddWithValue("@ownerid", course.OwnerId);
 
-                    int rowsAffected = command.ExecuteNonQuery();
+                    int existingCourses = Convert.ToInt32(checkCommand.ExecuteScalar());
+
+                    if (existingCourses > 0)
+                    {
+                        return BadRequest(new { message = "Courses names should be different." });
+                    }
+                }
+
+                // Wstawienie nowego kursu, jeśli nie istnieje inny o tej samej nazwie
+                string insertQuery = "INSERT INTO \"Course\" (name, category, description, ownerid) VALUES (@name, @category, @description, @ownerid)";
+
+                using (var insertCommand = new NpgsqlCommand(insertQuery, _connection))
+                {
+                    insertCommand.Parameters.AddWithValue("@name", course.Name);
+                    insertCommand.Parameters.AddWithValue("@category", course.Category);
+                    insertCommand.Parameters.AddWithValue("@description", course.Description);
+                    insertCommand.Parameters.AddWithValue("@ownerid", course.OwnerId);
+
+                    int rowsAffected = insertCommand.ExecuteNonQuery();
 
                     if (rowsAffected > 0)
                     {

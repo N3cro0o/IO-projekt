@@ -4,6 +4,8 @@ using Microsoft.Extensions.Configuration;
 using Npgsql;
 using System.Data;
 using System.Text.RegularExpressions;
+using System.Transactions;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace IO.Server.Controllers
 {
@@ -104,9 +106,9 @@ namespace IO.Server.Controllers
         {
             try
             {
-                if (string.IsNullOrEmpty(request.FieldName) || string.IsNullOrEmpty(request.Value))
+                if (string.IsNullOrEmpty(request.FieldName) || string.IsNullOrEmpty(request.Value) || string.IsNullOrEmpty(request.Password))
                 {
-                    return BadRequest(new { message = "Invalid request data." });
+                    return BadRequest(new { message = "Invalid request data. Password is required." });
                 }
 
                 // Lista dozwolonych pól
@@ -121,7 +123,7 @@ namespace IO.Server.Controllers
                 {
                     if (!IsUniqueLogin(request.Value))
                     {
-                        return BadRequest(new { message = "Login is already taken." });
+                        return BadRequest(new { message = "Login already in use." });
                     }
                 }
                 else if (request.FieldName == "email")
@@ -137,17 +139,30 @@ namespace IO.Server.Controllers
                     }
                 }
 
-
-
-                string query = $"UPDATE \"User\" SET \"{request.FieldName}\" = @Value WHERE userid = @UserId";
-
+                // Pobranie aktualnego hasła użytkownika
+                string query = "SELECT password FROM \"User\" WHERE userid = @UserId";
                 _connection.Open();
                 using (var command = new NpgsqlCommand(query, _connection))
                 {
-                    command.Parameters.AddWithValue("@Value", request.Value);
                     command.Parameters.AddWithValue("@UserId", userId);
+                    var storedPassword = command.ExecuteScalar()?.ToString();
 
-                    int rowsAffected = command.ExecuteNonQuery();
+                    if (storedPassword == null || !VerifyPassword(request.Password, storedPassword))
+                    {
+                        _connection.Close();
+                        return Unauthorized(new { message = "Incorrect password." });
+                    }
+                }
+
+                // Aktualizacja pola użytkownika
+                string updateQuery = $"UPDATE \"User\" SET \"{request.FieldName}\" = @Value WHERE userid = @UserId";
+                using (var updateCommand = new NpgsqlCommand(updateQuery, _connection))
+                {
+                    updateCommand.Parameters.AddWithValue("@Value", request.Value);
+                    updateCommand.Parameters.AddWithValue("@UserId", userId);
+
+                    int rowsAffected = updateCommand.ExecuteNonQuery();
+                    _connection.Close();
 
                     if (rowsAffected > 0)
                     {
@@ -171,6 +186,7 @@ namespace IO.Server.Controllers
                 }
             }
         }
+
 
         [HttpPut("changePassword/{userId}")]
         public IActionResult ChangePassword(int userId, [FromBody] ChangePasswordRequest request)
@@ -199,7 +215,7 @@ namespace IO.Server.Controllers
                     // Sprawdzenie poprawności starego hasła
                     if (storedPassword == null || !VerifyPassword(request.OldPassword, storedPassword))
                     {
-                        return Unauthorized(new { message = "Old password is incorrect." });
+                        return Unauthorized(new { message = "Current password is incorrect." });
                     }
 
                     // Haszowanie nowego hasła
@@ -238,6 +254,69 @@ namespace IO.Server.Controllers
             }
         }
 
+        [HttpDelete("DeleteAccount/{userId}")]
+        public IActionResult DeleteAccount(int userId, [FromBody] DeleteAccountRequest request)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(request.Password))
+                {
+                    return BadRequest(new { message = "Password is required." });
+                }
+
+                string query = "SELECT password FROM \"User\" WHERE userid = @UserId";
+                _connection.Open();
+                using (var command = new NpgsqlCommand(query, _connection))
+                {
+                    command.Parameters.AddWithValue("@UserId", userId);
+                    var storedPassword = command.ExecuteScalar()?.ToString();
+
+                    if (storedPassword == null || !VerifyPassword(request.Password, storedPassword))
+                    {
+                        _connection.Close();
+                        return Unauthorized(new { message = "Incorrect password." });
+                    }
+                }
+
+                // Usuwanie kursu
+                string deleteCourseQuery = "DELETE FROM \"Course\" WHERE ownerid = @ownerid";
+                using (var deleteCourseCommand = new NpgsqlCommand(deleteCourseQuery, _connection))
+                {
+                    deleteCourseCommand.Parameters.AddWithValue("@ownerid", userId);
+                    int rowsAffected = deleteCourseCommand.ExecuteNonQuery();
+                }
+
+                // Usunięcie konta
+                string deleteQuery = "DELETE FROM \"User\" WHERE userid = @UserId";
+                using (var deleteCommand = new NpgsqlCommand(deleteQuery, _connection))
+                {
+                    deleteCommand.Parameters.AddWithValue("@UserId", userId);
+                    int rowsAffected = deleteCommand.ExecuteNonQuery();
+                    _connection.Close();
+
+                    if (rowsAffected > 0)
+                    {
+                        return Ok(new { message = "Account deleted successfully." });
+                    }
+                    else
+                    {
+                        return NotFound(new { message = "User not found." });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred.", details = ex.Message });
+            }
+            finally
+            {
+                if (_connection.State == ConnectionState.Open)
+                {
+                    _connection.Close();
+                }
+            }
+        }
+
         private bool IsValidPassword(string password)
         {
             if (password.Length < 8)
@@ -260,11 +339,15 @@ namespace IO.Server.Controllers
             public string OldPassword { get; set; }
             public string NewPassword { get; set; }
         }
+
+
         public class UpdateFieldRequest
         {
             public string FieldName { get; set; }
             public string Value { get; set; }
+            public string Password { get; set; } // Nowe pole - wymagane hasło użytkownika
         }
+
 
         public class UserData
         {
@@ -274,6 +357,11 @@ namespace IO.Server.Controllers
             public string Surname { get; set; }
             public string Email { get; set; }
             public string Role { get; set; }
+        }
+
+        public class DeleteAccountRequest
+        {
+            public string Password { get; set; }
         }
     }
 }

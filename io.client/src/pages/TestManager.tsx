@@ -16,6 +16,11 @@ const UserPanel: React.FC = () => {
     const navigate = useNavigate(); // Hook do nawigacji
 
     useEffect(() => {
+        window.scrollTo(0, 0);
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+            navigate('/'); // Przekierowanie na stronê g³ówn¹
+        }
         const userId = localStorage.getItem('userId');
         console.log('User ID from localStorage:', userId);
 
@@ -48,7 +53,7 @@ const UserPanel: React.FC = () => {
                     Select course to manage tests:
                 </Typography>
                 {courses.length === 0 ? (
-                    <Typography variant="h6">Lack of courses added</Typography>
+                    <Typography variant="h6" color="red">Lack of courses added</Typography>
                 ) : (
                     <Grid container spacing={3}>
                         {courses.map((course) => (

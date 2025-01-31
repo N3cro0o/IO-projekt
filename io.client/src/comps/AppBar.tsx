@@ -42,15 +42,12 @@ export function ButtonAppBar() {
     useEffect(() => {
         const token = localStorage.getItem('authToken');
         if (token) {
-            setIsLoggedIn(true); // Je¿eli token istnieje, u¿ytkownik jest zalogowany
-            console.log('AppBar\n' + token);
+            setIsLoggedIn(true);
             setToken(token);
-            console.log('Hook\n' + tokenJwt);
-            //const d = jwtDecode(tokenJwt);
-            //console.log(d);
         } else {
-            setIsLoggedIn(false); // Jeœli token nie istnieje, u¿ytkownik nie jest zalogowany
+            setIsLoggedIn(false); 
         }
+
     }, [tokenJwt]);
 
     return (
